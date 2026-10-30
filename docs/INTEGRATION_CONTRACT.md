@@ -4,7 +4,7 @@ Bu belge Ekip A (şehir ve 3D) ile Ekip B (simülasyon ve arayüz) arasındaki t
 İki taraf birbirinin koduna yalnızca burada yazan sinyaller, fonksiyonlar ve veri şekilleri üzerinden dokunur.
 Burada yazmayan bir şeye güvenen kod, sözleşme dışıdır.
 
-Sürüm: **v1.3** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
+Sürüm: **v1.4** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
 
 ---
 
@@ -46,7 +46,7 @@ Sürüm: **v1.3** (2026-10-31). Her değişiklikte sürümü artırın ve en alt
 | `build_rejected` | `plot_id: StringName, building_id: StringName, reason: StringName` | B · `GameController` | B · `BuildPanel` |
 | `plot_deselect_requested` (v1.3) | yok | B · `BuildPanel` (kapat düğmesi, Esc) | A · `CityWorld` → seçimi bırakır ve `plot_deselected` yayar |
 
-`reason` değerleri: `&"not_enough_credits"`, `&"plot_occupied"`, `&"wrong_plot_kind"`, `&"max_count_reached"`, `&"wrong_phase"`, `&"unknown_building"`.
+`reason` değerleri: `&"not_enough_credits"`, `&"plot_occupied"`, `&"wrong_plot_kind"`, `&"max_count_reached"`, `&"wrong_phase"`, `&"unknown_building"`, v1.4: `&"scene_unavailable"` (bina sahnesi yüklenemiyor), `&"unknown_plot"` (bu oturumda `plot_selected` ile bildirilmemiş arsa).
 
 ### 3.2 Durum ve tur
 
@@ -195,6 +195,8 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
 
 1. `phase == &"build"` mi? Değilse `wrong_phase`.
 2. Tanım var mı? Yoksa `unknown_building`.
+2a. (v1.4) Tanımın `scene` alanı yüklenebilir mi? Değilse `scene_unavailable`.
+2b. (v1.4) Arsa `plot_selected` ile bildirilmiş mi? Değilse `unknown_plot`.
 3. Arsa boş mu (`GameState.get_building_on`)? Değilse `plot_occupied`.
 4. `plot_kind` izinli mi? Değilse `wrong_plot_kind`. (Plot türünü `plot_selected` anında `GameController` de dinleyip saklar.)
 5. Bu binadan `max_count` kadar var mı? Varsa `max_count_reached`.
@@ -302,6 +304,7 @@ MVP üçlüsü: `solar_plant`, `water_storage`, `green_park`.
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
 | v1.0 | 2026-10-30 | İlk sürüm. |
+| v1.4 | 2026-10-31 | Ekleme: iki ret nedeni (`scene_unavailable`, `unknown_plot`). Sinyal değişikliği yok; A ret nedenlerini kullanmaz. |
 | v1.3 | 2026-10-31 | Ekleme: `plot_deselect_requested` sinyali. Neden: panel kapanınca arsa vurgusu kalıyordu. A onayladı. |
 | v1.2 | 2026-10-31 | Ekleme: `stats` içine enerji ve su akışları (5 anahtar). Sinyal değişikliği yok, A etkilenmez. |
 | v1.1 | 2026-10-30 | Ekleme: `report.missions`, `summary.emission_reduction_pct`. Yalnızca B'nin YearReport'u kullanır; sinyal değişikliği yok, A etkilenmez. |
