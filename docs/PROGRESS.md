@@ -3,7 +3,7 @@
 Her ekip yalnızca kendi bölümündeki kutuları işaretler. Ortak bölümlere satır **eklenir**, var olan satır silinmez.
 İşaret: `[ ]` yapılmadı, `[~]` sürüyor, `[x]` bitti ve kendi dalında çalışıyor, `[D]` develop'a birleşti.
 
-Son güncelleme: 2026-10-30 · Aşama: **Gün 2, Ekip B işleri bitti (yerelde), Ekip A bekleniyor**
+Son güncelleme: 2026-10-30 · Aşama: **Gün 3, Ekip B işleri bitti; entegrasyon için Ekip A bekleniyor**
 Repo: https://github.com/isikramazanoglu/antalya-2040 (gizli)
 
 ---
@@ -81,16 +81,31 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 Öğlen 12:00 özellik dondurma. Sonrası yalnızca hata düzeltme ve denge.
 
 - [ ] A: ışık/gölge cilası, kamera hissi, performans testi
-- [ ] B: denge (2–3 tam oyun), görevler (vakit kalırsa), arayüz teması
+- [x] B: denge (5 stratejili simülasyon, GAME_DESIGN §9), görevler (4 görev), arayüz teması (ilerleme çubukları)
 - [ ] Birlikte: uçtan uca test, Windows export, `main`'e son birleştirme, `v1.0` etiketi
-- [ ] Sunum için 2 dakikalık demo senaryosu (sabit seed)
+- [x] Sunum için 2 dakikalık demo senaryosu (aşağıda; krizler sabit yıllı, seed gerekmez)
 
 ---
+
+### Demo senaryosu (2 dakika, script ile doğrulandı)
+
+1. Ana menü → **Yeni oyun**.
+2. 2040: O01'e **Güneş enerjisi tesisi**, U01'e **Yeşil park**. Bilgi kartını göster. → **Yılı bitir**, raporda emisyon düşüşü.
+3. 2041: O02'ye **Su depolama**. → Yılı bitir.
+4. 2042: Yılı bitir. Raporda **2043 sıcak hava dalgası uyarısı**; HUD'da uyarı satırı.
+5. 2043: U02'ye **İklim serinleme merkezi** (hazırlık). → Yılı bitir → **kriz paneli**: "Yatırımların hasarı %60 azaltacak". "Serinleme alanlarını aç" seç. Raporda hasar yalnızca −84 kredi.
+6. **İklim Laboratuvarı**: Yerel emisyonlar grafiği → Küresel CO2 (NOAA ölçümü, "şehrin bu eğriyi tek başına değiştiremez") → Yerel riskler.
+
+### Gün 3 notları (B)
+- Emisyon bonusu kişi başı emisyona göre (büyüyen şehir cezalandırılmıyor).
+- Sözleşme v1.1: rapora `missions`, final özetine `emission_reduction_pct` eklendi (yalnızca ekleme, A etkilenmez).
+- `export_presets.cfg` hazır; Windows export'u için 4.7.2 şablonları gerekir.
 
 ## Sözleşme değişiklik talepleri
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |
 |---|---|---|---|---|
+| 2026-10-30 | B | v1.1: `report.missions`, `summary.emission_reduction_pct` (ekleme) | B içi, A etkilenmez | Yapıldı |
 
 ## Entegrasyon günlüğü
 

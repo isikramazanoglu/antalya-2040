@@ -92,4 +92,17 @@ func _run() -> void:
 	var report: Dictionary = _last("year_ended")[1]
 	_check(report.crisis_results.size() == 1, "rapor kriz sonucunu içeriyor")
 	_check(report.stats_before.credits == credits_before and report.stats_before.population == pop_before, "rapor kriz öncesi değerlerden başlıyor")
+
+	print("Görevler (MissionTracker)")
+	var missions: Array[MissionDefinition] = root.get_node("Catalog").data.missions
+	var base := {"year": 2044, "water_security": 80.0, "quality_of_life": 50.0, "emissions_total": 84.0, "ecosystem_health": 60.0}
+	var r := MissionTracker.evaluate(missions, base, {})
+	_check(r.completed.has(&"water_75") and r.completed.has(&"emissions_85"), "su 80 ve emisyon 84 görevleri tamam")
+	_check(r.reward == 250, "ödül 100 + 150 = 250")
+	_check(not r.completed.has(&"quality_70") and r.failed.is_empty(), "yaşam görevi sürüyor, kaçan yok")
+	base.year = 2045
+	base.water_security = 70.0
+	r = MissionTracker.evaluate(missions, base, {&"emissions_85": &"done"})
+	_check(r.failed == [&"water_75"], "2045'te su 70 ise görev kaçtı")
+	_check(not r.completed.has(&"emissions_85"), "tamamlanan görev tekrar ödül vermiyor")
 	print("SONUÇ: ", "TAMAM" if _fail == 0 else "%d HATA" % _fail)

@@ -74,6 +74,10 @@ func apply_climate(climate: Dictionary) -> void:
 	GameState.set_climate(climate)
 
 
+func set_mission_state(mission_id: StringName, state: StringName) -> void:
+	GameState.set_mission_state(mission_id, state)
+
+
 func add_pending(warning: Dictionary) -> void:
 	GameState.add_pending(warning)
 

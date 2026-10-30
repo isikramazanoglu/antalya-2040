@@ -40,6 +40,11 @@ func _on_year_ended(report: Dictionary) -> void:
 		t += "\n[b]Kriz[/b]\n%s\n" % result.summary_text
 		for key in result.damage:
 			t += "%s  %s\n" % [UiText.STAT_NAMES.get(key, key), UiText.format_delta(result.damage[key])]
+	for id in report.missions.completed:
+		var m := _mission(id)
+		t += "\n[color=#4dd9d1][b]Görev tamamlandı:[/b] %s (+%d kredi)[/color]\n" % [m.title, m.reward_credits]
+	for id in report.missions.failed:
+		t += "\n[color=#ff8c73][b]Görev kaçtı:[/b] %s[/color]\n" % _mission(id).title
 	for w in report.new_warnings:
 		var def := Catalog.get_event(w.event_id)
 		t += "\n[color=#ffbf66][b]Uyarı:[/b] %d sonunda %s bekleniyor. Hazırlanmak için bir yılın var.[/color]\n" % [w.due_year, def.display_name]
@@ -52,7 +57,9 @@ func _on_game_over(summary: Dictionary) -> void:
 	_game_over = true
 	var s: Dictionary = summary.final_stats
 	%Title.text = "2052 · Şehrin geleceği"
-	var t := "[b]Puan: %d[/b]\n[b]%s[/b]\n\n" % [summary.score, summary.grade]
+	var t := "[b]Puan: %d[/b]\n[b]%s[/b]\nKişi başı emisyon azalması: %%%d\nTamamlanan görev: %d / %d\n\n" % [
+		summary.score, summary.grade, summary.emission_reduction_pct,
+		GameState.missions.values().count(&"done"), Catalog.data.missions.size()]
 	for key in REPORT_STATS:
 		t += "%s  %s\n" % [UiText.STAT_NAMES[key], UiText.format_value(s[key])]
 	%Body.text = t
@@ -66,3 +73,10 @@ func _on_continue_pressed() -> void:
 		return
 	hide()
 	EventBus.report_closed.emit()
+
+
+func _mission(id: StringName) -> MissionDefinition:
+	for m in Catalog.data.missions:
+		if m.id == id:
+			return m
+	return null

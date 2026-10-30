@@ -22,11 +22,17 @@
 [ext_resource type="Resource" path="res://data/events/drought.tres" id="18_5u5l8"]
 [ext_resource type="Resource" path="res://data/events/coastal_flood.tres" id="19_lcsjk"]
 [ext_resource type="Resource" path="res://data/cards/lab_local_vs_global.tres" id="21_vx4vr"]
+[ext_resource type="Script" path="res://scripts/data/mission_definition.gd" id="22_wvss8"]
+[ext_resource type="Resource" path="res://data/missions/water_75.tres" id="23_0uqn3"]
+[ext_resource type="Resource" path="res://data/missions/quality_70.tres" id="24_5q4dk"]
+[ext_resource type="Resource" path="res://data/missions/emissions_85.tres" id="25_l2ssu"]
+[ext_resource type="Resource" path="res://data/missions/ecosystem_65.tres" id="26_kruv5"]
 
 [resource]
 script = ExtResource("1_catalog")
 buildings = Array[ExtResource("2_glnki")]([ExtResource("3_8yuay"), ExtResource("3_lou8d"), ExtResource("5_sq7co"), ExtResource("4_8ik4w"), ExtResource("7_gpcun"), ExtResource("5_yp22b"), ExtResource("9_ri6n3"), ExtResource("10_n75ka"), ExtResource("11_wvss8"), ExtResource("12_0uqn3"), ExtResource("13_5q4dk"), ExtResource("14_l2ssu")])
 events = Array[ExtResource("6_g3anq")]([ExtResource("17_7671r"), ExtResource("18_5u5l8"), ExtResource("19_lcsjk")])
 lab_cards = Array[ExtResource("7_885by")]([ExtResource("21_vx4vr")])
+missions = Array[ExtResource("22_wvss8")]([ExtResource("23_0uqn3"), ExtResource("24_5q4dk"), ExtResource("25_l2ssu"), ExtResource("26_kruv5")])
 balance = ExtResource("2_balance")
 co2 = ExtResource("15_kruv5")

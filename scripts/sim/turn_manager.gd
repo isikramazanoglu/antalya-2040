@@ -6,7 +6,7 @@ extends Node
 
 @onready var controller: GameController = get_parent()
 
-var _start_emissions := 0.0
+var _start_stats: Dictionary = {}
 var _built_this_year: Array = []
 var _crisis_queue: Array = []
 var _current_crisis: Dictionary = {}
@@ -20,7 +20,7 @@ func _ready() -> void:
 
 
 func start_game() -> void:
-	_start_emissions = GameState.stats.emissions_total
+	_start_stats = GameState.get_stats()
 	_rng.seed = GameState.rng_seed
 	_set_phase(&"build")
 	EventBus.year_started.emit(GameState.stats.year)
@@ -81,6 +81,14 @@ func _finish_year() -> void:
 		controller.add_pending(w)
 		EventBus.crisis_warned.emit(w)
 
+	var missions := MissionTracker.evaluate(Catalog.data.missions, GameState.get_stats(), GameState.missions)
+	for id in missions.completed:
+		controller.set_mission_state(id, &"done")
+	for id in missions.failed:
+		controller.set_mission_state(id, &"failed")
+	if missions.reward > 0:
+		controller.apply_deltas({"credits": missions.reward})
+
 	controller.record_history()
 	var report := {
 		"year": before.year,
@@ -91,6 +99,7 @@ func _finish_year() -> void:
 		"built_this_year": _built_this_year.duplicate(),
 		"crisis_results": _crisis_results.duplicate(true),
 		"new_warnings": warnings,
+		"missions": missions,
 	}
 	_set_phase(&"report")
 	EventBus.year_ended.emit(report)
@@ -102,7 +111,7 @@ func close_report() -> void:
 	if GameState.stats.year >= Catalog.data.balance.end_year:
 		_set_phase(&"game_over")
 		var final_stats := GameState.get_stats()
-		var summary := EconomySimulator.final_score(final_stats, _start_emissions)
+		var summary := EconomySimulator.final_score(final_stats, _start_stats)
 		summary["final_stats"] = final_stats
 		summary["history"] = GameState.history.duplicate(true)
 		EventBus.game_over.emit(summary)

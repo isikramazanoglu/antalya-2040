@@ -44,6 +44,20 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="StyleBoxFlat" id="BarBg"]
+bg_color = Color(1, 1, 1, 0.08)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="BarFill"]
+bg_color = Color(1, 0.6, 0.35, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
 [resource]
 default_font_size = 18
 Button/colors/font_pressed_color = Color(0.03, 0.08, 0.09, 1)
@@ -52,3 +66,5 @@ Button/styles/normal = SubResource("Btn")
 Button/styles/pressed = SubResource("BtnPressed")
 Button/styles/hover_pressed = SubResource("BtnPressed")
 PanelContainer/styles/panel = SubResource("Panel")
+ProgressBar/styles/background = SubResource("BarBg")
+ProgressBar/styles/fill = SubResource("BarFill")

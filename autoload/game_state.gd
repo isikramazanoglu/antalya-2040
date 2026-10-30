@@ -6,6 +6,7 @@ var stats: Dictionary = {}
 var plots: Dictionary = {}  # plot_id (StringName) -> building_id (StringName)
 var pending_crises: Array = []  # sözleşme §5.2 warning sözlükleri
 var history: Array = []  # her yıl sonunun stats kopyası
+var missions: Dictionary = {}  # mission id -> &"active" | &"done" | &"failed"
 var phase: StringName = &"build"
 var rng_seed: int = 0
 
@@ -36,6 +37,7 @@ func reset() -> void:
 	plots.clear()
 	pending_crises.clear()
 	history.clear()
+	missions.clear()
 	phase = &"build"
 	rng_seed = randi()
 	EventBus.stats_changed.emit(get_stats())
@@ -94,6 +96,10 @@ func set_climate(climate: Dictionary) -> void:
 	stats.risks = climate.risks
 	stats.global_co2_ppm = climate.global_co2_ppm
 	EventBus.stats_changed.emit(get_stats())
+
+
+func set_mission_state(mission_id: StringName, state: StringName) -> void:
+	missions[mission_id] = state
 
 
 func add_pending(warning: Dictionary) -> void:

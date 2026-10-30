@@ -69,7 +69,7 @@ Hepsi `BalanceConfig` içinde katsayı olarak durur, kodda sabit sayı yazılmaz
 - `scripted_year` dolu olan kriz yalnızca o yıl gelir (demo garantisi). Boşsa her yıl olasılık = `base_probability` × (gösterilen risk / 50).
 
 **Final puanı**
-- Puan = (su + enerji + yaşam kalitesi + ekosistem) / 4 + emisyon azaltma yüzdesi × 0.3 (en çok 30). 
+- Puan = (su + enerji + yaşam kalitesi + ekosistem) / 4 + **kişi başı** emisyon azalma yüzdesi × 0.3 (en çok 30). Kişi başına bakılır ki şehri büyütmek cezalandırılmasın.
 - Not: 85+ "İklim Lideri", 70+ "Dayanıklı Şehir", 50+ "Gelişen Şehir", altı "Risk Altında".
 
 ## 5. On iki yatırım (taslak sayılar)
@@ -127,7 +127,14 @@ Veri kuralı:
 ## 8. Eğitim sistemi
 
 - **Bilgi kartları:** her yatırım ve her kriz için bir `InfoCard`. Yapıda "Nedir? Neden önemli? Antalya'yla bağı" ve kaynak satırı.
-- **Görevler (MVP sonrası):** basit hedefler, ör. "2045'e kadar su güvenliğini 75'e çıkar", "Ulaşım emisyonunu %30 azalt". Yıl sonu raporunda kontrol edilir. Kod yapısı: `GameCatalog` içine `missions` dizisi eklenir (sözleşme değişikliği gerekmez, B içi iş).
+- **Görevler:** yıl sonunda kontrol edilir, tamamlanınca ödül kredisi verilir, son yıl geçerse kaçar. HUD'da sol altta, raporda sonuçlarıyla görünür.
+
+| id | Görev | Son yıl | Ödül |
+|---|---|---|---|
+| `water_75` | Su güvenliğini 75'e çıkar | 2045 | 100 |
+| `quality_70` | Yaşam kalitesini 70'e çıkar | 2047 | 100 |
+| `emissions_85` | Yerel emisyonu 85'in altına indir | 2048 | 150 |
+| `ecosystem_65` | Ekosistem sağlığını 65'te tut | 2050 | 120 |
 - **İklim Laboratuvarı:** dört sekme (yerel emisyonlar, küresel CO2, yerel riskler, bilgi kartları).
 - **Grafikler:** yıllık geçmişten çizgi grafikler.
 
@@ -137,10 +144,24 @@ Kaynak kuralları:
 - Aday kurumlar: IPCC AR6 raporları (https://www.ipcc.ch/report/ar6/syr/), NOAA GML, Meteoroloji Genel Müdürlüğü, T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı. Her URL eklenmeden önce açılıp kontrol edilir.
 - Oyun değerleri ile gerçek veriler arayüzde karıştırılmaz: oyun değerleri "oyun ölçeği" etiketi taşır.
 
-## 9. Görsel ve kamera
+## 9. Denge ölçümü (Gün 3)
+
+`tests/balance_sim.gd` beş stratejiyi otomatik oynatır (yılda en çok bir yatırım, krizde en iyi karşılanabilir müdahale):
+
+| Strateji | Puan | Not | Görev | Kriz kredi kaybı |
+|---|---|---|---|---|
+| Hiçbir şey yapma | 40 | Risk Altında | 0/4 | −500 |
+| En ucuzdan başla | 75 | Dayanıklı Şehir | 2/4 | −499 |
+| Önce koruma | 74 | Dayanıklı Şehir | 2/4 | −435 |
+| Yalnız emisyon | 66 | Gelişen Şehir | 1/4 | −475 |
+| Karma | 79 | Dayanıklı Şehir | 2/4 | −299 |
+
+"İklim Lideri" (85+) hiçbir otomatik stratejiyle gelmiyor; bilinçli, dengeli oyun ister. Sayılar değişince simülasyon yeniden çalıştırılır.
+
+## 10. Görsel ve kamera
 
 Low-poly 3D, gerçekçi ışık, yumuşak gölge. Akdeniz mimarisi: beyaz sıva, terracotta çatı, turkuaz deniz, yeşil parklar. İzometrik perspektif kamera; yakınlaştırma, ±30° döndürme, harita sınırında duran kaydırma. Arayüz sade ve modern: yarı saydam koyu paneller, tek vurgu rengi (turkuaz), ikonlu gösterge çubuğu.
 
-## 10. Kapsam dışı (hackathon)
+## 11. Kapsam dışı (hackathon)
 
 Kaydet/yükle, bina yıkma ve yükseltme, çok oyunculu, serbest inşaat, gerçek harita verisi, ses dublajı, yerelleştirme (oyun yalnızca Türkçe).
