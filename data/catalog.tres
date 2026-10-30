@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="GameCatalog" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/game_catalog.gd" id="1_catalog"]
+[ext_resource type="Resource" path="res://data/balance.tres" id="2_balance"]
+
+[resource]
+script = ExtResource("1_catalog")
+balance = ExtResource("2_balance")
