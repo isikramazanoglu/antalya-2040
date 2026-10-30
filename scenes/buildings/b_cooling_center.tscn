@@ -1,0 +1,143 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/buildings/Building.tscn" id="1_Building"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/plaster_white.tres" id="2_plaster_whit"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/window_dark.tres" id="3_window_dark"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/accent_turquoise.tres" id="4_accent_turqu"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/metal.tres" id="5_metal"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/solar_panel.tres" id="6_solar_panel"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/wood.tres" id="7_wood"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/accent_blue.tres" id="8_accent_blue"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/canopy_olive.tres" id="9_canopy_olive"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/grass.tres" id="10_grass"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(3.6, 2.4, 2.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(3.66, 1, 1.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3"]
+size = Vector3(0.9, 1.4, 0.04)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4"]
+top_radius = 0.09
+bottom_radius = 0.09
+height = 3
+radial_segments = 8
+rings = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_5"]
+size = Vector3(5.6, 0.14, 3.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6"]
+size = Vector3(1.6, 0.05, 2.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7"]
+size = Vector3(1.4, 0.3, 0.4)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_8"]
+top_radius = 0.18
+bottom_radius = 0.18
+height = 0.9
+radial_segments = 8
+rings = 0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_9"]
+top_radius = 0.102
+bottom_radius = 0.102
+height = 0.85
+radial_segments = 6
+rings = 0
+
+[sub_resource type="SphereMesh" id="SphereMesh_10"]
+radius = 0.7225
+height = 1.19
+radial_segments = 8
+rings = 4
+
+[sub_resource type="BoxMesh" id="BoxMesh_11"]
+size = Vector3(5.8, 0.04, 0.9)
+
+[node name="b_cooling_center" instance=ExtResource("1_Building")]
+
+[node name="Hall" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 1.2, -1.4)
+mesh = SubResource("BoxMesh_1")
+surface_material_override/0 = ExtResource("2_plaster_whit")
+
+[node name="Glass" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 1.1, -1.4)
+mesh = SubResource("BoxMesh_2")
+surface_material_override/0 = ExtResource("3_window_dark")
+
+[node name="Door" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0.7, -0.18)
+mesh = SubResource("BoxMesh_3")
+surface_material_override/0 = ExtResource("4_accent_turqu")
+
+[node name="CanopyPost" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.5, -0.1)
+mesh = SubResource("CylinderMesh_4")
+surface_material_override/0 = ExtResource("5_metal")
+
+[node name="CanopyPost2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.5, 2.3)
+mesh = SubResource("CylinderMesh_4")
+surface_material_override/0 = ExtResource("5_metal")
+
+[node name="CanopyPost3" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.5, -0.1)
+mesh = SubResource("CylinderMesh_4")
+surface_material_override/0 = ExtResource("5_metal")
+
+[node name="CanopyPost4" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.5, 2.3)
+mesh = SubResource("CylinderMesh_4")
+surface_material_override/0 = ExtResource("5_metal")
+
+[node name="Canopy" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.05, 0.9)
+mesh = SubResource("BoxMesh_5")
+surface_material_override/0 = ExtResource("4_accent_turqu")
+
+[node name="CanopySolar" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 3.15, 0.9)
+mesh = SubResource("BoxMesh_6")
+surface_material_override/0 = ExtResource("6_solar_panel")
+
+[node name="CanopySolar2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 3.15, 0.9)
+mesh = SubResource("BoxMesh_6")
+surface_material_override/0 = ExtResource("6_solar_panel")
+
+[node name="Bench" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.2, 1.4)
+mesh = SubResource("BoxMesh_7")
+surface_material_override/0 = ExtResource("7_wood")
+
+[node name="Bench2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.2, 1.4)
+mesh = SubResource("BoxMesh_7")
+surface_material_override/0 = ExtResource("7_wood")
+
+[node name="WaterPoint" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.45, 0.5)
+mesh = SubResource("CylinderMesh_8")
+surface_material_override/0 = ExtResource("8_accent_blue")
+
+[node name="Trunk" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.425, -1.8)
+mesh = SubResource("CylinderMesh_9")
+surface_material_override/0 = ExtResource("7_wood")
+
+[node name="Canopy2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.3175, -1.8)
+mesh = SubResource("SphereMesh_10")
+surface_material_override/0 = ExtResource("9_canopy_olive")
+
+[node name="Lawn" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 2.5)
+mesh = SubResource("BoxMesh_11")
+surface_material_override/0 = ExtResource("10_grass")
+cast_shadow = 0
