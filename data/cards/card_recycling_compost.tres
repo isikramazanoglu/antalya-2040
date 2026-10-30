@@ -7,3 +7,6 @@ script = ExtResource("1_vndcc")
 id = &"card_recycling_compost"
 title = "Kompost"
 body = "Organik atık havasız bir çöplükte çürürse metan çıkar. Kompost tesisinde havayla temas ederek ayrışır ve bahçelerde kullanılabilecek verimli bir toprağa dönüşür."
+benefit = "Ambalajı geri kazanır, organik atığı toprağa döndürür."
+climate_link = "Çöplükte çürüyen organik atığın metan üretmesini önler."
+strategic = "Atık emisyonunu en çok düşüren yatırımdır."

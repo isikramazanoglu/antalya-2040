@@ -3,12 +3,13 @@
 [ext_resource type="Script" path="res://scripts/ui/build_panel.gd" id="1_panel"]
 
 [node name="BuildPanel" type="PanelContainer"]
+theme_type_variation = &"SolidPanel"
 anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -400.0
-offset_top = 76.0
+offset_left = -500.0
+offset_top = 84.0
 offset_right = -12.0
 offset_bottom = -92.0
 grow_horizontal = 0
@@ -19,39 +20,83 @@ script = ExtResource("1_panel")
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="PlotTitle" type="Label" parent="VBox"]
+[node name="Header" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="VBox/Header"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
-text = "Arsa"
+text = "Yatırımlar"
+
+[node name="CloseButton" type="Button" parent="VBox/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 32)
+layout_mode = 2
+tooltip_text = "Kapat (Esc)"
+text = "×"
+
+[node name="Hint" type="Label" parent="VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.88, 0.87, 0.7)
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3
 
 [node name="Scroll" type="ScrollContainer" parent="VBox"]
-custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 size_flags_vertical = 3
+size_flags_stretch_ratio = 1.4
 horizontal_scroll_mode = 0
 
 [node name="Cards" type="VBoxContainer" parent="VBox/Scroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
-[node name="InfoCardView" type="RichTextLabel" parent="VBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 160)
+[node name="DetailScroll" type="ScrollContainer" parent="VBox"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Detail" type="VBoxContainer" parent="VBox/DetailScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DetailSummary" type="RichTextLabel" parent="VBox/DetailScroll/Detail"]
+unique_name_in_owner = true
+layout_mode = 2
 bbcode_enabled = true
+fit_content = true
+
+[node name="DetailToggle" type="Button" parent="VBox/DetailScroll/Detail"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+toggle_mode = true
+text = "Ayrıntılı bilgi"
+
+[node name="DetailBody" type="RichTextLabel" parent="VBox/DetailScroll/Detail"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
 
 [node name="ErrorLabel" type="Label" parent="VBox"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(440, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.55, 0.45, 1)
 autowrap_mode = 3
 
 [node name="BuildButton" type="Button" parent="VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
 text = "İnşa et"

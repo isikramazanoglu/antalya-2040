@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="BuildingDefinition" format=3]
 
 [ext_resource type="Resource" path="res://data/cards/card_green_park.tres" id="1_6asdc"]
+[ext_resource type="Texture2D" path="res://assets/ui/thumbnails/green_park.png" id="1_xcbul"]
 [ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_odqk0"]
 [ext_resource type="PackedScene" path="res://scenes/buildings/b_green_park.tscn" id="2_xcbul"]
 
@@ -14,6 +15,7 @@ cost = 150
 upkeep_per_year = 10
 allowed_plot_kinds = Array[StringName]([&"urban"])
 scene = ExtResource("2_xcbul")
+icon = ExtResource("1_xcbul")
 on_build_effects = {
 "ecosystem_health": 5.0,
 "quality_of_life": 8.0

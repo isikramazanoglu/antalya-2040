@@ -7,3 +7,6 @@ script = ExtResource("1_b6qts")
 id = &"card_cooling_center"
 title = "Aşırı sıcak ve sağlık"
 body = "Aşırı sıcak özellikle yaşlılar, küçük çocuklar ve kronik hastalığı olanlar için tehlikelidir. Serinleme merkezleri evinde klima olmayanlara güvenli bir yer sağlar."
+benefit = "Sıcak günlerde herkesin sığınabileceği serin bir alan sunar."
+climate_link = "Isınan iklimde aşırı sıcak günler daha sık yaşanır; en çok risk altındakileri korur."
+strategic = "Sıcak hava dalgası hasarını en çok azaltan yatırımdır."

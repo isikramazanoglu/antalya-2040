@@ -28,11 +28,13 @@ func _ui(name: String) -> Node:
 	return current_scene.get_node("UI").find_child(name, true, false)
 
 func _build_via_ui(card_index_name: String) -> void:
-	for card in _ui("Cards").get_children():
-		if card is Button and card.text.begins_with(card_index_name):
-			card.pressed.emit()
+	var panel := current_scene.get_node("UI/BuildPanel")
+	for card in panel.find_child("Cards", true, false).get_children():
+		for label in card.find_children("*", "Label", true, false):
+			if label.text.begins_with(card_index_name):
+				card.pressed.emit()
 	await process_frame
-	_ui("BuildButton").pressed.emit()
+	panel.find_child("BuildButton", true, false).pressed.emit()
 
 func _process(_d: float) -> bool:
 	f += 1
@@ -46,7 +48,7 @@ func _process(_d: float) -> bool:
 			_click_plot("O01")
 		24:
 			_check(log_lines.size() > 0 and log_lines[-1][1] == &"O01" and log_lines[-1][2] == &"open", "fare tıklaması O01 seçti (plot_selected)")
-			_check(_ui("BuildPanel").visible, "BuildPanel açıldı")
+			_check(current_scene.get_node("UI/BuildPanel").visible, "BuildPanel açıldı")
 			_build_via_ui("Güneş")
 		30:
 			_check(gs.get_building_on(&"O01") == &"solar_plant", "güneş tesisi inşa edildi")

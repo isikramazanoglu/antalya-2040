@@ -7,3 +7,6 @@ script = ExtResource("1_3gpck")
 id = &"card_water_reuse"
 title = "Suyu iki kez kullanmak"
 body = "Evlerden gelen atık su arıtıldıktan sonra içme suyu gerektirmeyen işlerde, örneğin park sulamasında kullanılabilir. Böylece barajlardan ve yer altından çekilen su azalır."
+benefit = "Arıtılmış suyu sulama ve sanayide yeniden kullanır."
+climate_link = "Barajlardan ve yeraltından çekilen suyu azaltarak kuraklığa dayanıklılığı artırır."
+strategic = "Su arzını büyütür, kuraklık hasarını azaltır ve kıyı arsalarına da kurulabilir."

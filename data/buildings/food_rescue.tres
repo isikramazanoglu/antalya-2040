@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="BuildingDefinition" format=3]
 
 [ext_resource type="Resource" path="res://data/cards/card_food_rescue.tres" id="1_341uk"]
+[ext_resource type="Texture2D" path="res://assets/ui/thumbnails/food_rescue.png" id="1_xar1k"]
 [ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_vyumg"]
 [ext_resource type="PackedScene" path="res://scenes/buildings/b_food_rescue.tscn" id="2_xar1k"]
 
@@ -14,6 +15,7 @@ cost = 100
 upkeep_per_year = 5
 allowed_plot_kinds = Array[StringName]([&"urban"])
 scene = ExtResource("2_xar1k")
+icon = ExtResource("1_xar1k")
 on_build_effects = {
 "quality_of_life": 5.0
 }

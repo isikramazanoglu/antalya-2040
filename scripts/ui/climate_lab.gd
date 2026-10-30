@@ -8,8 +8,10 @@ const RISKS := {"drought": "Kuraklık", "heat": "Aşırı sıcak", "coastal_floo
 
 
 func _ready() -> void:
+	add_to_group("ui_panel")
 	add_to_group("climate_lab")
-	%Cards.get_parent().set_tab_title(3, "Bilgi kartları")
+	var tabs: TabContainer = %Cards.get_parent()
+	tabs.set_tab_title(tabs.get_tab_idx_from_control(%Cards), "Bilgi kartları")
 	hide()
 	%CloseButton.pressed.connect(hide)
 	EventBus.phase_changed.connect(_on_phase_changed)
@@ -20,10 +22,19 @@ func _on_phase_changed(phase: StringName) -> void:
 		hide()
 
 
-func toggle() -> void:
-	visible = not visible
-	if visible:
-		_refresh()
+func _unhandled_input(event: InputEvent) -> void:
+	if visible and event.is_action_pressed("cancel"):
+		close()
+		get_viewport().set_input_as_handled()
+
+
+func open() -> void:
+	_refresh()
+	UiText.pop_in(self)
+
+
+func close() -> void:
+	hide()
 
 
 func _refresh() -> void:
@@ -42,13 +53,57 @@ func _refresh() -> void:
 		series.append({"name": SECTORS[sector][0], "color": SECTORS[sector][1], "values": values})
 	%EmissionChart.set_data(series, years)
 	var now := GameState.get_stats()
-	var text := "Toplam: [b]%d[/b] (oyun birimi; gerçek ton değeri değildir)\n" % roundi(now.emissions_total)
+	var text := "Toplam: [b]%d[/b] (oyun birimi; gerçek ton değeri değildir)" % roundi(now.emissions_total)
+	if timeline.size() >= 2:
+		var change: float = now.emissions_total - timeline[-2].emissions_total
+		text += "   [color=#%s]önceki yıla göre %+d[/color]" % [UiText.delta_color(change, false).to_html(false), roundi(change)]
+	text += "\n"
 	for sector in SECTORS:
 		text += "%s: %d   " % [SECTORS[sector][0], roundi(now.emissions_by_sector[sector])]
-	text += "\nEnerji talebi %d · yenilenebilir üretim %d · [b]yenilenebilir payı %%%d[/b] (kalanı şebekeden, fosil kaynaklı)" % [
-		roundi(now.energy_demand), roundi(now.renewable_energy), roundi(now.renewable_share * 100)]
-	text += "\nSu talebi %d · su arzı %d" % [roundi(now.water_demand), roundi(now.water_supply)]
+	var effects := PackedStringArray()
+	for def in GameState.built_definitions():
+		for sector in def.emission_multipliers:
+			effects.append("%s: %s %+d%%" % [def.display_name, UiText.SECTOR_NAMES.get(sector, sector), roundi(def.emission_multipliers[sector] * 100)])
+	text += "\n[b]Yatırımların etkisi:[/b] " + (", ".join(effects) if effects.size() > 0 else "henüz emisyon azaltan yatırım yok")
 	%EmissionText.text = text
+
+	# Enerji ve su
+	var e_demand := PackedFloat32Array()
+	var e_renew := PackedFloat32Array()
+	var w_demand := PackedFloat32Array()
+	var w_supply := PackedFloat32Array()
+	for s in timeline:
+		e_demand.append(s.energy_demand)
+		e_renew.append(s.renewable_energy)
+		w_demand.append(s.water_demand)
+		w_supply.append(s.water_supply)
+	%ResourceChart.set_data([
+		{"name": "Enerji talebi", "color": Color(0.98, 0.75, 0.25), "values": e_demand},
+		{"name": "Yenilenebilir üretim", "color": Color(0.42, 0.82, 0.52), "values": e_renew},
+		{"name": "Su talebi", "color": Color(0.45, 0.72, 1.0), "values": w_demand},
+		{"name": "Su arzı", "color": Color(0.3, 0.85, 0.82), "values": w_supply}], years)
+	%ResourceText.text = ("[b]Enerji[/b] · üretim (yenilenebilir) %d · tüketim %d · denge %+d · [b]yenilenebilir payı %%%d[/b] (kalanı şebekeden, fosil kaynaklı)\n" % [
+			roundi(now.renewable_energy), roundi(now.energy_demand), roundi(now.renewable_energy - now.energy_demand), roundi(now.renewable_share * 100)]
+			+ "[b]Su[/b] · arz %d · talep %d · denge %+d · su güvenliği %d/100\n" % [
+			roundi(now.water_supply), roundi(now.water_demand), roundi(now.water_supply - now.water_demand), roundi(now.water_security)]
+			+ "[color=#b8c4c2]Oyun birimi; şebekeden gelen enerji yenilenebilir üretimin karşılamadığı talebi kapatır.[/color]")
+
+	# Ekosistem
+	var eco := PackedFloat32Array()
+	for s in timeline:
+		eco.append(s.ecosystem_health)
+	%EcoChart.set_data([{"name": "Ekosistem sağlığı", "color": Color(0.42, 0.82, 0.52), "values": eco}], years)
+	var built := GameState.built_definitions()
+	var green := built.filter(func(d): return d.id in [&"green_park", &"urban_farming"]).map(func(d): return d.display_name)
+	var coast := built.any(func(d): return d.id == &"coastal_restoration")
+	var waste_cut := 0.0
+	for def in built:
+		waste_cut -= def.emission_multipliers.get("waste", 0.0)
+	var st := UiText.status(now.ecosystem_health)
+	%EcoText.text = ("Ekosistem sağlığı [b]%d/100[/b] · [color=#%s]%s[/color]\n" % [roundi(now.ecosystem_health), st[1].to_html(false), st[0]]
+			+ "Yeşil alanlar: %s\n" % (", ".join(green) if green.size() > 0 else "yok")
+			+ "Kıyı ekosistemi: %s\n" % ("restore edildi" if coast else "korumasız")
+			+ "Atık geri kazanım / azaltma oranı: %%%d (oyun parametresi)" % roundi(minf(waste_cut, 1.0) * 100))
 
 	# Küresel CO2
 	var co2: Co2Scenario = Catalog.data.co2

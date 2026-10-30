@@ -7,3 +7,6 @@ script = ExtResource("1_ywluu")
 id = &"card_food_rescue"
 title = "Gıda israfı"
 body = "Çöpe giden gıda, onu üretmek için harcanan su ve enerjinin de boşa gitmesi demektir. Çöplükte çürüyen gıda ayrıca güçlü bir sera gazı olan metan üretir."
+benefit = "Yenilebilir ama satılmayan gıdayı ihtiyacı olanlara ulaştırır."
+climate_link = "Çöpe giden gıdanın çürürken ürettiği metanı azaltır."
+strategic = "En ucuz yatırımlardan biri; yaşam kalitesini artırır ve atık emisyonunu düşürür."
