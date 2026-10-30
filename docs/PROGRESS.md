@@ -74,6 +74,7 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - Harici model yok (`assets/models/LICENSES.md`).
 - Prompt 3 (A, 2026-10-31): belediye binası ve saat kuleli meydan, kordon meydanı, marina (deniz feneri, dalgakıran, yelkenliler), ağaçlarda hafif rüzgâr (`foliage.gdshader`), caddede dolaşan araçlar. Dekor artık MultiMesh ile çiziliyor. Boş arsa turkuaz, dolu arsa kehribar renkte parlar; etiket kimlik + tür gösterir ("U01 · KENT"). CityWorld'e görsel yerleştirme fonksiyonları eklendi: `get_plot_kind`, `is_plot_occupied`, `place_building` (başarısızsa false + uyarı). Sözleşme değişmedi.
 - Prompt 5 sonrası (A, 2026-10-31): Seçilen arsa yan panellerin veya alt çubuğun arkasında kalırsa kamera onu yumuşakça görünür alana kaydırır (`CameraRig.bring_into_view`, güvenli alan `safe_area` ile ayarlanır). Açılış kadrajı sol panel payı kadar sağa kaydırıldı. Yalnızca A dosyaları.
+- Prompt 6 (A, 2026-10-31): CityWorld `plot_deselect_requested`'e (v1.3) bağlandı; BuildPanel × veya Esc ile kapanınca arsa vurgusu kalkar ve `plot_deselected` yayılır. Kamera artık seçilen arsayı ortaya çekmek yerine yalnızca görünür alana girecek kadar kaydırır (alt çubuk arkasına kıyı arsası kaçmıyordu). Gerçek tıklama/tuşla 1280x720 ve 1920x1080'de denendi; A şehir testi + B'nin 7 testi (day1, day2, economy, integration, menu, e2e, ui) TAMAM.
 
 ### Ekip B
 - [x] 12 `BuildingDefinition` + bilgi kartları
