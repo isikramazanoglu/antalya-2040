@@ -3,15 +3,16 @@
 Her ekip yalnızca kendi bölümündeki kutuları işaretler. Ortak bölümlere satır **eklenir**, var olan satır silinmez.
 İşaret: `[ ]` yapılmadı, `[~]` sürüyor, `[x]` bitti ve kendi dalında çalışıyor, `[D]` develop'a birleşti.
 
-Son güncelleme: 2026-10-30 · Aşama: **Gün 1, Ekip B işleri bitti (Mac), A bekleniyor, GitHub'a gönderilmedi**
+Son güncelleme: 2026-10-30 · Aşama: **Gün 1, Ekip B işleri bitti ve gönderildi, Ekip A bekleniyor**
+Repo: https://github.com/isikramazanoglu/antalya-2040 (gizli)
 
 ---
 
 ## Gün 0 · Kurulum (ikisi birlikte, 1–2 saat)
 
 - [~] İki bilgisayarda Godot 4.7.2 Stable Standard kurulu (Mac: 4.7.2.stable.official doğrulandı; ikinci bilgisayar bekliyor)
-- [ ] GitHub reposu açıldı, iki kişi de yazma yetkili
-- [ ] `main`, `develop`, `feature/city-world`, `feature/simulation-ui` dalları açıldı
+- [~] GitHub reposu açıldı (gizli); ikinci kişi Collaborators'a eklenecek
+- [x] `main`, `develop`, `feature/city-world`, `feature/simulation-ui` dalları açıldı ve gönderildi
 - [x] B: iskelet commit'i `develop`'a: `project.godot` (Forward+, autoload'lar, Input Map, fizik katman adları), `.gitignore`, `.gitattributes`, `event_bus.gd`, `scripts/data/*.gd` boş Resource sınıfları, boş `catalog.tres`, `Game.tscn`, `MainMenu.tscn`
 - [x] A: `CityWorld.tscn` kök node'u (boş zemin + kamera) iskelete eklendi, Game.tscn içinde açılıyor
 - [ ] İki bilgisayarda da `develop` çekildi, oyun açıldı, hata yok
