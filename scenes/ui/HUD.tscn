@@ -56,12 +56,20 @@ theme_override_constants/separation = 12
 alignment = 2
 
 [node name="ClimateLabButton" type="Button" parent="BottomRight"]
+unique_name_in_owner = true
 layout_mode = 2
-disabled = true
-tooltip_text = "Gün 2"
 text = "İklim Laboratuvarı"
 
 [node name="EndTurnButton" type="Button" parent="BottomRight"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Yılı bitir"
+
+[node name="Warnings" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 72.0
+offset_right = 600.0
+offset_bottom = 200.0
+mouse_filter = 2

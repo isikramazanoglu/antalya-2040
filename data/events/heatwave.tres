@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="EventDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_event_heatwave.tres" id="1_0fyod"]
+[ext_resource type="Script" path="res://scripts/data/crisis_response.gd" id="2_b6ikl"]
+[ext_resource type="Script" path="res://scripts/data/event_definition.gd" id="3_xj6rt"]
+
+[sub_resource type="Resource" id="Resource_2ueqx"]
+script = ExtResource("2_b6ikl")
+id = &"open_cooling"
+label = "Serinleme alanlarını aç, yaşlılara ulaş"
+description = "Kamu binaları gün boyu açık tutulur, gönüllüler yalnız yaşayan yaşlıları ziyaret eder."
+cost = 60
+damage_multiplier = 0.6
+
+[sub_resource type="Resource" id="Resource_v1lmy"]
+script = ExtResource("2_b6ikl")
+id = &"shift_hours"
+label = "Açık hava çalışma saatlerini değiştir"
+description = "Öğle saatlerinde açık havada çalışma durdurulur."
+cost = 20
+damage_multiplier = 0.8
+
+[sub_resource type="Resource" id="Resource_27xy8"]
+script = ExtResource("2_b6ikl")
+id = &"do_nothing"
+label = "Müdahale etme"
+description = "Kaynaklar başka işlere ayrılır."
+
+[resource]
+script = ExtResource("3_xj6rt")
+id = &"heatwave"
+display_name = "Sıcak hava dalgası"
+description = "Günlerce süren aşırı sıcak, şehirde sağlık sorunlarına ve iş kaybına yol açıyor."
+risk_type = &"heat"
+earliest_year = 2042
+scripted_year = 2043
+base_damage = {
+"credits": -100,
+"population": -10,
+"quality_of_life": -10.0
+}
+responses = Array[ExtResource("2_b6ikl")]([SubResource("Resource_2ueqx"), SubResource("Resource_v1lmy"), SubResource("Resource_27xy8")])
+info_card = ExtResource("1_0fyod")

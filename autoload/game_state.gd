@@ -85,3 +85,31 @@ func advance_year() -> void:
 
 func record_history() -> void:
 	history.append(get_stats())
+
+
+## İklim adımının hesapladığı değerler (delta değil, yeni değer).
+func set_climate(climate: Dictionary) -> void:
+	stats.emissions_by_sector = climate.emissions_by_sector
+	stats.emissions_total = climate.emissions_total
+	stats.risks = climate.risks
+	stats.global_co2_ppm = climate.global_co2_ppm
+	EventBus.stats_changed.emit(get_stats())
+
+
+func add_pending(warning: Dictionary) -> void:
+	pending_crises.append(warning)
+
+
+func remove_pending(warning: Dictionary) -> void:
+	pending_crises.erase(warning)
+
+
+# --- Salt okunur yardımcılar ---
+
+func built_definitions() -> Array[BuildingDefinition]:
+	var result: Array[BuildingDefinition] = []
+	for building_id in plots.values():
+		var def := Catalog.get_building(building_id)
+		if def:
+			result.append(def)
+	return result

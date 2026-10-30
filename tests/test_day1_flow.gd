@@ -71,6 +71,8 @@ func _run() -> void:
 	_check(_gs.stats.year == 2041 and _gs.phase == &"build", "2041, faz build")
 
 	print("Oyun sonu")
+	# Gün 2'den beri krizler geliyor; bu testte hepsine "müdahale etme" denir.
+	_bus.crisis_started.connect(func(id, _r, _s): _bus.crisis_response_chosen.emit(id, &"do_nothing"))
 	while _gs.phase == &"build":
 		_bus.end_turn_requested.emit()
 		_bus.report_closed.emit()

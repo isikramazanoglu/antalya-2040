@@ -91,7 +91,7 @@ antalya-2040/
 │   ├── events/<id>.tres           EventDefinition × 3+
 │   └── cards/<id>.tres            InfoCard (bina, olay ve İklim Laboratuvarı kartları)
 │
-├── tests/                         B     Headless akış testleri (test_day1_flow.gd)
+├── tests/                         B     Headless akış testleri (test_day1_flow.gd, test_day2_flow.gd)
 │
 └── assets/
     ├── models/                    A     .glb modeller
@@ -239,8 +239,9 @@ EventPanel (PanelContainer, event_panel.gd, ekran ortası, mouse_filter = STOP)
     ├── Title (Label)
     ├── Description (RichTextLabel)
     ├── MitigationLabel (Label)          "Yatırımların hasarı %X azaltacak"
-    ├── Responses (VBoxContainer)        her CrisisResponse için Button
-    └── ResultBox (VBoxContainer, gizli) crisis_resolved sonrası özet + "Tamam"
+    └── Responses (VBoxContainer)        her CrisisResponse için Button (parası yetmeyen kapalı)
+
+Sonuç ayrı kutuda gösterilmez: `crisis_resolved` gelince panel kapanır, hasar yıl sonu raporunun "Kriz" bölümünde görünür.
 ```
 
 ### 2.11 YearReport (B)
@@ -266,7 +267,7 @@ Kural: **veri bir yerde, hesap bir yerde, yazma tek yerde.**
 
 | Modül | Tür | Yapar | Yapmaz |
 |---|---|---|---|
-| `GameState` | autoload Node | Verileri tutar (`stats`, `plots` sözlüğü, `pending_crises`, `history`, `phase`, `rng_seed`). Getter'lar. `GameController`'ın çağırdığı ayarlayıcılar. Her değişimde `stats_changed`. `reset()`. | Hesap yapmaz, kural kontrol etmez. |
+| `GameState` | autoload Node | Verileri tutar (`stats`, `plots` sözlüğü, `pending_crises`, `history`, `phase`, `rng_seed`). Getter'lar (`get_stats`, `get_building_on`, `built_definitions`). `GameController`'ın çağırdığı ayarlayıcılar. Her değişimde `stats_changed`. `reset()`. | Hesap yapmaz, kural kontrol etmez. |
 | `GameController` | Node (Game içinde) | Oyuncu taleplerini dinler (`build_requested`, `end_turn_requested`, `crisis_response_chosen`, `report_closed`). Kural kontrolü (sözleşme §6.3). `GameState`'e yazan tek modül. | Yıl sonu hesabı yapmaz; bunu TurnManager'a bırakır. |
 | `TurnManager` | Node | Yıl sonu adımlarını sıralar, faz makinesini tutar, tur sinyallerini yayar. Simülatörlerin sonuçlarını `GameController.apply_*` ile uygulatır. | Kendi formülü yoktur; oyuncu girdisi dinlemez. |
 | `EconomySimulator` | `RefCounted`, statik fonksiyonlar | `compute_year(stats, buildings, balance) -> Dictionary` (gelir, gider, nüfus değişimi). | Durum tutmaz, sinyal yaymaz. |

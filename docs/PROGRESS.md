@@ -3,7 +3,7 @@
 Her ekip yalnızca kendi bölümündeki kutuları işaretler. Ortak bölümlere satır **eklenir**, var olan satır silinmez.
 İşaret: `[ ]` yapılmadı, `[~]` sürüyor, `[x]` bitti ve kendi dalında çalışıyor, `[D]` develop'a birleşti.
 
-Son güncelleme: 2026-10-30 · Aşama: **Gün 1, Ekip B işleri bitti ve gönderildi, Ekip A bekleniyor**
+Son güncelleme: 2026-10-30 · Aşama: **Gün 2, Ekip B işleri bitti (yerelde), Ekip A bekleniyor**
 Repo: https://github.com/isikramazanoglu/antalya-2040 (gizli)
 
 ---
@@ -61,13 +61,20 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - [ ] Deniz shader'ı (turkuaz)
 
 ### Ekip B
-- [ ] 12 `BuildingDefinition` + bilgi kartları
-- [ ] ClimateSimulator (sektör emisyonları, riskler, ekosistem, CO2 okuma)
-- [ ] `co2_scenario.tres` kaynaklı verilerle (kaynak satırı zorunlu)
-- [ ] EventManager + 3 `EventDefinition` + müdahaleler
-- [ ] TurnManager kriz fazı
-- [ ] EventPanel, HUD uyarı listesi
-- [ ] ClimateLab ve LineChart
+- [x] 12 `BuildingDefinition` + bilgi kartları
+- [x] ClimateSimulator (sektör emisyonları, riskler, ekosistem, CO2 okuma)
+- [~] `co2_scenario.tres`: NOAA 1959–2025 ölçümü eklendi; 2040–2052 senaryo değeri yok (oyun "veri yok" gösterir)
+- [x] EventManager + 3 `EventDefinition` + müdahaleler
+- [x] TurnManager kriz fazı
+- [x] EventPanel, HUD uyarı listesi
+- [x] ClimateLab ve LineChart
+
+### Gün 2 notları (B)
+- Testler: `test_day1_flow.gd` ve `test_day2_flow.gd`, ikisi de TAMAM.
+- 12 binanın `scene` alanı boş; A'nın `b_<id>.tscn` dosyaları gelince B bağlayacak.
+- Kriz takvimi (demo): sıcak hava 2043, kuraklık 2046, kıyı taşkını 2049. Uyarı bir yıl önce gelir.
+- Bilgi kartları nitel; kaynak satırları boş. Sunumdan önce her karta kaynak eklenmeli (özellikle "Akdeniz havzası" cümlesi için IPCC AR6).
+- A için: `crisis_started(event_id, risk_type, severity)` ve `crisis_resolved(result)` yayılıyor, efektler bağlanabilir.
 
 ## Gün 3 · Cila ve teslim
 

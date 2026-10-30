@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_water_reuse.tres" id="1_6heiu"]
+[ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_pf3u6"]
+
+[resource]
+script = ExtResource("2_pf3u6")
+id = &"water_reuse"
+display_name = "Atık su geri kazanım tesisi"
+short_description = "Arıtılmış atık suyu park sulamasında ve sanayide yeniden kullanır."
+category = &"water"
+cost = 350
+upkeep_per_year = 20
+allowed_plot_kinds = Array[StringName]([&"open", &"coastal"])
+on_build_effects = {
+"ecosystem_health": 3.0,
+"water_security": 20.0
+}
+risk_reduction = {
+&"drought": 0.25
+}
+info_card = ExtResource("1_6heiu")

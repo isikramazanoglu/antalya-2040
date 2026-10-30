@@ -13,6 +13,12 @@ func _ready() -> void:
 	%ContinueButton.pressed.connect(_on_continue_pressed)
 	EventBus.year_ended.connect(_on_year_ended)
 	EventBus.game_over.connect(_on_game_over)
+	EventBus.phase_changed.connect(_on_phase_changed)
+
+
+func _on_phase_changed(phase: StringName) -> void:
+	if phase == &"build" or phase == &"crisis":
+		hide()
 
 
 func _on_year_ended(report: Dictionary) -> void:
@@ -30,6 +36,13 @@ func _on_year_ended(report: Dictionary) -> void:
 		for id in report.built_this_year:
 			names.append(Catalog.get_building(id).display_name)
 		t += "\n[b]Bu yıl yapılanlar[/b]\n" + ", ".join(names) + "\n"
+	for result in report.crisis_results:
+		t += "\n[b]Kriz[/b]\n%s\n" % result.summary_text
+		for key in result.damage:
+			t += "%s  %s\n" % [UiText.STAT_NAMES.get(key, key), UiText.format_delta(result.damage[key])]
+	for w in report.new_warnings:
+		var def := Catalog.get_event(w.event_id)
+		t += "\n[color=#ffbf66][b]Uyarı:[/b] %d sonunda %s bekleniyor. Hazırlanmak için bir yılın var.[/color]\n" % [w.due_year, def.display_name]
 	%Body.text = t
 	%ContinueButton.text = "Devam"
 	show()

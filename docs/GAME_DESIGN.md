@@ -56,6 +56,7 @@ Hepsi `BalanceConfig` içinde katsayı olarak durur, kodda sabit sayı yazılmaz
 **Riskler (0–100)**
 - Başlangıç: kuraklık 40, sıcak 45, kıyı taşkını 30.
 - Her yıl artış: kuraklık +2, sıcak +2, taşkın +1.5. Bu artış oyun içi bir eğilimdir, bilimsel tahmin değildir.
+- Yıl sonunda hesaplanan risk **gelecek yılın** riskidir (uyarılar da gelecek yıl için planlanır).
 - Gösterilen risk = ham risk × (1 − koruma oranı).
 - Koruma oranı = o `risk_type` için tüm binaların `risk_reduction` toplamı, en çok 0.8.
 
@@ -65,7 +66,7 @@ Hepsi `BalanceConfig` içinde katsayı olarak durur, kodda sabit sayı yazılmaz
 
 **Kriz hasarı**
 - Uygulanan hasar = `base_damage` × (1 − koruma oranı) × seçilen müdahalenin `damage_multiplier` değeri.
-- Kriz olasılığı (scripted değilse) = `base_probability` × (gösterilen risk / 50).
+- `scripted_year` dolu olan kriz yalnızca o yıl gelir (demo garantisi). Boşsa her yıl olasılık = `base_probability` × (gösterilen risk / 50).
 
 **Final puanı**
 - Puan = (su + enerji + yaşam kalitesi + ekosistem) / 4 + emisyon azaltma yüzdesi × 0.3 (en çok 30). 
@@ -96,7 +97,7 @@ Bütçe kontrolü: 13 yılda yaklaşık 2000–2800 kredi birikir; oyuncu 12 yat
 
 | id | risk_type | En erken | Demo yılı (`scripted_year`) | Taban hasar |
 |---|---|---|---|---|
-| `heatwave` | heat | 2042 | 2043 | yaşam −10, nüfus −%2, kredi −100 |
+| `heatwave` | heat | 2042 | 2043 | yaşam −10, nüfus −10 kişi, kredi −100 |
 | `drought` | drought | 2044 | 2046 | su −20, ekosistem −5, kredi −150 |
 | `coastal_flood` | coastal_flood | 2046 | 2049 | kredi −250, ekosistem −8, yaşam −5 |
 
@@ -117,8 +118,8 @@ Kriz aşamaları: risk uyarısı (yıl N sonu) → hazırlık (yıl N+1) → kri
 **B. Küresel atmosferik CO2 (ppm).** Yalnızca bilgi katmanıdır. Oyuncunun yatırımı bu sayıyı değiştirmez. İklim Laboratuvarı'nda şu mesaj verilir: tek bir şehrin emisyonu küresel yoğunluğa çok küçük katkı yapar; etki, dünyadaki bütün şehirlerin toplamıyla oluşur.
 
 Veri kuralı:
-- Geçmiş yıllar NOAA Global Monitoring Laboratory ölçümlerinden alınır (https://gml.noaa.gov/ccgg/trends/).
-- 2040–2052 değerleri ölçüm değil, senaryodur. Bir IPCC AR6 senaryosundan (ör. SSP2-4.5) alınır ve arayüzde senaryo adıyla gösterilir.
+- Geçmiş yıllar NOAA Global Monitoring Laboratory ölçümlerinden alınır (https://gml.noaa.gov/ccgg/trends/). `data/co2_scenario.tres` şu an 1959–2025 Mauna Loa yıllık ortalamalarını içerir (dosya tarihi 2026-10-09).
+- 2040–2052 değerleri ölçüm değil, senaryodur. Henüz eklenmedi; oyun bu yıllar için "veri yok" gösterir. Bir IPCC AR6 senaryosundan (ör. SSP2-4.5) alınır ve arayüzde senaryo adıyla gösterilir.
 - Kaynağı kontrol edilmemiş hiçbir sayı `co2_scenario.tres` dosyasına girmez. Değer yoksa oyun "veri yok" yazar.
 
 **C. Yerel iklim riskleri.** Kuraklık, aşırı sıcak, kıyı taşkını. 0–100 oyun ölçeği. Yatırımlar riski değil hasarı azaltır; arayüzde ham risk ve korunmuş risk ayrı gösterilir.

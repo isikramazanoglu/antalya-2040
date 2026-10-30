@@ -12,6 +12,7 @@ func _ready() -> void:
 	EventBus.build_requested.connect(_on_build_requested)
 	EventBus.end_turn_requested.connect(turn_manager.end_year)
 	EventBus.report_closed.connect(turn_manager.close_report)
+	EventBus.crisis_response_chosen.connect(turn_manager.on_crisis_response)
 	# UI node'ları _ready'lerini bitirsin, ilk year_started'ı kaçırmasın.
 	turn_manager.start_game.call_deferred()
 
@@ -51,15 +52,6 @@ func _on_build_requested(plot_id: StringName, building_id: StringName) -> void:
 	EventBus.build_approved.emit(plot_id, building_id)
 
 
-func built_definitions() -> Array[BuildingDefinition]:
-	var result: Array[BuildingDefinition] = []
-	for building_id in GameState.plots.values():
-		var def := Catalog.get_building(building_id)
-		if def:
-			result.append(def)
-	return result
-
-
 # --- TurnManager'ın sonuçları buradan yazdırılır ---
 
 func apply_deltas(deltas: Dictionary) -> void:
@@ -76,3 +68,15 @@ func advance_year() -> void:
 
 func record_history() -> void:
 	GameState.record_history()
+
+
+func apply_climate(climate: Dictionary) -> void:
+	GameState.set_climate(climate)
+
+
+func add_pending(warning: Dictionary) -> void:
+	GameState.add_pending(warning)
+
+
+func remove_pending(warning: Dictionary) -> void:
+	GameState.remove_pending(warning)

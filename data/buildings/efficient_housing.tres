@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_efficient_housing.tres" id="1_12km5"]
+[ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_sril0"]
+
+[resource]
+script = ExtResource("2_sril0")
+id = &"efficient_housing"
+display_name = "Enerji verimli konut bölgesi"
+short_description = "Yalıtımlı, gölgelemeli yeni konutlar şehre nüfus kazandırır."
+category = &"energy"
+cost = 300
+upkeep_per_year = 15
+allowed_plot_kinds = Array[StringName]([&"urban"])
+on_build_effects = {
+"population": 100,
+"quality_of_life": 4.0
+}
+emission_multipliers = {
+"buildings": -0.1
+}
+risk_reduction = {
+&"heat": 0.1
+}
+info_card = ExtResource("1_12km5")

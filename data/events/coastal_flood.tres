@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="EventDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_event_coastal_flood.tres" id="1_2cwen"]
+[ext_resource type="Script" path="res://scripts/data/crisis_response.gd" id="2_o58cd"]
+[ext_resource type="Script" path="res://scripts/data/event_definition.gd" id="3_h6vr7"]
+
+[sub_resource type="Resource" id="Resource_7js6r"]
+script = ExtResource("2_o58cd")
+id = &"evacuate_coast"
+label = "Kıyıyı boşalt, kum torbası diz"
+description = "Sahildeki insanlar ve araçlar güvenli yere taşınır."
+cost = 80
+damage_multiplier = 0.6
+
+[sub_resource type="Resource" id="Resource_7jki5"]
+script = ExtResource("2_o58cd")
+id = &"temporary_barrier"
+label = "Geçici taşkın bariyeri kur"
+description = "Hızlı kurulan bariyerler suyun önünü keser."
+cost = 150
+damage_multiplier = 0.4
+
+[sub_resource type="Resource" id="Resource_p6mrh"]
+script = ExtResource("2_o58cd")
+id = &"do_nothing"
+label = "Müdahale etme"
+description = "Fırtınanın geçmesini beklersin."
+
+[resource]
+script = ExtResource("3_h6vr7")
+id = &"coastal_flood"
+display_name = "Kıyı taşkını"
+description = "Fırtına ve yüksek dalgalar kıyı yolunu ve sahil işletmelerini su altında bırakıyor."
+risk_type = &"coastal_flood"
+earliest_year = 2046
+scripted_year = 2049
+base_damage = {
+"credits": -250,
+"ecosystem_health": -8.0,
+"quality_of_life": -5.0
+}
+responses = Array[ExtResource("2_o58cd")]([SubResource("Resource_7js6r"), SubResource("Resource_7jki5"), SubResource("Resource_p6mrh")])
+info_card = ExtResource("1_2cwen")

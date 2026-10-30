@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_rjgqg"]
+
+[resource]
+script = ExtResource("1_rjgqg")
+id = &"card_efficient_housing"
+title = "Isı yalıtımı"
+body = "İyi yalıtılmış bir bina yazın içeriyi serin, kışın sıcak tutar. Klima ve ısıtma daha az çalışır, böylece hem enerji faturası hem de binalardan kaynaklanan emisyon azalır."

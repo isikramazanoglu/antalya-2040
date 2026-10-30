@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_urban_farming.tres" id="1_xolsh"]
+[ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_nyf68"]
+
+[resource]
+script = ExtResource("2_nyf68")
+id = &"urban_farming"
+display_name = "İklime dayanıklı kent tarımı"
+short_description = "Damla sulamalı bahçeler, kuraklığa dayanıklı Akdeniz bitkileri."
+category = &"food"
+cost = 200
+upkeep_per_year = 5
+allowed_plot_kinds = Array[StringName]([&"open"])
+on_build_effects = {
+"ecosystem_health": 2.0,
+"quality_of_life": 4.0
+}
+risk_reduction = {
+&"drought": 0.1
+}
+info_card = ExtResource("1_xolsh")

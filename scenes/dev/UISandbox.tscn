@@ -7,6 +7,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/YearReport.tscn" id="5_report"]
 [ext_resource type="Script" path="res://scripts/ui/ui_sandbox.gd" id="6_sandbox"]
 
+[ext_resource type="PackedScene" path="res://scenes/ui/EventPanel.tscn" id="7_event"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ClimateLab.tscn" id="8_lab"]
+
 [node name="UISandbox" type="Node"]
 
 [node name="GameController" type="Node" parent="."]
@@ -32,5 +35,9 @@ color = Color(0.2, 0.45, 0.5, 1)
 [node name="HUD" parent="UI" instance=ExtResource("3_hud")]
 
 [node name="BuildPanel" parent="UI" instance=ExtResource("4_panel")]
+
+[node name="ClimateLab" parent="UI" instance=ExtResource("8_lab")]
+
+[node name="EventPanel" parent="UI" instance=ExtResource("7_event")]
 
 [node name="YearReport" parent="UI" instance=ExtResource("5_report")]
