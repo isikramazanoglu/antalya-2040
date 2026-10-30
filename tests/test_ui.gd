@@ -120,8 +120,15 @@ func _process(_d: float) -> bool:
 			_click_plot("U01")
 		140:
 			_find("BuildPanel", "Cards").get_child(0).pressed.emit()
+		142:
+			pass
 		145:
 			_check(_find("BuildPanel", "BuildButton").disabled and _find("BuildPanel", "ErrorLabel").text.contains("yeterli bütçen yok"), "9) yetersiz bütçede inşa düğmesi kapalı, neden yazıyor")
+			var asked := [false]
+			bus.plot_deselect_requested.connect(func(): asked[0] = true, CONNECT_ONE_SHOT)
+			_find("BuildPanel", "CloseButton").pressed.emit()
+			_check(asked[0] and not _ui("BuildPanel").visible, "v1.3) × ile kapatınca plot_deselect_requested yayıldı")
+			_click_plot("U01")
 			gs.stats.credits = 600
 			bus.stats_changed.emit(gs.get_stats())
 			var before := log.filter(func(l): return l[0] == "plot_selected").size()
