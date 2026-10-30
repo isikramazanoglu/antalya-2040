@@ -15,6 +15,9 @@ extends Node3D
 ## Yumuşatma hızı; büyüdükçe kamera hedefe daha çabuk varır.
 @export var smoothing := 8.0
 @export var drag_sensitivity := 0.0022
+## Ekranın arayüz panellerince kapatılmayan kısmı (oran olarak x, y, genişlik, yükseklik).
+## Seçilen arsa bunun dışında kalırsa kamera onu içeri kaydırır.
+@export var safe_area := Rect2(0.23, 0.1, 0.48, 0.76)
 
 @onready var _camera: Camera3D = $Pitch/Camera3D
 
@@ -65,6 +68,29 @@ func _process(delta: float) -> void:
 ## Kamerayı bir noktaya yumuşakça götürür (CitySandbox ve ileride odaklama için).
 func focus_on(point: Vector3) -> void:
 	_target_pos = Vector3(point.x, position.y, point.z)
+
+
+## Nokta ekranın güvenli alanı dışındaysa kamerayı kaydırıp alanın ortasına getirir; içindeyse dokunmaz.
+func bring_into_view(point: Vector3) -> void:
+	var view := get_viewport().get_visible_rect().size
+	var safe := Rect2(safe_area.position * view, safe_area.size * view)
+	var screen := _camera.unproject_position(point)
+	if safe.has_point(screen) and not _camera.is_position_behind(point):
+		return
+	var from = _ground_at(screen)
+	var to = _ground_at(safe.get_center())
+	if from != null and to != null:
+		_target_pos += from - to
+
+
+## Ekran noktasının y = 0 zemin düzlemindeki karşılığı; düzleme bakmıyorsa null.
+func _ground_at(screen: Vector2) -> Variant:
+	var origin := _camera.project_ray_origin(screen)
+	var dir := _camera.project_ray_normal(screen)
+	if dir.y > -0.01:
+		return null
+	var hit := origin + dir * (-origin.y / dir.y)
+	return Vector3(hit.x, 0.0, hit.z)
 
 
 func _flat_right() -> Vector3:

@@ -10,6 +10,7 @@ const BUILDING_SCENE_PATH := "res://scenes/buildings/b_%s.tscn"
 
 @onready var _plots: Node3D = $Plots
 @onready var _fx: DisasterFX = $DisasterFX
+@onready var _camera_rig: CameraRig = $CameraRig
 
 var _selected: BuildPlot
 var _hovered: BuildPlot
@@ -110,6 +111,8 @@ func _select(plot: BuildPlot) -> void:
 	_selected = plot
 	plot.set_selected(true)
 	EventBus.plot_selected.emit(plot.plot_id, plot.plot_kind, plot.is_empty())
+	# Arsa inşaat panelinin veya diğer panellerin arkasında kalmasın.
+	_camera_rig.bring_into_view(plot.global_position)
 
 
 func _deselect() -> void:

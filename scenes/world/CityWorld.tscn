@@ -77,7 +77,7 @@ directional_shadow_mode = 2
 directional_shadow_max_distance = 160.0
 
 [node name="CameraRig" parent="." instance=ExtResource("2_CameraRig")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
 
 [node name="Terrain" type="StaticBody3D" parent="."]
 collision_mask = 0
