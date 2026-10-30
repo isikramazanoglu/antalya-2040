@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_ln6o5"]
+
+[resource]
+script = ExtResource("1_ln6o5")
+id = &"card_event_heatwave"
+title = "Sıcak hava dalgaları"
+body = "Bilim insanları, iklim ısındıkça aşırı sıcak günlerin daha sık ve daha şiddetli yaşanacağını öngörüyor. Akdeniz havzası bu değişimden en çok etkilenen bölgeler arasında sayılıyor."

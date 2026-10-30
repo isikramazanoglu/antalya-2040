@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="EventDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_event_drought.tres" id="1_pt2ig"]
+[ext_resource type="Script" path="res://scripts/data/crisis_response.gd" id="2_6hgnv"]
+[ext_resource type="Script" path="res://scripts/data/event_definition.gd" id="3_m6xv3"]
+
+[sub_resource type="Resource" id="Resource_j4il8"]
+script = ExtResource("2_6hgnv")
+id = &"water_restriction"
+label = "Su kısıtlaması uygula"
+description = "Bahçe sulama ve araç yıkama yasaklanır. Halk memnun değil."
+damage_multiplier = 0.7
+extra_effects = {
+"quality_of_life": -3.0
+}
+
+[sub_resource type="Resource" id="Resource_1htna"]
+script = ExtResource("2_6hgnv")
+id = &"emergency_tanker"
+label = "Tankerle acil su getir"
+description = "Pahalı ama hızlı bir çözüm."
+cost = 120
+damage_multiplier = 0.5
+
+[sub_resource type="Resource" id="Resource_nb34a"]
+script = ExtResource("2_6hgnv")
+id = &"do_nothing"
+label = "Müdahale etme"
+description = "Yağmurun yağmasını beklersin."
+
+[resource]
+script = ExtResource("3_m6xv3")
+id = &"drought"
+display_name = "Kuraklık"
+description = "Yağışların azaldığı bir yıl: barajlar düşük, yer altı suyu çekiliyor."
+risk_type = &"drought"
+earliest_year = 2044
+scripted_year = 2046
+base_damage = {
+"credits": -150,
+"ecosystem_health": -5.0,
+"water_security": -20.0
+}
+responses = Array[ExtResource("2_6hgnv")]([SubResource("Resource_j4il8"), SubResource("Resource_1htna"), SubResource("Resource_nb34a")])
+info_card = ExtResource("1_pt2ig")

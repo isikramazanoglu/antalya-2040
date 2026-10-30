@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_b6qts"]
+
+[resource]
+script = ExtResource("1_b6qts")
+id = &"card_cooling_center"
+title = "Aşırı sıcak ve sağlık"
+body = "Aşırı sıcak özellikle yaşlılar, küçük çocuklar ve kronik hastalığı olanlar için tehlikelidir. Serinleme merkezleri evinde klima olmayanlara güvenli bir yer sağlar."

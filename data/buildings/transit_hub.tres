@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_transit_hub.tres" id="1_lsibo"]
+[ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_quxjm"]
+
+[resource]
+script = ExtResource("2_quxjm")
+id = &"transit_hub"
+display_name = "Düşük emisyonlu toplu taşıma merkezi"
+short_description = "Elektrikli otobüs ve tramvay hatlarını bisiklet yollarıyla birleştirir."
+category = &"transport"
+cost = 400
+upkeep_per_year = 20
+allowed_plot_kinds = Array[StringName]([&"urban"])
+on_build_effects = {
+"quality_of_life": 5.0
+}
+emission_multipliers = {
+"transport": -0.35
+}
+info_card = ExtResource("1_lsibo")

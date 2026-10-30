@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_food_rescue.tres" id="1_341uk"]
+[ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_vyumg"]
+
+[resource]
+script = ExtResource("2_vyumg")
+id = &"food_rescue"
+display_name = "Gıda kurtarma merkezi"
+short_description = "Satılmayan ama yenebilir gıdayı toplayıp ihtiyacı olanlara ulaştırır."
+category = &"food"
+cost = 100
+upkeep_per_year = 5
+allowed_plot_kinds = Array[StringName]([&"urban"])
+on_build_effects = {
+"quality_of_life": 5.0
+}
+emission_multipliers = {
+"waste": -0.1
+}
+info_card = ExtResource("1_341uk")

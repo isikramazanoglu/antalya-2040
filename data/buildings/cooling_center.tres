@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_cooling_center.tres" id="1_psi6u"]
+[ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_em1yh"]
+
+[resource]
+script = ExtResource("2_em1yh")
+id = &"cooling_center"
+display_name = "İklim serinleme merkezi"
+short_description = "Sıcak hava dalgalarında herkesin sığınabileceği serin, gölgeli bir bina."
+category = &"heat"
+cost = 200
+upkeep_per_year = 15
+allowed_plot_kinds = Array[StringName]([&"urban"])
+on_build_effects = {
+"quality_of_life": 4.0
+}
+risk_reduction = {
+&"heat": 0.35
+}
+info_card = ExtResource("1_psi6u")

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_tt54t"]
+
+[resource]
+script = ExtResource("1_tt54t")
+id = &"card_coastal_restoration"
+title = "Doğal kıyı savunması"
+body = "Kumullar ve kıyı bitkileri dalgaların enerjisini emer ve kıyı erozyonunu yavaşlatır. Erken uyarı sistemi, taşkın gelmeden insanların ve araçların güvenli yere taşınmasına zaman kazandırır."

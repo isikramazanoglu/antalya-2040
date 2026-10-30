@@ -37,13 +37,15 @@ antalya-2040/
 │   │   ├── info_card.gd
 │   │   ├── balance_config.gd
 │   │   ├── co2_scenario.gd
+│   │   ├── mission_definition.gd
 │   │   └── game_catalog.gd
 │   ├── sim/                       B
 │   │   ├── game_controller.gd     Oyuncu taleplerini karşılar, GameState'e tek yazan
 │   │   ├── turn_manager.gd        Yıl sonu adımlarını sıralar, faz makinesi
 │   │   ├── economy_simulator.gd   Saf hesap: gelir, gider, nüfus
 │   │   ├── climate_simulator.gd   Saf hesap: emisyon, risk, ekosistem, CO2 okuma
-│   │   └── event_manager.gd       Saf hesap: kriz planlama ve hasar
+│   │   ├── event_manager.gd       Saf hesap: kriz planlama ve hasar
+│   │   └── mission_tracker.gd     Saf hesap: görev değerlendirme
 │   ├── world/                     A
 │   │   ├── city_world.gd          Arsa seçimi, bina yerleştirme, efekt tetikleme
 │   │   ├── camera_rig.gd          İzometrik kamera
@@ -89,9 +91,10 @@ antalya-2040/
 │   ├── co2_scenario.tres          Co2Scenario: kaynaklı ppm tablosu
 │   ├── buildings/<id>.tres        BuildingDefinition × 12
 │   ├── events/<id>.tres           EventDefinition × 3+
+│   ├── missions/<id>.tres         MissionDefinition × 4
 │   └── cards/<id>.tres            InfoCard (bina, olay ve İklim Laboratuvarı kartları)
 │
-├── tests/                         B     Headless akış testleri (test_day1_flow.gd)
+├── tests/                         B     Headless testler (test_day1_flow.gd, test_day2_flow.gd) ve denge simülasyonu (balance_sim.gd)
 │
 └── assets/
     ├── models/                    A     .glb modeller
@@ -239,8 +242,9 @@ EventPanel (PanelContainer, event_panel.gd, ekran ortası, mouse_filter = STOP)
     ├── Title (Label)
     ├── Description (RichTextLabel)
     ├── MitigationLabel (Label)          "Yatırımların hasarı %X azaltacak"
-    ├── Responses (VBoxContainer)        her CrisisResponse için Button
-    └── ResultBox (VBoxContainer, gizli) crisis_resolved sonrası özet + "Tamam"
+    └── Responses (VBoxContainer)        her CrisisResponse için Button (parası yetmeyen kapalı)
+
+Sonuç ayrı kutuda gösterilmez: `crisis_resolved` gelince panel kapanır, hasar yıl sonu raporunun "Kriz" bölümünde görünür.
 ```
 
 ### 2.11 YearReport (B)
@@ -266,7 +270,7 @@ Kural: **veri bir yerde, hesap bir yerde, yazma tek yerde.**
 
 | Modül | Tür | Yapar | Yapmaz |
 |---|---|---|---|
-| `GameState` | autoload Node | Verileri tutar (`stats`, `plots` sözlüğü, `pending_crises`, `history`, `phase`, `rng_seed`). Getter'lar. `GameController`'ın çağırdığı ayarlayıcılar. Her değişimde `stats_changed`. `reset()`. | Hesap yapmaz, kural kontrol etmez. |
+| `GameState` | autoload Node | Verileri tutar (`stats`, `plots` sözlüğü, `pending_crises`, `history`, `phase`, `rng_seed`). Getter'lar (`get_stats`, `get_building_on`, `built_definitions`). `GameController`'ın çağırdığı ayarlayıcılar. Her değişimde `stats_changed`. `reset()`. | Hesap yapmaz, kural kontrol etmez. |
 | `GameController` | Node (Game içinde) | Oyuncu taleplerini dinler (`build_requested`, `end_turn_requested`, `crisis_response_chosen`, `report_closed`). Kural kontrolü (sözleşme §6.3). `GameState`'e yazan tek modül. | Yıl sonu hesabı yapmaz; bunu TurnManager'a bırakır. |
 | `TurnManager` | Node | Yıl sonu adımlarını sıralar, faz makinesini tutar, tur sinyallerini yayar. Simülatörlerin sonuçlarını `GameController.apply_*` ile uygulatır. | Kendi formülü yoktur; oyuncu girdisi dinlemez. |
 | `EconomySimulator` | `RefCounted`, statik fonksiyonlar | `compute_year(stats, buildings, balance) -> Dictionary` (gelir, gider, nüfus değişimi). | Durum tutmaz, sinyal yaymaz. |
@@ -345,13 +349,17 @@ Hepsi `scripts/data/` altında, `class_name` ile, `extends Resource`. Alanlar `@
 
 Başlangıç değerleri (kredi, nüfus, göstergeler), `start_year`, `end_year`, kişi başı vergi, şehir taban gideri, nüfus büyüme katsayısı, sektör taban emisyonları, risk yıllık artışları, koruma üst sınırı (0.8). Tüm sayılar `GAME_DESIGN.md` §4'ten gelir.
 
+### MissionDefinition
+
+`id`, `title`, `description`, `stat` (stats anahtarı), `target`, `at_most` (emisyon gibi altına inilecek hedefler), `deadline_year`, `reward_credits`. Yıl sonunda `MissionTracker` değerlendirir; durum `GameState.missions` içinde (`active` / `done` / `failed`).
+
 ### Co2Scenario
 
 `years: PackedInt32Array`, `ppm: PackedFloat32Array`, `scenario_name: String`, `source: String`. Eksik yıl için `ClimateSimulator` -1.0 döner ve arayüz "veri yok" yazar.
 
 ### GameCatalog
 
-`buildings: Array[BuildingDefinition]`, `events: Array[EventDefinition]`, `lab_cards: Array[InfoCard]`, `balance: BalanceConfig`, `co2: Co2Scenario`.
+`buildings: Array[BuildingDefinition]`, `events: Array[EventDefinition]`, `lab_cards: Array[InfoCard]`, `missions: Array[MissionDefinition]`, `balance: BalanceConfig`, `co2: Co2Scenario`.
 
 **Yeni bina eklemek:** `data/buildings/<id>.tres` oluştur, `catalog.tres` → `buildings` dizisine ekle, A `b_<id>.tscn` hazırlar ve `scene` alanına sürükler. Kod değişmez. Sözleşme §8'e satır eklenir.
 **Yeni kriz eklemek:** `data/events/<id>.tres` oluştur, `catalog.tres` → `events` dizisine ekle. Yeni `risk_type` gerekiyorsa sözleşme değişikliğidir (A'nın efekt yazması gerekir).
@@ -382,7 +390,9 @@ Klasör taramak yerine katalog dizisi seçildi: dışa aktarılmış oyunda `.tr
 
 ## 7. Dışa aktarım
 
-Windows Desktop preset, Godot 4.7.2 export template'leri ile. `export_presets.cfg` B'nin sahipliğindedir ve repoya eklenir. `scenes/dev/*` dışa aktarım filtresiyle hariç tutulur.
+Windows Desktop preset, Godot 4.7.2 export template'leri ile. `export_presets.cfg` B'nin sahipliğindedir ve repoya eklenir. `scenes/dev/*` ve `tests/*` dışa aktarım filtresiyle hariç tutulur. Çıktı: `export/ANTALYA2040.exe` (PCK gömülü, tek dosya; `export/` git'e girmez).
+
+Komut satırından: `<godot> --headless --path . --export-release "Windows Desktop" export/ANTALYA2040.exe`
 
 ---
 

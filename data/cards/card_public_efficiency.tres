@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_ahypq"]
+
+[resource]
+script = ExtResource("1_ahypq")
+id = &"card_public_efficiency"
+title = "Önce tasarruf"
+body = "Harcanmayan enerji, üretilmesi gerekmeyen enerjidir. Verimli aydınlatma, yalıtım ve doğru ayarlanmış ısıtma-soğutma sistemleri kamu binalarının tüketimini düşürür."

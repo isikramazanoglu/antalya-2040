@@ -6,6 +6,7 @@ var stats: Dictionary = {}
 var plots: Dictionary = {}  # plot_id (StringName) -> building_id (StringName)
 var pending_crises: Array = []  # sözleşme §5.2 warning sözlükleri
 var history: Array = []  # her yıl sonunun stats kopyası
+var missions: Dictionary = {}  # mission id -> &"active" | &"done" | &"failed"
 var phase: StringName = &"build"
 var rng_seed: int = 0
 
@@ -36,6 +37,7 @@ func reset() -> void:
 	plots.clear()
 	pending_crises.clear()
 	history.clear()
+	missions.clear()
 	phase = &"build"
 	rng_seed = randi()
 	EventBus.stats_changed.emit(get_stats())
@@ -50,3 +52,70 @@ func get_stats() -> Dictionary:
 func get_building_on(plot_id: StringName) -> StringName:
 	return plots.get(plot_id, &"")
 
+
+# --- Yazma fonksiyonları: yalnızca GameController çağırır ---
+
+const INDEX_STATS: Array[String] = ["water_security", "energy_security", "quality_of_life", "ecosystem_health"]
+
+
+## {"credits": -400, "energy_security": 20} gibi değişimleri uygular; göstergeler 0..100 arası kalır.
+func apply_deltas(deltas: Dictionary) -> void:
+	for key in deltas:
+		if key == "credits":
+			stats.credits += int(deltas[key])
+		elif key == "population":
+			stats.population = maxi(0, stats.population + int(deltas[key]))
+		elif key in INDEX_STATS:
+			stats[key] = clampf(stats[key] + float(deltas[key]), 0.0, 100.0)
+		else:
+			push_warning("GameState: bilinmeyen gösterge '%s'" % key)
+	EventBus.stats_changed.emit(get_stats())
+
+
+func place_building(plot_id: StringName, building_id: StringName) -> void:
+	plots[plot_id] = building_id
+
+
+func set_phase(new_phase: StringName) -> void:
+	phase = new_phase
+
+
+func advance_year() -> void:
+	stats.year += 1
+	EventBus.stats_changed.emit(get_stats())
+
+
+func record_history() -> void:
+	history.append(get_stats())
+
+
+## İklim adımının hesapladığı değerler (delta değil, yeni değer).
+func set_climate(climate: Dictionary) -> void:
+	stats.emissions_by_sector = climate.emissions_by_sector
+	stats.emissions_total = climate.emissions_total
+	stats.risks = climate.risks
+	stats.global_co2_ppm = climate.global_co2_ppm
+	EventBus.stats_changed.emit(get_stats())
+
+
+func set_mission_state(mission_id: StringName, state: StringName) -> void:
+	missions[mission_id] = state
+
+
+func add_pending(warning: Dictionary) -> void:
+	pending_crises.append(warning)
+
+
+func remove_pending(warning: Dictionary) -> void:
+	pending_crises.erase(warning)
+
+
+# --- Salt okunur yardımcılar ---
+
+func built_definitions() -> Array[BuildingDefinition]:
+	var result: Array[BuildingDefinition] = []
+	for building_id in plots.values():
+		var def := Catalog.get_building(building_id)
+		if def:
+			result.append(def)
+	return result

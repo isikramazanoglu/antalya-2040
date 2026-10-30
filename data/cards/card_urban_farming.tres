@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_ivae8"]
+
+[resource]
+script = ExtResource("1_ivae8")
+id = &"card_urban_farming"
+title = "Az suyla tarım"
+body = "Damla sulama suyu doğrudan bitkinin köküne verir, buharlaşma ile kaybolan su azalır. Bölgenin iklimine uygun bitkiler kurak yıllarda daha az etkilenir."

@@ -3,19 +3,20 @@
 Her ekip yalnızca kendi bölümündeki kutuları işaretler. Ortak bölümlere satır **eklenir**, var olan satır silinmez.
 İşaret: `[ ]` yapılmadı, `[~]` sürüyor, `[x]` bitti ve kendi dalında çalışıyor, `[D]` develop'a birleşti.
 
-Son güncelleme: 2026-10-30 · Aşama: **Gün 1, Ekip B işleri bitti (Mac), A bekleniyor, GitHub'a gönderilmedi**
+Son güncelleme: 2026-10-30 · Aşama: **Gün 3, Ekip B işleri bitti; entegrasyon için Ekip A bekleniyor**
+Repo: https://github.com/isikramazanoglu/antalya-2040 (gizli)
 
 ---
 
 ## Gün 0 · Kurulum (ikisi birlikte, 1–2 saat)
 
 - [~] İki bilgisayarda Godot 4.7.2 Stable Standard kurulu (Mac: 4.7.2.stable.official doğrulandı; ikinci bilgisayar bekliyor)
-- [ ] GitHub reposu açıldı, iki kişi de yazma yetkili
-- [ ] `main`, `develop`, `feature/city-world`, `feature/simulation-ui` dalları açıldı
+- [~] GitHub reposu açıldı (gizli); ikinci kişi Collaborators'a eklenecek
+- [x] `main`, `develop`, `feature/city-world`, `feature/simulation-ui` dalları açıldı ve gönderildi
 - [x] B: iskelet commit'i `develop`'a: `project.godot` (Forward+, autoload'lar, Input Map, fizik katman adları), `.gitignore`, `.gitattributes`, `event_bus.gd`, `scripts/data/*.gd` boş Resource sınıfları, boş `catalog.tres`, `Game.tscn`, `MainMenu.tscn`
 - [x] A: `CityWorld.tscn` kök node'u (boş zemin + kamera) iskelete eklendi, Game.tscn içinde açılıyor
 - [ ] İki bilgisayarda da `develop` çekildi, oyun açıldı, hata yok
-- [ ] Windows export denemesi (boş proje) çalıştı · export template'leri henüz kurulu değil
+- [x] Windows export: Mac'te `export/ANTALYA2040.exe` üretildi (PCK gömülü, Game sahnesi ve 12 bina paketten yüklendi, dev/test hariç). Windows'ta çalıştırılması bekliyor.
 
 ## Gün 1 · Oynanabilir prototip (3 yatırım)
 
@@ -60,29 +61,51 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - [ ] Deniz shader'ı (turkuaz)
 
 ### Ekip B
-- [ ] 12 `BuildingDefinition` + bilgi kartları
-- [ ] ClimateSimulator (sektör emisyonları, riskler, ekosistem, CO2 okuma)
-- [ ] `co2_scenario.tres` kaynaklı verilerle (kaynak satırı zorunlu)
-- [ ] EventManager + 3 `EventDefinition` + müdahaleler
-- [ ] TurnManager kriz fazı
-- [ ] EventPanel, HUD uyarı listesi
-- [ ] ClimateLab ve LineChart
+- [x] 12 `BuildingDefinition` + bilgi kartları
+- [x] ClimateSimulator (sektör emisyonları, riskler, ekosistem, CO2 okuma)
+- [~] `co2_scenario.tres`: NOAA 1959–2025 ölçümü eklendi; 2040–2052 senaryo değeri yok (oyun "veri yok" gösterir)
+- [x] EventManager + 3 `EventDefinition` + müdahaleler
+- [x] TurnManager kriz fazı
+- [x] EventPanel, HUD uyarı listesi
+- [x] ClimateLab ve LineChart
+
+### Gün 2 notları (B)
+- Testler: `test_day1_flow.gd` ve `test_day2_flow.gd`, ikisi de TAMAM.
+- 12 binanın `scene` alanı boş; A'nın `b_<id>.tscn` dosyaları gelince B bağlayacak.
+- Kriz takvimi (demo): sıcak hava 2043, kuraklık 2046, kıyı taşkını 2049. Uyarı bir yıl önce gelir.
+- Bilgi kartları nitel; kaynak satırları boş. Sunumdan önce her karta kaynak eklenmeli (özellikle "Akdeniz havzası" cümlesi için IPCC AR6).
+- A için: `crisis_started(event_id, risk_type, severity)` ve `crisis_resolved(result)` yayılıyor, efektler bağlanabilir.
 
 ## Gün 3 · Cila ve teslim
 
 Öğlen 12:00 özellik dondurma. Sonrası yalnızca hata düzeltme ve denge.
 
 - [ ] A: ışık/gölge cilası, kamera hissi, performans testi
-- [ ] B: denge (2–3 tam oyun), görevler (vakit kalırsa), arayüz teması
+- [x] B: denge (5 stratejili simülasyon, GAME_DESIGN §9), görevler (4 görev), arayüz teması (ilerleme çubukları)
 - [ ] Birlikte: uçtan uca test, Windows export, `main`'e son birleştirme, `v1.0` etiketi
-- [ ] Sunum için 2 dakikalık demo senaryosu (sabit seed)
+- [x] Sunum için 2 dakikalık demo senaryosu (aşağıda; krizler sabit yıllı, seed gerekmez)
 
 ---
+
+### Demo senaryosu (2 dakika, script ile doğrulandı)
+
+1. Ana menü → **Yeni oyun**.
+2. 2040: O01'e **Güneş enerjisi tesisi**, U01'e **Yeşil park**. Bilgi kartını göster. → **Yılı bitir**, raporda emisyon düşüşü.
+3. 2041: O02'ye **Su depolama**. → Yılı bitir.
+4. 2042: Yılı bitir. Raporda **2043 sıcak hava dalgası uyarısı**; HUD'da uyarı satırı.
+5. 2043: U02'ye **İklim serinleme merkezi** (hazırlık). → Yılı bitir → **kriz paneli**: "Yatırımların hasarı %60 azaltacak". "Serinleme alanlarını aç" seç. Raporda hasar yalnızca −84 kredi.
+6. **İklim Laboratuvarı**: Yerel emisyonlar grafiği → Küresel CO2 (NOAA ölçümü, "şehrin bu eğriyi tek başına değiştiremez") → Yerel riskler.
+
+### Gün 3 notları (B)
+- Emisyon bonusu kişi başı emisyona göre (büyüyen şehir cezalandırılmıyor).
+- Sözleşme v1.1: rapora `missions`, final özetine `emission_reduction_pct` eklendi (yalnızca ekleme, A etkilenmez).
+- `export_presets.cfg` hazır; Windows export'u için 4.7.2 şablonları gerekir.
 
 ## Sözleşme değişiklik talepleri
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |
 |---|---|---|---|---|
+| 2026-10-30 | B | v1.1: `report.missions`, `summary.emission_reduction_pct` (ekleme) | B içi, A etkilenmez | Yapıldı |
 
 ## Entegrasyon günlüğü
 

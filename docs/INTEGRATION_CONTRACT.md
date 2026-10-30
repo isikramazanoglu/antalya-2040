@@ -4,7 +4,7 @@ Bu belge Ekip A (şehir ve 3D) ile Ekip B (simülasyon ve arayüz) arasındaki t
 İki taraf birbirinin koduna yalnızca burada yazan sinyaller, fonksiyonlar ve veri şekilleri üzerinden dokunur.
 Burada yazmayan bir şeye güvenen kod, sözleşme dışıdır.
 
-Sürüm: **v1.0** (2026-10-30). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
+Sürüm: **v1.1** (2026-10-30). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
 
 ---
 
@@ -152,14 +152,15 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
   "upkeep": int,
   "built_this_year": Array,       # building_id listesi
   "crisis_results": Array,        # §5.3 listesi
-  "new_warnings": Array           # §5.2 listesi
+  "new_warnings": Array,          # §5.2 listesi
+  "missions": { "completed": Array, "failed": Array, "reward": int }   # v1.1
 }
 ```
 
 ### 5.5 `summary` (oyun sonu)
 
 ```
-{ "final_stats": Dictionary, "history": Array, "score": int, "grade": String }
+{ "final_stats": Dictionary, "history": Array, "score": int, "grade": String, "emission_reduction_pct": int }   # emission_reduction_pct: v1.1
 ```
 
 `history`: her yıl sonunun `stats` kopyası (ClimateLab grafikleri de bunu kullanır).
@@ -294,3 +295,4 @@ MVP üçlüsü: `solar_plant`, `water_storage`, `green_park`.
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
 | v1.0 | 2026-10-30 | İlk sürüm. |
+| v1.1 | 2026-10-30 | Ekleme: `report.missions`, `summary.emission_reduction_pct`. Yalnızca B'nin YearReport'u kullanır; sinyal değişikliği yok, A etkilenmez. |

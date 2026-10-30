@@ -23,4 +23,6 @@ Godot 4.7.2 Stable Standard, GDScript, 3D. İki kişilik ekip, iki ayrı bilgisa
 macOS'ta Godot: `/Applications/Godot.app/Contents/MacOS/Godot`. Windows'ta kurulu yol farklıdır.
 - Script hatası kontrolü: `<godot> --headless --path . --import`
 - Sahneyi kısa çalıştırma: `<godot> --headless --path . --quit-after 120 res://scenes/main/Game.tscn`
-- Ekip B akış testi: `<godot> --headless --path . --script res://tests/test_day1_flow.gd` (SONUÇ: TAMAM beklenir)
+- Ekip B akış testleri: `<godot> --headless --path . --script res://tests/test_day1_flow.gd` ve `test_day2_flow.gd` (SONUÇ: TAMAM beklenir)
+- Denge simülasyonu: `<godot> --headless --path . --script res://tests/balance_sim.gd`
+- Windows export: `<godot> --headless --path . --export-release "Windows Desktop" export/ANTALYA2040.exe`

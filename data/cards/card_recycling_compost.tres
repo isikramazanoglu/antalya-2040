@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_vndcc"]
+
+[resource]
+script = ExtResource("1_vndcc")
+id = &"card_recycling_compost"
+title = "Kompost"
+body = "Organik atık havasız bir çöplükte çürürse metan çıkar. Kompost tesisinde havayla temas ederek ayrışır ve bahçelerde kullanılabilecek verimli bir toprağa dönüşür."
