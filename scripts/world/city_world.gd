@@ -22,6 +22,8 @@ func _ready() -> void:
 	EventBus.phase_changed.connect(_on_phase_changed)
 	EventBus.crisis_started.connect(_on_crisis_started)
 	EventBus.crisis_resolved.connect(_on_crisis_resolved)
+	# Sözleşme v1.3: BuildPanel kapanınca seçim bırakılır; seçili arsa varsa plot_deselected yayılır.
+	EventBus.plot_deselect_requested.connect(_deselect)
 	# Sahne yeniden açıldıysa GameState'teki binaları animasyonsuz geri kur.
 	for plot in get_plots():
 		var building_id := GameState.get_building_on(plot.plot_id)
