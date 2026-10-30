@@ -24,4 +24,5 @@ emission_multipliers = {
 risk_reduction = {
 &"heat": 0.1
 }
+energy_consumption = -3.0
 info_card = ExtResource("1_12km5")

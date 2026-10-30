@@ -20,4 +20,5 @@ on_build_effects = {
 risk_reduction = {
 &"drought": 0.3
 }
+water_production = 10.0
 info_card = ExtResource("1_q04tm")

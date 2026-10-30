@@ -4,7 +4,7 @@ Bu belge Ekip A (şehir ve 3D) ile Ekip B (simülasyon ve arayüz) arasındaki t
 İki taraf birbirinin koduna yalnızca burada yazan sinyaller, fonksiyonlar ve veri şekilleri üzerinden dokunur.
 Burada yazmayan bir şeye güvenen kod, sözleşme dışıdır.
 
-Sürüm: **v1.1** (2026-10-30). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
+Sürüm: **v1.2** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
 
 ---
 
@@ -118,7 +118,13 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
   "emissions_total": float,       # oyun birimi, yıllık
   "emissions_by_sector": { "energy": float, "transport": float, "buildings": float, "waste": float },
   "risks": { "drought": float, "heat": float, "coastal_flood": float },   # 0..100
-  "global_co2_ppm": float         # kaynak tablodan; veri yoksa -1.0
+  "global_co2_ppm": float,        # kaynak tablodan; veri yoksa -1.0
+  # v1.2 kaynak akışları (oyun birimi, bilgi amaçlı; endekslerden ayrı)
+  "energy_demand": float,
+  "renewable_energy": float,
+  "renewable_share": float,       # 0..1
+  "water_demand": float,
+  "water_supply": float
 }
 ```
 
@@ -295,4 +301,5 @@ MVP üçlüsü: `solar_plant`, `water_storage`, `green_park`.
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
 | v1.0 | 2026-10-30 | İlk sürüm. |
+| v1.2 | 2026-10-31 | Ekleme: `stats` içine enerji ve su akışları (5 anahtar). Sinyal değişikliği yok, A etkilenmez. |
 | v1.1 | 2026-10-30 | Ekleme: `report.missions`, `summary.emission_reduction_pct`. Yalnızca B'nin YearReport'u kullanır; sinyal değişikliği yok, A etkilenmez. |

@@ -45,6 +45,9 @@ func _refresh() -> void:
 	var text := "Toplam: [b]%d[/b] (oyun birimi; gerçek ton değeri değildir)\n" % roundi(now.emissions_total)
 	for sector in SECTORS:
 		text += "%s: %d   " % [SECTORS[sector][0], roundi(now.emissions_by_sector[sector])]
+	text += "\nEnerji talebi %d · yenilenebilir üretim %d · [b]yenilenebilir payı %%%d[/b] (kalanı şebekeden, fosil kaynaklı)" % [
+		roundi(now.energy_demand), roundi(now.renewable_energy), roundi(now.renewable_share * 100)]
+	text += "\nSu talebi %d · su arzı %d" % [roundi(now.water_demand), roundi(now.water_supply)]
 	%EmissionText.text = text
 
 	# Küresel CO2

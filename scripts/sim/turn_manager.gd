@@ -22,6 +22,7 @@ func _ready() -> void:
 func start_game() -> void:
 	_start_stats = GameState.get_stats()
 	_rng.seed = GameState.rng_seed
+	controller.refresh_resources()
 	_set_phase(&"build")
 	EventBus.year_started.emit(GameState.stats.year)
 
@@ -70,6 +71,7 @@ func _finish_year() -> void:
 
 	var eco := EconomySimulator.compute_year(GameState.get_stats(), buildings, balance)
 	controller.apply_deltas(eco.deltas)
+	controller.refresh_resources()  # nüfus değişti, talep de değişir
 
 	var climate := ClimateSimulator.compute_year(GameState.get_stats(), buildings, balance, Catalog.data.co2)
 	controller.apply_climate(climate)
