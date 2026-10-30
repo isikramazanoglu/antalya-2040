@@ -25,7 +25,7 @@ func _ready() -> void:
 	for plot in get_plots():
 		var building_id := GameState.get_building_on(plot.plot_id)
 		if building_id != &"":
-			_spawn_building(plot, building_id, false)
+			place_building(plot.plot_id, building_id, false)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -54,6 +54,39 @@ func get_plots() -> Array[BuildPlot]:
 func find_plot(plot_id: StringName) -> BuildPlot:
 	var node := _plots.get_node_or_null(NodePath(String(plot_id)))
 	return node as BuildPlot
+
+
+## Arsa türü (sözleşme §7); arsa yoksa &"".
+func get_plot_kind(plot_id: StringName) -> StringName:
+	var plot := find_plot(plot_id)
+	return plot.plot_kind if plot else &""
+
+
+## Şehirde bu arsada bina görünüyor mu. Bilinmeyen arsa için false.
+func is_plot_occupied(plot_id: StringName) -> bool:
+	var plot := find_plot(plot_id)
+	return plot != null and plot.is_occupied()
+
+
+## Onaylanmış binayı arsaya yalnızca görsel olarak koyar; bütçe, gösterge ve tur durumuna dokunmaz.
+## Arsa yoksa veya doluysa false döner ve uyarı yazar. Sahne bulunamazsa yer tutucu kutu konur (sözleşme §4).
+func place_building(plot_id: StringName, building_id: StringName, animate := true) -> bool:
+	var plot := find_plot(plot_id)
+	if plot == null:
+		push_warning("CityWorld: '%s' arsası yok, '%s' yerleştirilmedi" % [plot_id, building_id])
+		return false
+	if plot.is_occupied():
+		push_warning("CityWorld: '%s' arsası dolu, '%s' yerleştirilmedi" % [plot_id, building_id])
+		return false
+	var def := Catalog.get_building(building_id)
+	var scene: PackedScene = def.scene if def else null
+	if scene == null:
+		var path := BUILDING_SCENE_PATH % building_id
+		if ResourceLoader.exists(path):
+			scene = load(path)
+		else:
+			push_warning("CityWorld: '%s' için bina sahnesi yok, yer tutucu gösteriliyor" % building_id)
+	return plot.place_building(scene, animate) != null
 
 
 # --- Seçim ---
@@ -108,11 +141,7 @@ func _on_phase_changed(phase: StringName) -> void:
 
 
 func _on_build_approved(plot_id: StringName, building_id: StringName) -> void:
-	var plot := find_plot(plot_id)
-	if plot == null:
-		push_warning("CityWorld: build_approved için arsa bulunamadı: %s" % plot_id)
-		return
-	_spawn_building(plot, building_id, true)
+	place_building(plot_id, building_id)
 
 
 func _on_crisis_started(_event_id: StringName, risk_type: StringName, severity: float) -> void:
@@ -121,15 +150,3 @@ func _on_crisis_started(_event_id: StringName, risk_type: StringName, severity: 
 
 func _on_crisis_resolved(_result: Dictionary) -> void:
 	_fx.stop()
-
-
-func _spawn_building(plot: BuildPlot, building_id: StringName, animate: bool) -> void:
-	var def := Catalog.get_building(building_id)
-	var scene: PackedScene = def.scene if def else null
-	if scene == null:
-		var path := BUILDING_SCENE_PATH % building_id
-		if ResourceLoader.exists(path):
-			scene = load(path)
-		else:
-			push_warning("CityWorld: '%s' için bina sahnesi yok, yer tutucu gösteriliyor" % building_id)
-	plot.place_building(scene, animate)

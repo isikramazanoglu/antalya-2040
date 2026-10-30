@@ -14,7 +14,8 @@ const STORM_FOG := Color(0.45, 0.5, 0.55)
 @export var sun: DirectionalLight3D
 @export var sea: MeshInstance3D
 ## Kuraklıkta sararan ortak materyaller; sahne kapanınca asıl renklerine döner.
-@export var dry_materials: Array[StandardMaterial3D] = []
+## StandardMaterial3D'de albedo_color, ShaderMaterial'da (foliage) `albedo` parametresi değişir.
+@export var dry_materials: Array[Material] = []
 @export var dry_color := Color(0.8, 0.66, 0.36)
 ## Şiddet 1 iken denizin yükselmesi (metre).
 @export var max_sea_rise := 0.45
@@ -62,14 +63,14 @@ func _ready() -> void:
 		"wave_height": _sea_material.get_shader_parameter("wave_height"),
 	}
 	for material in dry_materials:
-		_dry_base[material] = material.albedo_color
+		_dry_base[material] = _get_albedo(material)
 	_flood_base_y = _flood.position.y
 	_apply(0.0)
 
 
 func _exit_tree() -> void:
 	for material in _dry_base:
-		material.albedo_color = _dry_base[material]
+		_set_albedo(material, _dry_base[material])
 
 
 func play(risk_type: StringName, severity: float) -> void:
@@ -123,7 +124,7 @@ func _apply(level: float) -> void:
 	_env.adjustment_contrast = _base.contrast * (1.0 + 0.05 * heat)
 
 	for material in _dry_base:
-		material.albedo_color = (_dry_base[material] as Color).lerp(dry_color, dry)
+		_set_albedo(material, (_dry_base[material] as Color).lerp(dry_color, dry))
 
 	_haze_layer.visible = heat > 0.01
 	(_haze.material as ShaderMaterial).set_shader_parameter("strength", heat)
@@ -134,3 +135,16 @@ func _apply(level: float) -> void:
 	_flood.position.y = _flood_base_y + max_flood_height * rise
 	_rain.emitting = storm > 0.05
 	_rain.amount_ratio = storm
+
+
+func _get_albedo(material: Material) -> Color:
+	if material is ShaderMaterial:
+		return material.get_shader_parameter("albedo")
+	return (material as StandardMaterial3D).albedo_color
+
+
+func _set_albedo(material: Material, color: Color) -> void:
+	if material is ShaderMaterial:
+		material.set_shader_parameter("albedo", color)
+	else:
+		(material as StandardMaterial3D).albedo_color = color

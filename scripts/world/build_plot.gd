@@ -10,9 +10,13 @@ const KIND_MATERIALS := {
 }
 const PLACEHOLDER_SCENE := preload("res://scenes/buildings/Building.tscn")
 const PLACEHOLDER_MATERIAL := preload("res://assets/materials/plaster_white.tres")
+## Arsa etiketinde gösterilen tür adı.
+const KIND_NAMES := {&"urban": "KENT", &"open": "AÇIK ALAN", &"coastal": "KIYI"}
 ## Tıklama kutusunun yüksekliği; binanın üstüne tıklamak da arsayı seçsin.
 const PICK_HEIGHT := 5.0
-const HOVER_COLOR := Color(0.3, 0.95, 0.9)
+## Boş arsa turkuaz, dolu arsa kehribar tonunda parlar.
+const HOVER_EMPTY := Color(0.3, 0.95, 0.9)
+const HOVER_OCCUPIED := Color(1.0, 0.7, 0.3)
 
 @export var plot_id: StringName
 @export var plot_kind: StringName = &"urban"
@@ -26,6 +30,7 @@ const HOVER_COLOR := Color(0.3, 0.95, 0.9)
 @onready var _anchor: Marker3D = $BuildingAnchor
 
 var _pad_material: StandardMaterial3D
+var _highlight_material: StandardMaterial3D
 var _selected := false
 var _hovered := false
 var _pulse := 0.0
@@ -40,7 +45,9 @@ func _ready() -> void:
 	_shape.position.y = PICK_HEIGHT * 0.5
 	_pad_material = KIND_MATERIALS.get(plot_kind, KIND_MATERIALS[&"urban"]).duplicate()
 	_pad.material_override = _pad_material
-	_label.text = String(plot_id)
+	_highlight_material = _highlight.get_surface_override_material(0).duplicate()
+	_highlight.set_surface_override_material(0, _highlight_material)
+	_label.text = "%s · %s" % [plot_id, KIND_NAMES.get(plot_kind, String(plot_kind))]
 	_label.position = Vector3(-size * 0.5 + 0.25, _label.position.y, size * 0.5 - 0.25)
 	_refresh()
 
@@ -52,6 +59,15 @@ func _process(delta: float) -> void:
 
 func is_empty() -> bool:
 	return _anchor.get_child_count() == 0
+
+
+func is_occupied() -> bool:
+	return not is_empty()
+
+
+## Arsadaki bina node'u; boşsa null.
+func get_building() -> Node3D:
+	return _anchor.get_child(0) as Node3D if is_occupied() else null
 
 
 func set_selected(value: bool) -> void:
@@ -75,15 +91,18 @@ func place_building(scene: PackedScene, animate := true) -> Node3D:
 	if animate and building.has_method("play_build_animation"):
 		building.play_build_animation()
 	_label.modulate.a = 0.35
+	_refresh()
 	return building
 
 
 func _refresh() -> void:
+	var color := HOVER_OCCUPIED if is_occupied() else HOVER_EMPTY
 	_highlight.visible = _selected
 	set_process(_selected)
 	_pad_material.emission_enabled = _selected or _hovered
-	_pad_material.emission = HOVER_COLOR
+	_pad_material.emission = color
 	_pad_material.emission_energy_multiplier = 0.45 if _selected else 0.2
+	_highlight_material.albedo_color = Color(color, 0.8)
 
 
 func _make_placeholder() -> Node3D:
