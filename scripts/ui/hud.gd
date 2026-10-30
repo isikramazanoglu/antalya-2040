@@ -35,7 +35,7 @@ func _ready() -> void:
 	EventBus.year_ended.connect(_on_year_ended)
 	EventBus.crisis_warned.connect(func(_w): _refresh_warnings())
 	EventBus.crisis_resolved.connect(func(_r): _refresh_warnings())
-	EventBus.year_started.connect(func(_y): _refresh_missions())
+	EventBus.year_started.connect(func(_y): _refresh_missions(); _refresh_warnings())
 	EventBus.stats_changed.connect(func(_s): _refresh_missions())  # "şu an" değerleri inşaattan hemen sonra da doğru olsun
 	_shown_credits = GameState.stats.credits
 	_on_stats_changed(GameState.get_stats())
@@ -190,7 +190,11 @@ func _refresh_warnings() -> void:
 		child.queue_free()
 	for w in GameState.pending_crises:
 		var def := Catalog.get_event(w.event_id)
-		var label := _side_label("Uyarı · %d sonunda %s" % [w.due_year, def.display_name if def else str(w.event_id)], UiText.C_HIGH)
+		var left: int = w.due_year - GameState.stats.year
+		var when := "bu yıl sonunda, hazırlık için son yıl" if left <= 0 else "%d sonunda · %d yıl hazırlık süresi" % [w.due_year, left]
+		var label := _side_label("Uyarı · %s · %s" % [def.display_name if def else str(w.event_id), when], UiText.C_HIGH)
+		label.tooltip_text = def.warning_text if def else ""
+		label.mouse_filter = Control.MOUSE_FILTER_PASS
 		%Warnings.add_child(label)
 		var t := label.create_tween().set_loops(3)
 		t.tween_property(label, "modulate:a", 0.45, 0.35)

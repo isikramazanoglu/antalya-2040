@@ -61,7 +61,7 @@ func _on_build_approved(_plot_id: StringName, building_id: StringName) -> void:
 
 func _on_crisis_warned(w: Dictionary) -> void:
 	var def := Catalog.get_event(w.event_id)
-	show_toast("Uyarı: %d sonunda %s bekleniyor." % [w.due_year, def.display_name], UiText.C_HIGH, "warning")
+	show_toast(def.warning_text if def.warning_text != "" else "Uyarı: %d sonunda %s bekleniyor." % [w.due_year, def.display_name], UiText.C_HIGH, "warning")
 
 
 func _on_stats_changed(stats: Dictionary) -> void:

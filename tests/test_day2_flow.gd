@@ -84,9 +84,14 @@ func _run() -> void:
 	_bus.crisis_response_chosen.emit(&"heatwave", &"open_cooling")
 	var result: Dictionary = _last("crisis_resolved")[1]
 	_check(is_equal_approx(result.mitigation, 0.25), "park sıcak hasarını %25 azalttı")
-	# taban × 0.75 × 0.6: yaşam -10 → -4.5 → -5, nüfus -10 → -5, kredi -100 → -45 → -45 - 60 müdahale
-	_check(result.damage.quality_of_life == -5.0 and result.damage.population == -5.0 and result.damage.credits == -105.0,
-			"hasar: yaşam -5, nüfus -5, kredi -105 (%s)" % str(result.damage))
+	# Prompt 7A formülü: taban × tehlike × maruziyet × hassasiyet × (1 − uyum) × müdahale; maliyet ayrıca.
+	var a: Dictionary = result.assessment
+	var scale: float = a.hazard * a.exposure * a.vulnerability * (1.0 - a.mitigation) * 0.6
+	_check(result.damage.quality_of_life == roundf(-10.0 * scale) and result.damage.population == roundf(-10.0 * scale)
+			and result.damage.credits == roundf(-100.0 * scale - 60.0) and result.damage.energy_security == roundf(-8.0 * scale),
+			"hasar formülle aynı (ölçek %.3f): %s" % [scale, str(result.damage)])
+	_check(_gs.stats.credits == credits_before + int(result.damage.credits) + _last("year_ended")[1].income - _last("year_ended")[1].upkeep + _last("year_ended")[1].missions.reward,
+			"kriz maliyeti kasadan bir kez düştü")
 	_check(_gs.pending_crises.is_empty(), "bekleyen kriz kalmadı")
 	_check(_gs.phase == &"report", "kriz sonrası yıl sonu raporu")
 	var report: Dictionary = _last("year_ended")[1]

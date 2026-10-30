@@ -137,10 +137,21 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - `tests/test_integration.gd`: Prompt 6'nın 17 senaryosu (21 kontrol) 1280×720 ve 1920×1080'de TAMAM, konsolda hata/uyarı yok. Diğer 6 test ve denge simülasyonu değişmedi.
 - Bilerek korunan: arsa türleri urban/open/coastal (talimattaki enerji/su/yeşil/kıyı değil), maliyetler 400/250/150 (talimattaki 250/200/150 "örnek").
 
+### Prompt 7A notları (B, 2026-10-31) · Kriz sistemi
+- Mevcut yaşam döngüsü korundu (uyarı → hazırlık yılı → kriz → müdahale → sonuç → rapor); eklenenler:
+  - Hasar = taban × tehlike × maruziyet × hassasiyet × (1 − uyum) × müdahale (GAME_DESIGN §6). Şiddet artık yatırımdan bağımsız ham riskten; uyum iki kez sayılmıyor.
+  - Altyapıya bağlı müdahaleler (su deposu, kent tarımı, serinleme merkezi, park, kıyı restorasyonu). Müdahale bütçe/altyapı kontrolü artık TurnManager'da da var (geçersiz seçim durumu değiştirmez).
+  - Sıcak hava enerji güvenliğini düşürür. Uyarı metinleri talimattaki cümleler.
+  - Kriz paneli: risk seviyesi, hasar dökümü, yatırım avantajları, seçenek → olası etkiler → onay. HUD uyarısında kalan hazırlık süresi.
+  - Sözleşme v1.5: `crisis_stage_changed` (A için isteğe bağlı).
+- `tests/test_crises.gd`: 12 test sorusu (22 kontrol) TAMAM. Diğer 7 test TAMAM. Denge: hiçbir şey 38, koruyucu 77, karma 81; hazırlıklı şehrin kriz kaybı 145, hazırlıksızın 472.
+- Kriz yılları sabit (2043, 2046, 2049): sonuç tekrarlanabilir, oyuncu sürekli felaketle cezalandırılmaz.
+
 ## Sözleşme değişiklik talepleri
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |
 |---|---|---|---|---|
+| 2026-10-31 | B | v1.5: `crisis_stage_changed` + `result.severity/assessment` (ekleme) | A'nın kullanması isteğe bağlı | Yapıldı |
 | 2026-10-31 | B | v1.4: ret nedenleri `scene_unavailable`, `unknown_plot` (ekleme) | B içi, A ret nedenlerini kullanmaz | Yapıldı |
 | 2026-10-31 | B (öneri) | v1.3: `plot_deselect_requested` (parametresiz). Yayan: B · BuildPanel (kapat düğmesi, Esc). Dinleyen: A · CityWorld → seçimi bırakır ve `plot_deselected` yayar. Neden: panel kapanınca arsa vurgusu kalıyor. | A onayladı (2026-10-31) | B ekledi (2026-10-31); A'nın CityWorld'de dinlemesi bekleniyor |
 | 2026-10-31 | B | v1.2: `stats` enerji/su akışları (ekleme) | B içi, A etkilenmez | Yapıldı |

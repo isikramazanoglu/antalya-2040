@@ -102,7 +102,7 @@ Bütçe kontrolü: 13 yılda yaklaşık 2000–2800 kredi birikir; oyuncu 12 yat
 
 | id | risk_type | En erken | Demo yılı (`scripted_year`) | Taban hasar |
 |---|---|---|---|---|
-| `heatwave` | heat | 2042 | 2043 | yaşam −10, nüfus −10 kişi, kredi −100 |
+| `heatwave` | heat | 2042 | 2043 | yaşam −10, nüfus −10 kişi, kredi −100, enerji −8 |
 | `drought` | drought | 2044 | 2046 | su −20, ekosistem −5, kredi −150 |
 | `coastal_flood` | coastal_flood | 2046 | 2049 | kredi −250, ekosistem −8, yaşam −5 |
 
@@ -113,6 +113,33 @@ Her krizin üç müdahale seçeneği olur. Örnek, sıcak hava dalgası:
 | `open_cooling` | Serinleme alanlarını aç, yaşlılara ulaş | 60 | 0.6 |
 | `shift_hours` | Açık hava çalışma saatlerini değiştir | 20 | 0.8 |
 | `do_nothing` | Müdahale etme | 0 | 1.0 |
+
+**Hasar hesabı (Prompt 7A):** taban × tehlike × maruziyet × hassasiyet × (1 − uyum) × müdahale çarpanı; müdahale maliyeti ve ek etkileri ayrıca eklenir.
+- Tehlike = 0.5 + şiddet; şiddet = o yılın yatırımdan bağımsız ham riski / 100 (0.2–1).
+- Maruziyet = nüfus / 500 (0.8–1.5).
+- Hassasiyet = 1 + Σ ağırlık × (50 − gösterge) / 100 (0.6–1.5): kuraklıkta su güvenliği, sıcakta yaşam kalitesi + ekosistem, taşkında ekosistem.
+- Uyum = binaların koruma oranı (en çok %80).
+- Sıcak hava enerji güvenliğini de düşürür (klima talebi).
+
+**Müdahaleler** (altyapı şartlı olanlar yalnızca o bina kuruluysa görünür; bütçe yetmeyen seçilemez):
+
+| Kriz | Seçenek | Maliyet | Çarpan | Şart |
+|---|---|---|---|---|
+| Kuraklık | Su tasarrufu programı (yaşam −3) | 0 | 0.7 | – |
+| | Acil su tedariki | 120 | 0.5 | – |
+| | Su depolama altyapısını devreye al | 20 | 0.35 | Su depolama |
+| | Verimli sulama ve tarım planı (ekosistem +2) | 30 | 0.5 | Kent tarımı |
+| Sıcak hava | Acil enerji desteği (enerji +5) | 90 | 0.65 | – |
+| | Serinleme merkezlerini devreye al | 20 | 0.4 | Serinleme merkezi |
+| | Park ve gölgelendirme altyapısını kullan | 10 | 0.6 | Yeşil park |
+| | Enerji talebini azaltma programı (enerji +3) | 20 | 0.8 | – |
+| | Kamu binalarını serinleme alanı yap | 60 | 0.6 | – |
+| Kıyı taşkını | Acil kıyı koruma önlemleri | 150 | 0.4 | – |
+| | Riskli bölgelerde geçici tahliye (yaşam −2) | 80 | 0.6 | – |
+| | Restore edilmiş kıyı ekosistemine güven | 0 | 0.5 | Kıyı restorasyonu |
+| | Erken uyarı ve koordinasyon merkezini çalıştır | 30 | 0.35 | Kıyı restorasyonu |
+
+Her krizde "Müdahale etme" (0 kredi, ×1.0) de vardır; böylece bütçesi biten oyuncu takılmaz.
 
 Kriz aşamaları: risk uyarısı (yıl N sonu) → hazırlık (yıl N+1) → kriz (yıl N+1 sonu) → müdahale → sonuç ve hasar → yıl sonu raporu. Ayrıntı: `INTEGRATION_CONTRACT.md` §6.6.
 

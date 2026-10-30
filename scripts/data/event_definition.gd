@@ -15,4 +15,12 @@ extends Resource
 ## Ör. {"credits": -150, "water_security": -20}
 @export var base_damage: Dictionary = {}
 @export var responses: Array[CrisisResponse] = []
+## Uyarı anında oyuncuya gösterilen cümle.
+@export var warning_text: String
+## Hassasiyet: {"stat": ağırlık}. Gösterge 50'nin altındaysa hasar artar, üstündeyse azalır (Prompt 7A).
+@export var vulnerability_stats: Dictionary = {}
+## Ekip A görselleri için (sözleşme v1.5): efekt kimliği, etkilenen bölge ve arsa türleri.
+@export var visual_effect_id: StringName
+@export var affected_area: StringName
+@export var affected_plot_kinds: Array[StringName] = []
 @export var info_card: InfoCard
