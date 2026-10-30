@@ -70,15 +70,18 @@ func focus_on(point: Vector3) -> void:
 	_target_pos = Vector3(point.x, position.y, point.z)
 
 
-## Nokta ekranın güvenli alanı dışındaysa kamerayı kaydırıp alanın ortasına getirir; içindeyse dokunmaz.
+## Nokta ekranın güvenli alanı dışındaysa kamerayı yalnızca alanın içine girecek kadar kaydırır;
+## içindeyse dokunmaz. Kamera gereksiz yere zıplamaz, şehrin geri kalanı yerinde kalır.
 func bring_into_view(point: Vector3) -> void:
 	var view := get_viewport().get_visible_rect().size
 	var safe := Rect2(safe_area.position * view, safe_area.size * view)
 	var screen := _camera.unproject_position(point)
 	if safe.has_point(screen) and not _camera.is_position_behind(point):
 		return
+	var margin := view * 0.04
+	var inner := safe.grow_individual(-margin.x, -margin.y, -margin.x, -margin.y)
 	var from = _ground_at(screen)
-	var to = _ground_at(safe.get_center())
+	var to = _ground_at(screen.clamp(inner.position, inner.end))
 	if from != null and to != null:
 		_target_pos += from - to
 
