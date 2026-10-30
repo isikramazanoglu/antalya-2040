@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="BuildingDefinition" format=3]
 
 [ext_resource type="Resource" path="res://data/cards/card_public_efficiency.tres" id="1_61fpq"]
+[ext_resource type="Texture2D" path="res://assets/ui/thumbnails/public_efficiency.png" id="1_vxv68"]
 [ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_6l8yw"]
 [ext_resource type="PackedScene" path="res://scenes/buildings/b_public_efficiency.tscn" id="2_vxv68"]
 
@@ -14,6 +15,7 @@ cost = 200
 upkeep_per_year = 5
 allowed_plot_kinds = Array[StringName]([&"urban"])
 scene = ExtResource("2_vxv68")
+icon = ExtResource("1_vxv68")
 on_build_effects = {
 "energy_security": 8.0
 }

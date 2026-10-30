@@ -21,6 +21,7 @@ grow_vertical = 2
 color = Color(0.25, 0.05, 0, 0.35)
 
 [node name="Panel" type="PanelContainer" parent="."]
+theme_type_variation = &"SolidPanel"
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

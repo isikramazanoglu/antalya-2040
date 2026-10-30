@@ -7,3 +7,6 @@ script = ExtResource("1_b37h4")
 id = &"card_solar_plant"
 title = "Güneş enerjisi"
 body = "Fotovoltaik paneller güneş ışığını doğrudan elektriğe çevirir. Üretim sırasında yakıt yakılmadığı için elektrik kaynaklı emisyon azalır. Antalya yılın büyük bölümünde güneşli bir kenttir; bu yüzden güneş enerjisi bölgeye uygun bir seçenektir."
+benefit = "Yenilenebilir enerji üretimini artırır."
+climate_link = "Elektrik sistemindeki fosil yakıt bağımlılığını azaltmaya yardımcı olur."
+strategic = "Şehrin enerji dengesini ve yerel emisyon performansını iyileştirir."

@@ -121,6 +121,14 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - Prompt 4: Enerji/su akışları ve yenilenebilir payı eklendi (sözleşme v1.2). `tests/test_economy.gd` Prompt 4'ün 12 testini gerçek denge değerleriyle çalıştırır: TAMAM. Talimattaki örnek maliyetler (güneş 250, su 200) yerine denge simülasyonundaki değerler (400, 250) korundu; `construction_turns` yok, inşaat anlık.
 - Bilinen: kredi bilinçli olarak eksiye düşebilir (borç; o yıl yaşam −5). Endeksler 0–100, nüfus ≥ 0.
 
+### Prompt 5 notları (B, 2026-10-31) · Arayüz
+- HUD üç bölüm: üst bar (logo, yıl ilerlemesi, animasyonlu bütçe, nüfus), sol kaynak paneli (ikon, değer, çubuk, renk + durum yazısı; enerji ve su için üretim/talep), alt menü (İnşaat, İklim Laboratuvarı, Şehir bilgileri, Son rapor, Ayarlar, Ana menü, Yılı bitir).
+- BuildPanel: bina küçük resmi, ad, açıklama, maliyet, gider, arsa türü, etki etiketleri; seçilince Temel fayda / İklim bağlantısı / Stratejik avantaj + açılır ayrıntılı bilgi. Yetersiz bütçede düğme kapalı ve neden yazılı.
+- Yeni: bildirimler, Şehir bilgileri, Ayarlar (tam ekran, V-Sync), "Son rapor". İklim Laboratuvarı'na Enerji ve su, Ekosistem sekmeleri; emisyonda önceki yıla göre değişim ve yatırım etkileri. Yıl sonu raporu tablo hâlinde.
+- `tests/test_ui.gd`: 20 kabul kriteri, 1280×720 ve 1920×1080'de TAMAM. Diğer 5 test ve denge simülasyonu değişmedi.
+- A için: BuildPanel kapanınca arsa vurgusu kalıyor (`plot_deselected` A'nın). İstenirse sözleşmeye "arayüz seçimi bırak" isteği eklenebilir.
+- Sözleşme değişikliği yok.
+
 ## Sözleşme değişiklik talepleri
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |

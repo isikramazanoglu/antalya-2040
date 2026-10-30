@@ -1,14 +1,25 @@
 extends Control
-## Sahip: B. Yıl sonu raporu ve final ekranı. Hesap yapmaz, yalnızca gösterir (sözleşme §6.7).
+## Sahip: B. Yıl sonu raporu ve final ekranı. Hesap yapmaz, yalnızca rapor sözlüğünü gösterir (sözleşme §6.7).
+## "Son rapor" düğmesiyle son rapor yeniden açılabilir; bu görünümde report_closed yayılmaz.
 
 const MAIN_MENU := "res://scenes/main/MainMenu.tscn"
-const REPORT_STATS: Array[String] = ["population", "water_security", "energy_security",
-		"quality_of_life", "ecosystem_health", "emissions_total"]
+## [anahtar, ad, yüksek iyi mi]
+const ROWS := [
+	["credits", "Bütçe", true], ["population", "Nüfus", true],
+	["renewable_energy", "Yenilenebilir enerji üretimi", true], ["energy_demand", "Enerji tüketimi", false],
+	["water_supply", "Su arzı", true], ["water_demand", "Su tüketimi", false], ["water_security", "Su güvenliği", true],
+	["quality_of_life", "Yaşam kalitesi", true], ["ecosystem_health", "Ekosistem sağlığı", true],
+	["emissions_total", "Yerel emisyon", false],
+]
 
 var _game_over := false
+var _review_only := false  # "Son rapor" ile açıldıysa
+var _last_report: Dictionary = {}
 
 
 func _ready() -> void:
+	add_to_group("ui_panel")
+	add_to_group("year_report")
 	hide()
 	%ContinueButton.pressed.connect(_on_continue_pressed)
 	EventBus.year_ended.connect(_on_year_ended)
@@ -21,27 +32,75 @@ func _on_phase_changed(phase: StringName) -> void:
 		hide()
 
 
+## HUD "Son rapor": yalnızca inceleme.
+func open() -> void:
+	if _last_report.is_empty():
+		return
+	_review_only = true
+	_render(_last_report)
+	%ContinueButton.text = "Kapat"
+	UiText.pop_in(self)
+
+
+## Zorunlu rapor (report fazı) veya final ekranı başka panel açılınca kapanmaz.
+func close() -> void:
+	if _review_only:
+		_review_only = false
+		hide()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if visible and _review_only and event.is_action_pressed("cancel"):
+		close()
+		get_viewport().set_input_as_handled()
+
+
 func _on_year_ended(report: Dictionary) -> void:
+	_last_report = report
+	_review_only = false
+	_render(report)
+	%ContinueButton.text = "Devam"
+	UiText.pop_in(self)
+	%ContinueButton.grab_focus()
+
+
+func _render(report: Dictionary) -> void:
 	var before: Dictionary = report.stats_before
 	var after: Dictionary = report.stats_after
 	%Title.text = "%d yıl sonu raporu" % report.year
-	var t := "[b]Bütçe[/b]\nGelir  +%d\nİşletme gideri  -%d\nNet  %s\nKasa  %d kredi\n\n" % [
-		report.income, report.upkeep, UiText.format_delta(report.income - report.upkeep), after.credits]
-	t += "[b]Şehir[/b]\n"
-	for key in REPORT_STATS:
-		t += "%s  %s → %s\n" % [UiText.STAT_NAMES[key],
-				UiText.format_value(before[key]), UiText.format_value(after[key])]
-	t += "Yenilenebilir enerji payı  %%%d → %%%d\nSu arzı / talebi  %d / %d\n" % [
-		roundi(before.renewable_share * 100), roundi(after.renewable_share * 100), roundi(after.water_supply), roundi(after.water_demand)]
+	var crisis_cost := 0.0
+	for r in report.crisis_results:
+		crisis_cost -= r.damage.get("credits", 0.0)
+
+	var t := "[color=#4dd9d1]%d yılı tamamlandı. Şehrinin yıllık raporu hazır.[/color]\n\n[b]Bütçe[/b]\n[table=2]" % report.year
+	t += _pair("Başlangıç bütçesi", UiText.thousands(before.credits))
+	t += _pair("Toplam gelir", "[color=#6bd185]+%s[/color]" % UiText.thousands(report.income))
+	t += _pair("İşletme giderleri", "[color=#ff8c73]-%s[/color]" % UiText.thousands(report.upkeep))
+	if crisis_cost > 0.0:
+		t += _pair("Kriz giderleri", "[color=#ff8c73]-%s[/color]" % UiText.thousands(roundi(crisis_cost)))
+	if report.missions.reward > 0:
+		t += _pair("Görev ödülü", "[color=#6bd185]+%s[/color]" % UiText.thousands(report.missions.reward))
+	t += _pair("[b]Yıl sonu bütçesi[/b]", "[b]%s[/b]" % UiText.thousands(after.credits))
+	t += "[/table]\n\n[b]Şehir[/b]\n[table=4]"
+	t += "[cell][color=#b8c4c2]Gösterge[/color][/cell][cell][color=#b8c4c2]Önce[/color][/cell][cell][color=#b8c4c2]Sonra[/color][/cell][cell][color=#b8c4c2]Değişim[/color][/cell]"
+	for row in ROWS:
+		var a: float = before[row[0]]
+		var b: float = after[row[0]]
+		var d := b - a
+		# İşaret (+/−) renkten bağımsız da yönü gösterir.
+		t += "[cell]%s      [/cell][cell]%s      [/cell][cell]%s      [/cell][cell][color=#%s]%s[/color][/cell]" % [
+			row[1], UiText.thousands(roundi(a)), UiText.thousands(roundi(b)), UiText.delta_color(roundf(d), row[2]).to_html(false), UiText.format_delta(d)]
+	t += "[/table]\n"
+
 	if not report.built_this_year.is_empty():
 		var names := PackedStringArray()
 		for id in report.built_this_year:
 			names.append(Catalog.get_building(id).display_name)
-		t += "\n[b]Bu yıl yapılanlar[/b]\n" + ", ".join(names) + "\n"
+		t += "\n[b]Yeni yatırımlar[/b]\n" + ", ".join(names) + "\n"
 	for result in report.crisis_results:
-		t += "\n[b]Kriz[/b]\n%s\n" % result.summary_text
+		t += "\n[b]İklim olayı[/b]\n%s\n" % result.summary_text
 		for key in result.damage:
-			t += "%s  %s\n" % [UiText.STAT_NAMES.get(key, key), UiText.format_delta(result.damage[key])]
+			t += "  %s %s\n" % [UiText.STAT_NAMES.get(key, key), UiText.format_delta(result.damage[key])]
 	for id in report.missions.completed:
 		var m := _mission(id)
 		t += "\n[color=#4dd9d1][b]Görev tamamlandı:[/b] %s (+%d kredi)[/color]\n" % [m.title, m.reward_credits]
@@ -51,27 +110,34 @@ func _on_year_ended(report: Dictionary) -> void:
 		var def := Catalog.get_event(w.event_id)
 		t += "\n[color=#ffbf66][b]Uyarı:[/b] %d sonunda %s bekleniyor. Hazırlanmak için bir yılın var.[/color]\n" % [w.due_year, def.display_name]
 	%Body.text = t
-	%ContinueButton.text = "Devam"
-	show()
+	%Body.scroll_to_line(0)
+
+
+func _pair(label: String, value: String) -> String:
+	return "[cell]%s        [/cell][cell]%s[/cell]" % [label, value]
 
 
 func _on_game_over(summary: Dictionary) -> void:
 	_game_over = true
+	_review_only = false
 	var s: Dictionary = summary.final_stats
 	%Title.text = "2052 · Şehrin geleceği"
 	var t := "[b]Puan: %d[/b]\n[b]%s[/b]\nKişi başı emisyon azalması: %%%d\nTamamlanan görev: %d / %d\n\n" % [
 		summary.score, summary.grade, summary.emission_reduction_pct,
 		GameState.missions.values().count(&"done"), Catalog.data.missions.size()]
-	for key in REPORT_STATS:
-		t += "%s  %s\n" % [UiText.STAT_NAMES[key], UiText.format_value(s[key])]
+	for row in ROWS:
+		t += "%s  %s\n" % [row[1], UiText.thousands(roundi(s[row[0]]))]
 	%Body.text = t
 	%ContinueButton.text = "Ana menü"
-	show()
+	UiText.pop_in(self)
 
 
 func _on_continue_pressed() -> void:
 	if _game_over:
 		get_tree().change_scene_to_file(MAIN_MENU)
+		return
+	if _review_only:
+		close()
 		return
 	hide()
 	EventBus.report_closed.emit()

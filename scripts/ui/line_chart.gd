@@ -34,9 +34,10 @@ func _draw() -> void:
 	if count == 0:
 		draw_string(font, area.position + Vector2(12, 28), "Henüz veri yok", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1, 1, 1, 0.6))
 		return
-	if is_equal_approx(lo, hi):
-		lo -= 1.0
-		hi += 1.0
+	if hi - lo < 10.0:  # küçük değişimler grafiği abartmasın
+		var mid := (hi + lo) / 2.0
+		lo = mid - 5.0
+		hi = mid + 5.0
 
 	for i in 3:
 		var t := i / 2.0

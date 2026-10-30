@@ -7,3 +7,6 @@ script = ExtResource("1_uqqpv")
 id = &"card_water_storage"
 title = "Su kayıplarını azaltmak"
 body = "Şehir şebekelerinde suyun bir bölümü eskimiş borulardan kaçarak kaybolur. Kaçakları onarmak ve yağışlı aylarda suyu depolamak, kuraklık dönemlerinde kullanılabilecek suyu artırır."
+benefit = "Su rezervlerini ve hazırlık kapasitesini artırır."
+climate_link = "Kuraklık dönemlerinde şehirdeki su güvenliğini destekler."
+strategic = "Kuraklık krizinde kayıpları azaltır."

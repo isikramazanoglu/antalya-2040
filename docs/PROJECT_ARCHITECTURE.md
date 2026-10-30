@@ -61,7 +61,10 @@ antalya-2040/
 │       ├── climate_lab.gd
 │       ├── line_chart.gd          Control._draw() ile basit çizgi grafik
 │       ├── event_panel.gd
-│       └── year_report.gd
+│       ├── year_report.gd
+│       ├── toasts.gd              Geçici bildirimler
+│       ├── city_info.gd           Şehir bilgileri paneli
+│       └── settings_panel.gd      Ayarlar (tam ekran, V-Sync)
 │
 ├── scenes/
 │   ├── main/
@@ -80,7 +83,9 @@ antalya-2040/
 │   │   ├── BuildPanel.tscn
 │   │   ├── ClimateLab.tscn
 │   │   ├── EventPanel.tscn
-│   │   └── YearReport.tscn
+│   │   ├── YearReport.tscn
+│   │   ├── CityInfo.tscn
+│   │   └── SettingsPanel.tscn
 │   └── dev/
 │       ├── CitySandbox.tscn       A     Şehri B olmadan test etme sahnesi
 │       └── UISandbox.tscn         B     Arayüzü şehir olmadan test etme sahnesi
@@ -94,7 +99,7 @@ antalya-2040/
 │   ├── missions/<id>.tres         MissionDefinition × 4
 │   └── cards/<id>.tres            InfoCard (bina, olay ve İklim Laboratuvarı kartları)
 │
-├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy), pencereli testler (test_menu, test_e2e_game), denge simülasyonu (balance_sim)
+├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy), pencereli testler (test_menu, test_e2e_game, test_ui), denge simülasyonu (balance_sim)
 │
 └── assets/
     ├── models/                    A     .glb modeller
@@ -197,16 +202,26 @@ Building (Node3D, building.gd)          play_build_animation(): ölçek 0 → 1 
 
 Her `b_<id>.tscn` bu sahneden miras alır (Scene > New Inherited Scene) ve yalnızca `Model` altını doldurur. Bina sahnelerinde çarpışma yoktur; tıklama arsadan gelir.
 
+### 2.6b Arayüz düzeni (Prompt 5)
+
+- Paneller `ui_panel` grubundadır ve `open()` / `close()` sunar; HUD bir panel açarken önce `call_group("ui_panel", "close")` çağırır, aynı anda tek panel açık kalır. Esc açık paneli kapatır.
+- Büyük paneller `theme.tres` içindeki `SolidPanel` varyasyonunu kullanır (opak, turkuaz üst kenar).
+- Bildirimler (`Toasts`, HUD içinde, `z_index = 10`) üst ortada 3 sn görünür; rapor/kriz fazında temizlenir.
+- İkonlar `assets/ui/icons/*.svg` (aynı çizgi stili); bina küçük resimleri `assets/ui/thumbnails/<id>.png`, A'nın modellerinden render edilir ve `BuildingDefinition.icon` alanına bağlıdır.
+- `BuildPanel` kapatılınca şehirdeki arsa vurgusu kalır: `plot_deselected` A'ya aittir, B yayamaz.
+
 ### 2.7 HUD (B)
 
 ```
 HUD (Control, hud.gd, tam ekran, mouse_filter = IGNORE)
-├── TopBar (PanelContainer, mouse_filter = STOP)
-│   └── HBox: Year, Credits, Population, Water, Energy, Quality, Ecosystem, Emissions (Label + ikon)
-├── WarningList (VBoxContainer)          crisis_warned kayıtları
-└── BottomRight (HBoxContainer)
-    ├── ClimateLabButton (Button)
-    └── EndTurnButton (Button)
+├── TopBar (PanelContainer)              logo, yıl + ilerleme, bütçe (animasyonlu, yetmezse kırmızı), nüfus
+├── LeftColumn (VBoxContainer)
+│   ├── ResourcePanel                    su, enerji (üretim/talep), yaşam, ekosistem, ekonomi: ikon + değer + çubuk + durum yazısı; daraltılabilir
+│   ├── Warnings                         bekleyen krizler
+│   └── Missions                         aktif görevler
+├── BottomBar (PanelContainer)           İnşaat, İklim Laboratuvarı, Şehir bilgileri, Son rapor, Ayarlar, Ana menü | Yılı bitir
+├── Toasts (toasts.gd)                   geçici bildirimler
+└── QuitConfirm (ConfirmationDialog)     ana menüye dönüş onayı
 ```
 
 ### 2.8 BuildPanel (B)

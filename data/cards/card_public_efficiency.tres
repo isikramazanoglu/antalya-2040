@@ -7,3 +7,6 @@ script = ExtResource("1_ahypq")
 id = &"card_public_efficiency"
 title = "Önce tasarruf"
 body = "Harcanmayan enerji, üretilmesi gerekmeyen enerjidir. Verimli aydınlatma, yalıtım ve doğru ayarlanmış ısıtma-soğutma sistemleri kamu binalarının tüketimini düşürür."
+benefit = "Okul, hastane ve belediye binalarının enerji tüketimini düşürür."
+climate_link = "Harcanmayan enerji üretilmesi gerekmeyen enerjidir; emisyon kaynağında azalır."
+strategic = "Ucuz bir yatırımla enerji güvenliğini ve bina emisyonlarını birlikte iyileştirir."

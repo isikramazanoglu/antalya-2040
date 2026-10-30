@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://scripts/ui/line_chart.gd" id="2_chart"]
 
 [node name="ClimateLab" type="PanelContainer"]
+theme_type_variation = &"SolidPanel"
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -53,10 +54,27 @@ custom_minimum_size = Vector2(0, 110)
 layout_mode = 2
 bbcode_enabled = true
 
-[node name="Küresel CO2" type="VBoxContainer" parent="VBox/Tabs"]
+[node name="Enerji ve su" type="VBoxContainer" parent="VBox/Tabs"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
+
+[node name="ResourceChart" type="Control" parent="VBox/Tabs/Enerji ve su"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_chart")
+
+[node name="ResourceText" type="RichTextLabel" parent="VBox/Tabs/Enerji ve su"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+bbcode_enabled = true
+
+[node name="Küresel CO2" type="VBoxContainer" parent="VBox/Tabs"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
 
 [node name="Co2Chart" type="Control" parent="VBox/Tabs/Küresel CO2"]
 unique_name_in_owner = true
@@ -73,7 +91,7 @@ bbcode_enabled = true
 [node name="Yerel riskler" type="ScrollContainer" parent="VBox/Tabs"]
 visible = false
 layout_mode = 2
-metadata/_tab_index = 2
+metadata/_tab_index = 3
 
 [node name="Risks" type="VBoxContainer" parent="VBox/Tabs/Yerel riskler"]
 unique_name_in_owner = true
@@ -81,9 +99,26 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
+[node name="Ekosistem" type="VBoxContainer" parent="VBox/Tabs"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 4
+
+[node name="EcoChart" type="Control" parent="VBox/Tabs/Ekosistem"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_chart")
+
+[node name="EcoText" type="RichTextLabel" parent="VBox/Tabs/Ekosistem"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+bbcode_enabled = true
+
 [node name="Cards" type="RichTextLabel" parent="VBox/Tabs"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 bbcode_enabled = true
-metadata/_tab_index = 3
+metadata/_tab_index = 5

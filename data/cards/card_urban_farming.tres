@@ -7,3 +7,6 @@ script = ExtResource("1_ivae8")
 id = &"card_urban_farming"
 title = "Az suyla tarım"
 body = "Damla sulama suyu doğrudan bitkinin köküne verir, buharlaşma ile kaybolan su azalır. Bölgenin iklimine uygun bitkiler kurak yıllarda daha az etkilenir."
+benefit = "Şehirde taze gıda üretir ve yeşil alan sağlar."
+climate_link = "Damla sulama ve iklime uygun bitkiler az suyla üretim yapar."
+strategic = "Yaşam kalitesine ve ekosisteme katkı verir; kuraklıkta küçük bir koruma sağlar."
