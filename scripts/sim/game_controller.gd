@@ -28,9 +28,14 @@ func check_build(plot_id: StringName, building_id: StringName) -> StringName:
 	var def := Catalog.get_building(building_id)
 	if def == null:
 		return &"unknown_building"
+	# Bina sahnesi yüklenemiyorsa hiçbir şey değişmeden reddedilir (işlem bölünmez kalır).
+	if def.scene == null or not def.scene.can_instantiate():
+		return &"scene_unavailable"
+	if not _plot_kinds.has(plot_id):
+		return &"unknown_plot"
 	if GameState.get_building_on(plot_id) != &"":
 		return &"plot_occupied"
-	if not _plot_kinds.get(plot_id, &"") in def.allowed_plot_kinds:
+	if not _plot_kinds[plot_id] in def.allowed_plot_kinds:
 		return &"wrong_plot_kind"
 	if GameState.plots.values().count(building_id) >= def.max_count:
 		return &"max_count_reached"
@@ -71,9 +76,12 @@ func record_history() -> void:
 	GameState.record_history()
 
 
-## Enerji ve su akışlarını güncel nüfus ve binalardan yeniden hesaplatıp yazar.
+## Enerji/su akışlarını ve sektör emisyonlarını güncel nüfus ve binalardan yeniden hesaplatıp yazar.
 func refresh_resources() -> void:
-	GameState.set_resources(EconomySimulator.compute_resources(GameState.stats.population, GameState.built_definitions(), Catalog.data.balance))
+	var buildings := GameState.built_definitions()
+	var values := EconomySimulator.compute_resources(GameState.stats.population, buildings, Catalog.data.balance)
+	values.merge(ClimateSimulator.compute_emissions(GameState.stats.population, buildings, Catalog.data.balance))
+	GameState.set_resources(values)
 
 
 func apply_climate(climate: Dictionary) -> void:

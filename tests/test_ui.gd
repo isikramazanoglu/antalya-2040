@@ -93,9 +93,9 @@ func _process(_d: float) -> bool:
 			_check(_find("HUD", "CreditsValue").text == "600", "3) HUD bütçesi güncellendi (%s)" % _find("HUD", "CreditsValue").text)
 			var energy_detail := ""
 			for l in _find("HUD", "ResourceList").find_children("*", "Label", true, false):
-				if l.text.begins_with("Yenilenebilir"):
+				if l.text.begins_with("Üretim"):
 					energy_detail = l.text
-			_check(energy_detail.contains("Yenilenebilir 20 / talep 50"), "5) enerji üretimi ve tüketimi gösteriliyor (%s)" % energy_detail)
+			_check(energy_detail.contains("Üretim 20 / tüketim 50 · denge -30"), "5) enerji üretimi, tüketimi ve dengesi gösteriliyor (%s)" % energy_detail)
 			_check(not _find("BuildPanel", "BuildButton").visible and _find("BuildPanel", "Hint").text.contains("Bu arsada"), "12) dolu arsada inşa düğmesi yok")
 			bus.build_requested.emit(&"O01", &"water_storage")
 			var rejected := log.filter(func(l): return l[0] == "build_rejected")
@@ -120,8 +120,15 @@ func _process(_d: float) -> bool:
 			_click_plot("U01")
 		140:
 			_find("BuildPanel", "Cards").get_child(0).pressed.emit()
+		142:
+			pass
 		145:
 			_check(_find("BuildPanel", "BuildButton").disabled and _find("BuildPanel", "ErrorLabel").text.contains("yeterli bütçen yok"), "9) yetersiz bütçede inşa düğmesi kapalı, neden yazıyor")
+			var asked := [false]
+			bus.plot_deselect_requested.connect(func(): asked[0] = true, CONNECT_ONE_SHOT)
+			_find("BuildPanel", "CloseButton").pressed.emit()
+			_check(asked[0] and not _ui("BuildPanel").visible, "v1.3) × ile kapatınca plot_deselect_requested yayıldı")
+			_click_plot("U01")
 			gs.stats.credits = 600
 			bus.stats_changed.emit(gs.get_stats())
 			var before := log.filter(func(l): return l[0] == "plot_selected").size()

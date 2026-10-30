@@ -1,6 +1,6 @@
 extends Node
-## ORTAK dosya. Sözleşme: docs/INTEGRATION_CONTRACT.md v1.0
-## Yalnızca sinyal bildirimleri. Değişken, fonksiyon, mantık eklenmez.
+## ORTAK dosya. Sözleşme: docs/INTEGRATION_CONTRACT.md
+## Sürüm v1.3. Yalnızca sinyal bildirimleri. Değişken, fonksiyon, mantık eklenmez.
 ## Değişiklik yalnızca sözleşme §11 süreciyle, yalnızca ekleme olarak.
 
 # Sinyaller başka script'lerden yayılır; bu dosyada kullanılmamaları normal.
@@ -12,6 +12,7 @@ signal plot_deselected  # A: CityWorld
 signal build_requested(plot_id: StringName, building_id: StringName)  # B: BuildPanel
 signal build_approved(plot_id: StringName, building_id: StringName)  # B: GameController
 signal build_rejected(plot_id: StringName, building_id: StringName, reason: StringName)  # B: GameController
+signal plot_deselect_requested  # B: BuildPanel (kapat düğmesi, Esc) → A: CityWorld seçimi bırakır (v1.3)
 
 # --- 3.2 Durum ve tur ---
 signal stats_changed(stats: Dictionary)  # B: GameState

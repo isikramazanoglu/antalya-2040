@@ -12,7 +12,7 @@ func _ready() -> void:
 	add_to_group("build_panel")
 	hide()
 	%BuildButton.pressed.connect(_on_build_pressed)
-	%CloseButton.pressed.connect(close)
+	%CloseButton.pressed.connect(_close_by_player)
 	%DetailToggle.toggled.connect(func(on): %DetailBody.visible = on)
 	EventBus.plot_selected.connect(_on_plot_selected)
 	EventBus.plot_deselected.connect(close)
@@ -34,7 +34,7 @@ func _on_phase_changed(phase: StringName) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if visible and event.is_action_pressed("cancel"):
-		close()
+		_close_by_player()
 		get_viewport().set_input_as_handled()
 
 
@@ -48,6 +48,13 @@ func open() -> void:
 
 func close() -> void:
 	hide()
+
+
+## Oyuncu paneli kendisi kapattı (× veya Esc): şehirdeki arsa vurgusu da bırakılsın (sözleşme v1.3).
+func _close_by_player() -> void:
+	close()
+	if _plot_id != &"":
+		EventBus.plot_deselect_requested.emit()
 
 
 func _on_plot_selected(plot_id: StringName, plot_kind: StringName, _is_empty: bool) -> void:
