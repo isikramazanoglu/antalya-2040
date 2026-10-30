@@ -23,15 +23,15 @@ Repo: https://github.com/isikramazanoglu/antalya-2040 (gizli)
 Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et → bütçe düşer → yılı bitir → rapor → 2052 → final.
 
 ### Ekip A
-- [ ] CameraRig: kaydırma, yakınlaştırma, ±30° döndürme, sınırlar
-- [ ] Zemin, deniz düzlemi, ışık ve WorldEnvironment ilk ayar
-- [ ] BuildPlot sahnesi ve 15 arsa (sözleşme §7)
-- [ ] Işınla arsa seçimi, vurgu, `plot_selected` / `plot_deselected`
-- [ ] `phase_changed` ile seçimi kilitleme
-- [ ] Building taban sahnesi + büyüme animasyonu
-- [ ] Yer tutucu modeller: `b_solar_plant`, `b_water_storage`, `b_green_park`
-- [ ] `build_approved` → bina yerleştirme
-- [ ] CitySandbox sahnesi
+- [x] CameraRig: kaydırma, yakınlaştırma, ±30° döndürme, sınırlar
+- [x] Zemin, deniz düzlemi, ışık ve WorldEnvironment ilk ayar
+- [x] BuildPlot sahnesi ve 15 arsa (sözleşme §7)
+- [x] Işınla arsa seçimi, vurgu, `plot_selected` / `plot_deselected`
+- [x] `phase_changed` ile seçimi kilitleme
+- [x] Building taban sahnesi + büyüme animasyonu
+- [x] Yer tutucu modeller: `b_solar_plant`, `b_water_storage`, `b_green_park`
+- [x] `build_approved` → bina yerleştirme
+- [x] CitySandbox sahnesi
 
 ### Ekip B
 - [x] Resource sınıfları, `balance.tres`, 3 `BuildingDefinition`
@@ -54,11 +54,24 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 ## Gün 2 · 12 yatırım, iklim, krizler
 
 ### Ekip A
-- [ ] Kalan 9 bina sahnesi (önce yer tutucu, sonra low-poly)
-- [ ] Akdeniz dekor: evler, yollar, ağaçlar, iskele, terracotta materyaller
-- [ ] DisasterFX: sıcak, kuraklık, taşkın
-- [ ] `crisis_started` / `crisis_resolved` bağlantısı
-- [ ] Deniz shader'ı (turkuaz)
+- [x] Kalan 9 bina sahnesi (önce yer tutucu, sonra low-poly)
+- [x] Akdeniz dekor: evler, yollar, ağaçlar, iskele, terracotta materyaller
+- [x] DisasterFX: sıcak, kuraklık, taşkın
+- [x] `crisis_started` / `crisis_resolved` bağlantısı
+- [x] Deniz shader'ı (turkuaz)
+
+### Gün 1–3 notları (A, Windows)
+- Windows bilgisayarda Godot 4.7.2.stable.official kurulu (Mac ile aynı sürüm). `develop` (85a4b42) bu dala alındı; B'nin `test_day1_flow.gd` ve `test_day2_flow.gd` testleri Windows'ta da TAMAM.
+- 12 bina sahnesi hazır: `scenes/buildings/b_<id>.tscn` (hepsi `Building.tscn`'den miras, low-poly). **B:** `data/buildings/*.tres` → `scene` alanları bağlanabilir. Bağlanana kadar CityWorld sözleşme §8'deki yoldan sahneyi kendisi bulur; boş kutu görünmez.
+- Arsa yerleşimi: U01–U04 kuzey sıra, U05–U08 güney sıra (ana caddenin iki yanı), O01–O05 kuzeyde açık alan, C01/C02 kordonun güneyinde kıyıda. Arsa kimliği arsanın sol alt köşesinde yazar.
+- Seçim: sol tık seç, boş yere sol tık / sağ tık / Esc bırak. Fare üstündeyken arsa hafif parlar. Faz `build` değilse seçim kapanır ve seçili arsa varsa `plot_deselected` yayılır.
+- Kamera: WASD kaydır, Q/E ±30° döndür, tekerlek yakınlaş, orta tuş sürükle. Ayarlar `CameraRig` üzerinde `@export`.
+- Kriz efektleri `severity` ile ölçeklenir: sıcak = sıcak ton + ısı pusu, kuraklık = zemin/bitki sararır + toz sisi, taşkın = deniz ve kordon şeridinde su yükselir + fırtına + yağmur. `crisis_resolved`'dan 1.5 sn sonra 3 sn'de söner.
+- Sahne yeniden açılırsa CityWorld binaları `GameState.get_building_on` ile geri kurar.
+- Dekor (evler, zeytinlik, palmiyeler, iskele, tekneler, şemsiyeler, dağlar) `scripts/world/city_decor.gd` ile sabit seed'le kodla kurulur; sahneye kaydedilmez, editörde de görünür.
+- Test: `scenes/dev/CitySandbox.tscn` (B sıradaki bina, N hepsi, 1/2/3 kriz, R krizi bitir, P faz). Headless doğrulama: tıklama → `plot_selected`, faz kilidi, 12 bina, 3 efekt ve Game.tscn'de B ile uçtan uca inşaat; hepsi geçiyor.
+- Performans (RTX 5060 Laptop, 1080p, vsync kapalı): boş şehir ~520 FPS, 12 bina ~500 FPS, taşkın + yağmur ~450 FPS, ~515 draw call. Orta seviye bir PC'de henüz denenmedi.
+- Harici model yok (`assets/models/LICENSES.md`).
 
 ### Ekip B
 - [x] 12 `BuildingDefinition` + bilgi kartları
@@ -80,7 +93,7 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 
 Öğlen 12:00 özellik dondurma. Sonrası yalnızca hata düzeltme ve denge.
 
-- [ ] A: ışık/gölge cilası, kamera hissi, performans testi
+- [x] A: ışık/gölge cilası, kamera hissi, performans testi (yalnızca RTX 5060 dizüstünde; orta seviye PC testi kaldı)
 - [x] B: denge (5 stratejili simülasyon, GAME_DESIGN §9), görevler (4 görev), arayüz teması (ilerleme çubukları)
 - [ ] Birlikte: uçtan uca test, Windows export, `main`'e son birleştirme, `v1.0` etiketi
 - [x] Sunum için 2 dakikalık demo senaryosu (aşağıda; krizler sabit yıllı, seed gerekmez)
