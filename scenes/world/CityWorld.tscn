@@ -11,6 +11,9 @@
 [ext_resource type="StandardMaterial3D" path="res://assets/materials/grass.tres" id="9_grass"]
 [ext_resource type="StandardMaterial3D" path="res://assets/materials/canopy_olive.tres" id="10_canopy_olive"]
 [ext_resource type="StandardMaterial3D" path="res://assets/materials/hill_green.tres" id="11_hill_green"]
+[ext_resource type="ShaderMaterial" path="res://assets/materials/foliage_olive.tres" id="12_foliage_oliv"]
+[ext_resource type="ShaderMaterial" path="res://assets/materials/foliage_cypress.tres" id="13_foliage_cypr"]
+[ext_resource type="ShaderMaterial" path="res://assets/materials/foliage_palm.tres" id="14_foliage_palm"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.3, 0.55, 0.82, 1)
@@ -51,7 +54,7 @@ size = Vector3(220, 2, 104)
 size = Vector3(220, 2, 104)
 
 [sub_resource type="BoxMesh" id="BoxMesh_6"]
-size = Vector3(220, 0.4, 9.2)
+size = Vector3(220, 0.4, 40)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_7"]
 size = Vector2(600, 600)
@@ -85,7 +88,7 @@ mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = ExtResource("7_ground")
 
 [node name="Beach" type="MeshInstance3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 0.989728, -0.142961, 0, 0.142961, 0.989728, 0, -0.847946, 18.5)
+transform = Transform3D(1, 0, 0, 0, 0.989728, -0.142961, 0, 0.142961, 0.989728, 0, -3.057161, 33.765975)
 mesh = SubResource("BoxMesh_6")
 surface_material_override/0 = ExtResource("8_sand")
 
@@ -198,4 +201,4 @@ script = ExtResource("5_city_decor")
 world_environment = NodePath("../WorldEnvironment")
 sun = NodePath("../Sun")
 sea = NodePath("../Sea")
-dry_materials = Array[StandardMaterial3D]([ExtResource("7_ground"), ExtResource("9_grass"), ExtResource("10_canopy_olive"), ExtResource("11_hill_green")])
+dry_materials = Array[Material]([ExtResource("7_ground"), ExtResource("9_grass"), ExtResource("10_canopy_olive"), ExtResource("11_hill_green"), ExtResource("12_foliage_oliv"), ExtResource("13_foliage_cypr"), ExtResource("14_foliage_palm")])
