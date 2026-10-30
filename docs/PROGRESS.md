@@ -142,6 +142,7 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 
 | Tarih saat | develop commit | Çalışan akışlar | Sorunlar |
 |---|---|---|---|
+| 2026-10-31 | f373ba7 + A kamera (Windows) | Windows'ta `export/ANTALYA2040.exe` üretildi (4.7.2 şablonları, 105 MB) ve çalıştırıldı: ana menü, arka plan şehri, Türkçe karakterler doğru; log'da hata yok. A şehir testi + B'nin 6 testi (day1, day2, economy, menu, e2e, ui) TAMAM. | Panel kapanınca arsa vurgusu kalıyor (v1.3 sinyali bekleniyor). Orta seviye PC'de FPS ölçülmedi. |
 | 2026-10-31 | 2b93949 + B bağlama | Menü → Game, fare tıklamasıyla arsa seçimi, BuildPanel, 3 bina şehirde, 2043 sıcak hava ve 2049 taşkın krizi + efektler, kriz sırasında seçim kilidi (`tests/test_e2e_game.gd`, Mac) | Görev/uyarı yazıları açık zeminde zor okunuyordu, kenar çizgisi eklendi. Windows'ta oynanmadı. |
 
 ## Açık sorular
