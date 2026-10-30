@@ -2,6 +2,7 @@
 
 [ext_resource type="Resource" path="res://data/cards/card_coastal_restoration.tres" id="1_uen2i"]
 [ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_hg7bi"]
+[ext_resource type="PackedScene" path="res://scenes/buildings/b_coastal_restoration.tscn" id="2_ncnyj"]
 
 [resource]
 script = ExtResource("2_hg7bi")
@@ -12,6 +13,7 @@ category = &"coast"
 cost = 350
 upkeep_per_year = 10
 allowed_plot_kinds = Array[StringName]([&"coastal"])
+scene = ExtResource("2_ncnyj")
 on_build_effects = {
 "ecosystem_health": 12.0
 }

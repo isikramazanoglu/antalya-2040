@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="BuildingDefinition" format=3]
 
 [ext_resource type="Resource" path="res://data/cards/card_cooling_center.tres" id="1_psi6u"]
+[ext_resource type="PackedScene" path="res://scenes/buildings/b_cooling_center.tscn" id="2_cmvrl"]
 [ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_em1yh"]
 
 [resource]
@@ -12,6 +13,7 @@ category = &"heat"
 cost = 200
 upkeep_per_year = 15
 allowed_plot_kinds = Array[StringName]([&"urban"])
+scene = ExtResource("2_cmvrl")
 on_build_effects = {
 "quality_of_life": 4.0
 }

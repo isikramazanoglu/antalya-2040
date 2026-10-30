@@ -24,5 +24,6 @@ macOS'ta Godot: `/Applications/Godot.app/Contents/MacOS/Godot`. Windows'ta kurul
 - Script hatası kontrolü: `<godot> --headless --path . --import`
 - Sahneyi kısa çalıştırma: `<godot> --headless --path . --quit-after 120 res://scenes/main/Game.tscn`
 - Ekip B akış testleri: `<godot> --headless --path . --script res://tests/test_day1_flow.gd` ve `test_day2_flow.gd` (SONUÇ: TAMAM beklenir)
+- Uçtan uca (pencere açar, headless değil): `<godot> --path . --script res://tests/test_e2e_game.gd`
 - Denge simülasyonu: `<godot> --headless --path . --script res://tests/balance_sim.gd`
 - Windows export: `<godot> --headless --path . --export-release "Windows Desktop" export/ANTALYA2040.exe`

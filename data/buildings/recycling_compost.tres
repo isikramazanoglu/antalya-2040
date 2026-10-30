@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="BuildingDefinition" format=3]
 
 [ext_resource type="Resource" path="res://data/cards/card_recycling_compost.tres" id="1_n08yj"]
+[ext_resource type="PackedScene" path="res://scenes/buildings/b_recycling_compost.tscn" id="2_2ukyx"]
 [ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_8f3dc"]
 
 [resource]
@@ -12,6 +13,7 @@ category = &"waste"
 cost = 250
 upkeep_per_year = 10
 allowed_plot_kinds = Array[StringName]([&"open"])
+scene = ExtResource("2_2ukyx")
 on_build_effects = {
 "ecosystem_health": 3.0
 }

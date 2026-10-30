@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="BuildingDefinition" format=3]
 
 [ext_resource type="Resource" path="res://data/cards/card_transit_hub.tres" id="1_lsibo"]
+[ext_resource type="PackedScene" path="res://scenes/buildings/b_transit_hub.tscn" id="2_7lyp2"]
 [ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_quxjm"]
 
 [resource]
@@ -12,6 +13,7 @@ category = &"transport"
 cost = 400
 upkeep_per_year = 20
 allowed_plot_kinds = Array[StringName]([&"urban"])
+scene = ExtResource("2_7lyp2")
 on_build_effects = {
 "quality_of_life": 5.0
 }

@@ -39,6 +39,7 @@ func _refresh_warnings() -> void:
 		var label := Label.new()
 		label.text = "Uyarı · %d sonunda %s bekleniyor" % [w.due_year, def.display_name if def else str(w.event_id)]
 		label.add_theme_color_override("font_color", Color(1.0, 0.75, 0.4))
+		_add_outline(label)
 		%Warnings.add_child(label)
 
 
@@ -54,4 +55,11 @@ func _refresh_missions() -> void:
 		label.text = "Görev · %s  (şu an %d, son yıl %d, ödül %d)" % [m.title, roundi(stats[m.stat]), m.deadline_year, m.reward_credits]
 		label.tooltip_text = m.description
 		label.mouse_filter = Control.MOUSE_FILTER_PASS
+		_add_outline(label)
 		%Missions.add_child(label)
+
+
+## Şehrin üstünde açık zeminde de okunsun diye koyu kenar çizgisi.
+func _add_outline(label: Label) -> void:
+	label.add_theme_constant_override("outline_size", 6)
+	label.add_theme_color_override("font_outline_color", Color(0.04, 0.1, 0.12, 0.9))
