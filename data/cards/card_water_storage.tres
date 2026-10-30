@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_uqqpv"]
+
+[resource]
+script = ExtResource("1_uqqpv")
+id = &"card_water_storage"
+title = "Su kayıplarını azaltmak"
+body = "Şehir şebekelerinde suyun bir bölümü eskimiş borulardan kaçarak kaybolur. Kaçakları onarmak ve yağışlı aylarda suyu depolamak, kuraklık dönemlerinde kullanılabilecek suyu artırır."

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_green_park.tres" id="1_6asdc"]
+[ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_odqk0"]
+
+[resource]
+script = ExtResource("2_odqk0")
+id = &"green_park"
+display_name = "Yeşil park ve gölgelendirme"
+short_description = "Ağaçlar ve gölgelikler sıcak günlerde şehri serinletir."
+category = &"heat"
+cost = 150
+upkeep_per_year = 10
+allowed_plot_kinds = Array[StringName]([&"urban"])
+on_build_effects = {
+"ecosystem_health": 5.0,
+"quality_of_life": 8.0
+}
+risk_reduction = {
+&"heat": 0.25
+}
+info_card = ExtResource("1_6asdc")

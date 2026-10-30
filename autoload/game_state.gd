@@ -50,3 +50,38 @@ func get_stats() -> Dictionary:
 func get_building_on(plot_id: StringName) -> StringName:
 	return plots.get(plot_id, &"")
 
+
+# --- Yazma fonksiyonları: yalnızca GameController çağırır ---
+
+const INDEX_STATS: Array[String] = ["water_security", "energy_security", "quality_of_life", "ecosystem_health"]
+
+
+## {"credits": -400, "energy_security": 20} gibi değişimleri uygular; göstergeler 0..100 arası kalır.
+func apply_deltas(deltas: Dictionary) -> void:
+	for key in deltas:
+		if key == "credits":
+			stats.credits += int(deltas[key])
+		elif key == "population":
+			stats.population = maxi(0, stats.population + int(deltas[key]))
+		elif key in INDEX_STATS:
+			stats[key] = clampf(stats[key] + float(deltas[key]), 0.0, 100.0)
+		else:
+			push_warning("GameState: bilinmeyen gösterge '%s'" % key)
+	EventBus.stats_changed.emit(get_stats())
+
+
+func place_building(plot_id: StringName, building_id: StringName) -> void:
+	plots[plot_id] = building_id
+
+
+func set_phase(new_phase: StringName) -> void:
+	phase = new_phase
+
+
+func advance_year() -> void:
+	stats.year += 1
+	EventBus.stats_changed.emit(get_stats())
+
+
+func record_history() -> void:
+	history.append(get_stats())

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_d4c33"]
+
+[resource]
+script = ExtResource("1_d4c33")
+id = &"card_green_park"
+title = "Kentsel ısı adası"
+body = "Asfalt ve beton gün boyunca ısıyı depolar; bu yüzden şehir merkezleri çevresindeki kırsal alanlardan daha sıcak olur. Ağaçlar gölge yapar ve yapraklarından su buharlaştırarak havayı serinletir."
