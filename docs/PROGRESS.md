@@ -16,7 +16,7 @@ Repo: https://github.com/isikramazanoglu/antalya-2040 (gizli)
 - [x] B: iskelet commit'i `develop`'a: `project.godot` (Forward+, autoload'lar, Input Map, fizik katman adları), `.gitignore`, `.gitattributes`, `event_bus.gd`, `scripts/data/*.gd` boş Resource sınıfları, boş `catalog.tres`, `Game.tscn`, `MainMenu.tscn`
 - [x] A: `CityWorld.tscn` kök node'u (boş zemin + kamera) iskelete eklendi, Game.tscn içinde açılıyor
 - [ ] İki bilgisayarda da `develop` çekildi, oyun açıldı, hata yok
-- [ ] Windows export denemesi (boş proje) çalıştı · export template'leri henüz kurulu değil
+- [x] Windows export: Mac'te `export/ANTALYA2040.exe` üretildi (PCK gömülü, Game sahnesi ve 12 bina paketten yüklendi, dev/test hariç). Windows'ta çalıştırılması bekliyor.
 
 ## Gün 1 · Oynanabilir prototip (3 yatırım)
 
