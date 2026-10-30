@@ -84,7 +84,7 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 
 ### Gün 2 notları (B)
 - Testler: `test_day1_flow.gd` ve `test_day2_flow.gd`, ikisi de TAMAM.
-- 12 binanın `scene` alanı boş; A'nın `b_<id>.tscn` dosyaları gelince B bağlayacak.
+- 12 binanın `scene` alanı A'nın `b_<id>.tscn` sahnelerine bağlandı (2026-10-31).
 - Kriz takvimi (demo): sıcak hava 2043, kuraklık 2046, kıyı taşkını 2049. Uyarı bir yıl önce gelir.
 - Bilgi kartları nitel; kaynak satırları boş. Sunumdan önce her karta kaynak eklenmeli (özellikle "Akdeniz havzası" cümlesi için IPCC AR6).
 - A için: `crisis_started(event_id, risk_type, severity)` ve `crisis_resolved(result)` yayılıyor, efektler bağlanabilir.
@@ -124,6 +124,7 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 
 | Tarih saat | develop commit | Çalışan akışlar | Sorunlar |
 |---|---|---|---|
+| 2026-10-31 | 2b93949 + B bağlama | Menü → Game, fare tıklamasıyla arsa seçimi, BuildPanel, 3 bina şehirde, 2043 sıcak hava ve 2049 taşkın krizi + efektler, kriz sırasında seçim kilidi (`tests/test_e2e_game.gd`, Mac) | Görev/uyarı yazıları açık zeminde zor okunuyordu, kenar çizgisi eklendi. Windows'ta oynanmadı. |
 
 ## Açık sorular
 

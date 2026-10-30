@@ -1,6 +1,15 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="PackedScene" path="res://scenes/world/CityWorld.tscn" id="2_city"]
+
+[sub_resource type="Gradient" id="Shade_gradient"]
+offsets = PackedFloat32Array(0, 0.45, 1)
+colors = PackedColorArray(0.03, 0.09, 0.11, 0.92, 0.03, 0.09, 0.11, 0.55, 0.03, 0.09, 0.11, 0)
+
+[sub_resource type="GradientTexture2D" id="Shade_texture"]
+gradient = SubResource("Shade_gradient")
+fill_to = Vector2(1, 0)
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -11,50 +20,136 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="CityBackdrop" parent="." instance=ExtResource("2_city")]
+process_mode = 4
+
+[node name="Shade" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.07, 0.29, 0.33, 1)
+mouse_filter = 2
+texture = SubResource("Shade_texture")
+expand_mode = 1
 
-[node name="VBox" type="VBoxContainer" parent="."]
+[node name="MenuPanel" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 140.0
+offset_top = -230.0
+offset_right = 680.0
+offset_bottom = 230.0
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="MenuPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.09, 0.11, 0.8)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 72
+text = "ANTALYA 2040"
+
+[node name="Subtitle" type="Label" parent="MenuPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 0.82, 1)
+theme_override_font_sizes/font_size = 28
+text = "İklimin Geleceği"
+
+[node name="Tagline" type="Label" parent="MenuPanel"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.93, 0.92, 0.85)
+text = "Akdeniz kıyısında küçük bir şehri 2052'ye kadar yönet: yatırım yap, krizlere hazırlan, iklim değişikliğini öğren."
+autowrap_mode = 3
+
+[node name="NewGameButton" type="Button" parent="MenuPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "YENİ OYUN"
+
+[node name="AboutButton" type="Button" parent="MenuPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "OYUN HAKKINDA"
+
+[node name="QuitButton" type="Button" parent="MenuPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "ÇIKIŞ"
+
+[node name="About" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="About"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="Panel" type="PanelContainer" parent="About"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -240.0
-offset_top = -140.0
-offset_right = 240.0
-offset_bottom = 140.0
+offset_left = -400.0
+offset_top = -350.0
+offset_right = 400.0
+offset_bottom = 350.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 16
 
-[node name="Title" type="Label" parent="VBox"]
+[node name="VBox" type="VBoxContainer" parent="About/Panel"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "ANTALYA 2040"
-horizontal_alignment = 1
+theme_override_constants/separation = 14
 
-[node name="Subtitle" type="Label" parent="VBox"]
+[node name="Title" type="Label" parent="About/Panel/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "İklimin Geleceği"
-horizontal_alignment = 1
+theme_override_font_sizes/font_size = 30
+text = "Oyun hakkında"
 
-[node name="NewGameButton" type="Button" parent="VBox"]
+[node name="Body" type="RichTextLabel" parent="About/Panel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "2040 yılındasın. Antalya kıyısından esinlenen küçük bir Akdeniz şehrinin yönetimi sana geçti. Her tur bir yıl; oyun 2052'de biter.
+
+[b]Ne yaparsın?[/b]
+Şehirdeki arsalara tıkla, sınırlı bütçenle on iki sürdürülebilir yatırımdan birini seç: güneş enerjisi, su depolama, yeşil park, toplu taşıma, kıyı restorasyonu ve diğerleri. Her yatırımın bilgi kartını oku.
+
+[b]Krizler önceden haber verir.[/b]
+Kuraklık, sıcak hava dalgası ve kıyı taşkını gelmeden bir yıl önce uyarı alırsın. Doğru yatırımlar hasarı azaltır; kriz anında bir müdahale seçersin.
+
+[b]İklim Laboratuvarı[/b]
+Şehrinin emisyonlarını, yerel riskleri ve atmosferdeki CO2'nin gerçek ölçümünü (NOAA) karşılaştırırsın. Tek bir şehir küresel eğriyi değiştiremez; ama kendi emisyonunu ve risklerini yönetebilir.
+
+[i]Oyundaki bütçe, nüfus, gösterge ve risk değerleri gerçek Antalya ölçümleri değil, oyun dengeleme değerleridir.[/i]"
+
+[node name="AboutCloseButton" type="Button" parent="About/Panel/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-text = "Yeni oyun"
-
-[node name="QuitButton" type="Button" parent="VBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-text = "Çıkış"
+text = "Kapat"
