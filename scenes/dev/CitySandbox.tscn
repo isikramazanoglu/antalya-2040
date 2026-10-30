@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/world/CityWorld.tscn" id="1_CityWorld"]
+[ext_resource type="Script" path="res://scripts/world/city_sandbox.gd" id="2_city_sandbox"]
+
+[node name="CitySandbox" type="Node"]
+
+[node name="CityWorld" parent="." instance=ExtResource("1_CityWorld")]
+
+[node name="Sandbox" type="Node" parent="."]
+script = ExtResource("2_city_sandbox")
+
+[node name="Help" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="Help"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 900.0
+offset_bottom = 120.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 6
+text = "CitySandbox · Sol tık arsa seç · Sağ tık/Esc bırak · WASD kaydır · Q/E döndür · Tekerlek yakınlaş · Orta tuş sürükle\nB sıradaki bina · N tüm binalar · 1 sıcak hava · 2 kuraklık · 3 kıyı taşkını · R krizi bitir · P faz build/report"

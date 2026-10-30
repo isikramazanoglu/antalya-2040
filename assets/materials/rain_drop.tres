@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "rain_drop"
+albedo_color = Color(0.8, 0.86, 0.95, 0.45)
+roughness = 1.0
+shading_mode = 0
+transparency = 1
