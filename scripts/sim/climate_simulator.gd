@@ -7,15 +7,9 @@ extends RefCounted
 ## Dönüş: {"emissions_by_sector", "emissions_total", "risks", "global_co2_ppm", "deltas"}.
 ## risks: gelen yılın (stats.year + 1) korunmuş riskleri; uyarılar ve arayüz bunu kullanır.
 static func compute_year(stats: Dictionary, buildings: Array[BuildingDefinition], b: BalanceConfig, co2: Co2Scenario) -> Dictionary:
-	var pop_factor: float = stats.population / 500.0
-	var by_sector := {}
-	var total := 0.0
-	for sector in b.base_emissions:
-		var mult := 1.0
-		for def in buildings:
-			mult += def.emission_multipliers.get(sector, 0.0)
-		by_sector[sector] = b.base_emissions[sector] * pop_factor * maxf(mult, b.emission_floor)
-		total += by_sector[sector]
+	var emissions := compute_emissions(stats.population, buildings, b)
+	var by_sector: Dictionary = emissions.emissions_by_sector
+	var total: float = emissions.emissions_total
 
 	var risks := {}
 	for risk_type in b.start_risks:
@@ -32,6 +26,20 @@ static func compute_year(stats: Dictionary, buildings: Array[BuildingDefinition]
 		"global_co2_ppm": co2_for_year(co2, stats.year),
 		"deltas": {"ecosystem_health": eco_delta},
 	}
+
+
+## Sektör emisyonları; yıl sonunda ve her inşaattan sonra kullanılır.
+static func compute_emissions(population: int, buildings: Array[BuildingDefinition], b: BalanceConfig) -> Dictionary:
+	var pop_factor := population / 500.0
+	var by_sector := {}
+	var total := 0.0
+	for sector in b.base_emissions:
+		var mult := 1.0
+		for def in buildings:
+			mult += def.emission_multipliers.get(sector, 0.0)
+		by_sector[sector] = b.base_emissions[sector] * pop_factor * maxf(mult, b.emission_floor)
+		total += by_sector[sector]
+	return {"emissions_by_sector": by_sector, "emissions_total": total}
 
 
 ## Yatırım öncesi risk: başlangıç + yıllık artış × başlangıçtan beri geçen yıl.

@@ -36,6 +36,7 @@ func _ready() -> void:
 	EventBus.crisis_warned.connect(func(_w): _refresh_warnings())
 	EventBus.crisis_resolved.connect(func(_r): _refresh_warnings())
 	EventBus.year_started.connect(func(_y): _refresh_missions())
+	EventBus.stats_changed.connect(func(_s): _refresh_missions())  # "şu an" değerleri inşaattan hemen sonra da doğru olsun
 	_shown_credits = GameState.stats.credits
 	_on_stats_changed(GameState.get_stats())
 	_refresh_warnings()
@@ -70,6 +71,7 @@ func _build_resource_cards() -> void:
 	for r in RESOURCES:
 		_cards[r[0]] = _make_card(r[1], r[2])
 	_cards["economy"] = _make_card("Ekonomik durum", "economy")
+	_cards["emissions_total"] = _make_card("Yerel emisyon", "emission")
 
 
 func _make_card(title: String, icon_name: String) -> Dictionary:
@@ -138,7 +140,8 @@ func _on_stats_changed(stats: Dictionary) -> void:
 	for r in RESOURCES:
 		var detail := ""
 		if r[0] == "energy_security":
-			detail = "Yenilenebilir %d / talep %d · pay %%%d" % [roundi(stats.renewable_energy), roundi(stats.energy_demand), roundi(stats.renewable_share * 100)]
+			detail = "Üretim %d / tüketim %d · denge %+d · yenilenebilir %%%d" % [roundi(stats.renewable_energy), roundi(stats.energy_demand),
+					roundi(stats.renewable_energy - stats.energy_demand), roundi(stats.renewable_share * 100)]
 		elif r[0] == "water_security":
 			detail = "Su arzı %d / talep %d · denge %+d" % [roundi(stats.water_supply), roundi(stats.water_demand), roundi(stats.water_supply - stats.water_demand)]
 		_set_card(r[0], stats[r[0]], str(roundi(stats[r[0]])), detail)
@@ -148,6 +151,15 @@ func _on_stats_changed(stats: Dictionary) -> void:
 	var econ := 80.0 if stats.credits >= cheapest else (40.0 if stats.credits >= 0 else 10.0)
 	_set_card("economy", econ, UiText.thousands(stats.credits),
 			("Geçen yıl net %s · " % UiText.format_delta(_last_net) if _has_report else "") + ("en ucuz yatırım %d" % cheapest if cheapest > 0 else "bütün yatırımlar yapıldı"))
+
+
+	# Emisyonda düşük iyidir: 80 ve altı iyi, 120 üstü kritik olacak şekilde 0-100 ölçeğine çevrilip durum rengi alınır.
+	var start_total := 0.0
+	for v in Catalog.data.balance.base_emissions.values():
+		start_total += v
+	var em: float = stats.emissions_total
+	_set_card("emissions_total", clampf(150.0 - em, 0.0, 100.0), str(roundi(em)),
+			"Başlangıç %d · fark %+d (oyun birimi)" % [roundi(start_total), roundi(em - start_total)])
 
 
 func _cheapest_available_cost() -> int:

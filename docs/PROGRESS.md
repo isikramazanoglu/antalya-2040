@@ -130,10 +130,17 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - A için: BuildPanel kapanınca arsa vurgusu kalıyor (`plot_deselected` A'nın). İstenirse sözleşmeye "arayüz seçimi bırak" isteği eklenebilir.
 - Sözleşme değişikliği yok.
 
+### Prompt 6 notları (B, 2026-10-31) · Tam entegrasyon
+- Denetim: sinyaller, fonksiyon imzaları, node yolları, 15 arsa kimliği (benzersiz, sözleşme §7 ile aynı), 12 bina sahnesi ↔ BuildingDefinition uyumlu. A ve UI GameState'e yazmıyor.
+- Eklenen: GameController kontrol zincirine `scene_unavailable` ve `unknown_plot` (sözleşme v1.4, işlem durum değişmeden reddedilir = bölünmez); emisyonlar ve enerji/su akışları inşaatta hemen güncelleniyor (`ClimateSimulator.compute_emissions`); HUD'a Yerel emisyon kartı ve enerji dengesi; Türkçe ret mesajları talimattaki ifadelere çekildi.
+- `tests/test_integration.gd`: Prompt 6'nın 17 senaryosu (21 kontrol) 1280×720 ve 1920×1080'de TAMAM, konsolda hata/uyarı yok. Diğer 6 test ve denge simülasyonu değişmedi.
+- Bilerek korunan: arsa türleri urban/open/coastal (talimattaki enerji/su/yeşil/kıyı değil), maliyetler 400/250/150 (talimattaki 250/200/150 "örnek").
+
 ## Sözleşme değişiklik talepleri
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |
 |---|---|---|---|---|
+| 2026-10-31 | B | v1.4: ret nedenleri `scene_unavailable`, `unknown_plot` (ekleme) | B içi, A ret nedenlerini kullanmaz | Yapıldı |
 | 2026-10-31 | B (öneri) | v1.3: `plot_deselect_requested` (parametresiz). Yayan: B · BuildPanel (kapat düğmesi, Esc). Dinleyen: A · CityWorld → seçimi bırakır ve `plot_deselected` yayar. Neden: panel kapanınca arsa vurgusu kalıyor. | A onayladı (2026-10-31) | B ekledi (2026-10-31); A'nın CityWorld'de dinlemesi bekleniyor |
 | 2026-10-31 | B | v1.2: `stats` enerji/su akışları (ekleme) | B içi, A etkilenmez | Yapıldı |
 | 2026-10-30 | B | v1.1: `report.missions`, `summary.emission_reduction_pct` (ekleme) | B içi, A etkilenmez | Yapıldı |

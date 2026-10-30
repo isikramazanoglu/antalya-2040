@@ -15,12 +15,14 @@ const STAT_NAMES := {
 const PLOT_KINDS := {&"urban": "Kent arsası", &"open": "Açık alan", &"coastal": "Kıyı arsası"}
 
 const REJECT_REASONS := {
-	&"not_enough_credits": "Bütçe yetmiyor.",
-	&"plot_occupied": "Bu arsa dolu.",
-	&"wrong_plot_kind": "Bu yatırım bu arsa türüne yapılamaz.",
+	&"not_enough_credits": "Bu yatırımı gerçekleştirmek için yeterli bütçen yok.",
+	&"plot_occupied": "Bu inşaat alanı zaten kullanılıyor.",
+	&"wrong_plot_kind": "Seçilen arsa bu yatırım türüne uygun değil.",
 	&"max_count_reached": "Bu yatırımdan zaten var.",
 	&"wrong_phase": "Şu an inşaat yapılamaz.",
 	&"unknown_building": "Tanımsız yatırım.",
+	&"scene_unavailable": "Bu yatırımın şehir modeli yüklenemedi; işlem yapılmadı.",
+	&"unknown_plot": "Seçilen inşaat alanı bulunamadı.",
 }
 
 

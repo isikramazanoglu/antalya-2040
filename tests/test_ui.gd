@@ -93,9 +93,9 @@ func _process(_d: float) -> bool:
 			_check(_find("HUD", "CreditsValue").text == "600", "3) HUD bütçesi güncellendi (%s)" % _find("HUD", "CreditsValue").text)
 			var energy_detail := ""
 			for l in _find("HUD", "ResourceList").find_children("*", "Label", true, false):
-				if l.text.begins_with("Yenilenebilir"):
+				if l.text.begins_with("Üretim"):
 					energy_detail = l.text
-			_check(energy_detail.contains("Yenilenebilir 20 / talep 50"), "5) enerji üretimi ve tüketimi gösteriliyor (%s)" % energy_detail)
+			_check(energy_detail.contains("Üretim 20 / tüketim 50 · denge -30"), "5) enerji üretimi, tüketimi ve dengesi gösteriliyor (%s)" % energy_detail)
 			_check(not _find("BuildPanel", "BuildButton").visible and _find("BuildPanel", "Hint").text.contains("Bu arsada"), "12) dolu arsada inşa düğmesi yok")
 			bus.build_requested.emit(&"O01", &"water_storage")
 			var rejected := log.filter(func(l): return l[0] == "build_rejected")
