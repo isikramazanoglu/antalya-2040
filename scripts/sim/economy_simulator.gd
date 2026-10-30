@@ -25,6 +25,28 @@ static func compute_year(stats: Dictionary, buildings: Array[BuildingDefinition]
 	return {"income": income, "upkeep": upkeep, "deltas": deltas}
 
 
+## Enerji ve su akışları (sözleşme §5.1 v1.2). Endekslerden (energy_security, water_security) ayrı, bilgi amaçlı.
+## renewable_share: talebin yenilenebilir üretimle karşılanan payı, 0..1.
+static func compute_resources(population: int, buildings: Array[BuildingDefinition], b: BalanceConfig) -> Dictionary:
+	var energy_demand := population * b.energy_per_capita
+	var water_demand := population * b.water_per_capita
+	var renewable := 0.0
+	var water_supply := b.base_water_supply
+	for def in buildings:
+		renewable += def.energy_production
+		energy_demand += def.energy_consumption
+		water_supply += def.water_production
+		water_demand += def.water_consumption
+	energy_demand = maxf(energy_demand, 0.0)
+	return {
+		"energy_demand": energy_demand,
+		"renewable_energy": renewable,
+		"renewable_share": clampf(renewable / energy_demand, 0.0, 1.0) if energy_demand > 0.0 else 0.0,
+		"water_demand": maxf(water_demand, 0.0),
+		"water_supply": water_supply,
+	}
+
+
 ## Sözleşme §5.5 için puan ve not.
 ## Emisyon bonusu kişi başı emisyondaki azalmadan gelir; şehri büyütmek cezalandırılmaz.
 static func final_score(final_stats: Dictionary, start_stats: Dictionary) -> Dictionary:

@@ -22,4 +22,9 @@ extends Resource
 @export var emission_multipliers: Dictionary = {}
 ## Kriz hasarını azaltma, ör. {"drought": 0.30}
 @export var risk_reduction: Dictionary = {}
+## Kaynak akışları (oyun birimi/yıl, isteğe bağlı). Üretim yenilenebilirdir; tüketim negatifse tasarruftur.
+@export var energy_production: float = 0.0
+@export var energy_consumption: float = 0.0
+@export var water_production: float = 0.0
+@export var water_consumption: float = 0.0
 @export var info_card: InfoCard

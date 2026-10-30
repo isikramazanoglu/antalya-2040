@@ -20,4 +20,5 @@ on_build_effects = {
 emission_multipliers = {
 "energy": -0.3
 }
+energy_production = 20.0
 info_card = ExtResource("1_v5ht7")

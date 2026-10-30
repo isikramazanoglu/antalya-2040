@@ -29,6 +29,12 @@ func reset() -> void:
 		"emissions_by_sector": b.base_emissions.duplicate(),
 		"risks": b.start_risks.duplicate(),
 		"global_co2_ppm": -1.0,
+		# v1.2 kaynak akışları; değerleri TurnManager.start_game ve her inşaat sonrası EconomySimulator hesaplar.
+		"energy_demand": 0.0,
+		"renewable_energy": 0.0,
+		"renewable_share": 0.0,
+		"water_demand": 0.0,
+		"water_supply": 0.0,
 	}
 	var total := 0.0
 	for value in b.base_emissions.values():
@@ -95,6 +101,12 @@ func set_climate(climate: Dictionary) -> void:
 	stats.emissions_total = climate.emissions_total
 	stats.risks = climate.risks
 	stats.global_co2_ppm = climate.global_co2_ppm
+	EventBus.stats_changed.emit(get_stats())
+
+
+## Kaynak akışlarının yeni değerleri (delta değil).
+func set_resources(resources: Dictionary) -> void:
+	stats.merge(resources, true)
 	EventBus.stats_changed.emit(get_stats())
 
 

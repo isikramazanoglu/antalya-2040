@@ -114,10 +114,17 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - Sözleşme v1.1: rapora `missions`, final özetine `emission_reduction_pct` eklendi (yalnızca ekleme, A etkilenmez).
 - `export_presets.cfg` hazır; Windows export'u için 4.7.2 şablonları gerekir.
 
+### Prompt 2-4 notları (B, 2026-10-31)
+- Prompt 2: Ana menüye OYUN HAKKINDA penceresi, arkada Ekip A'nın şehri (girdiye kapalı), giriş animasyonu. `tests/test_menu.gd` TAMAM. Mimari çelişkiler raporlandı; mevcut yapı korundu.
+- Prompt 3: Ekip A'nın işi; salt okunur kontrol edildi (15 kriterin 13'ü tam). A için açık: belediye binası + meydan, ağaçlarda rüzgâr, isteğe bağlı MultiMesh, orta seviye PC'de FPS.
+- Prompt 4: Enerji/su akışları ve yenilenebilir payı eklendi (sözleşme v1.2). `tests/test_economy.gd` Prompt 4'ün 12 testini gerçek denge değerleriyle çalıştırır: TAMAM. Talimattaki örnek maliyetler (güneş 250, su 200) yerine denge simülasyonundaki değerler (400, 250) korundu; `construction_turns` yok, inşaat anlık.
+- Bilinen: kredi bilinçli olarak eksiye düşebilir (borç; o yıl yaşam −5). Endeksler 0–100, nüfus ≥ 0.
+
 ## Sözleşme değişiklik talepleri
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |
 |---|---|---|---|---|
+| 2026-10-31 | B | v1.2: `stats` enerji/su akışları (ekleme) | B içi, A etkilenmez | Yapıldı |
 | 2026-10-30 | B | v1.1: `report.missions`, `summary.emission_reduction_pct` (ekleme) | B içi, A etkilenmez | Yapıldı |
 
 ## Entegrasyon günlüğü

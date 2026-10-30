@@ -20,4 +20,5 @@ on_build_effects = {
 risk_reduction = {
 &"heat": 0.35
 }
+energy_consumption = 2.0
 info_card = ExtResource("1_psi6u")

@@ -94,7 +94,7 @@ antalya-2040/
 │   ├── missions/<id>.tres         MissionDefinition × 4
 │   └── cards/<id>.tres            InfoCard (bina, olay ve İklim Laboratuvarı kartları)
 │
-├── tests/                         B     Headless testler (test_day1_flow.gd, test_day2_flow.gd) ve denge simülasyonu (balance_sim.gd)
+├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy), pencereli testler (test_menu, test_e2e_game), denge simülasyonu (balance_sim)
 │
 └── assets/
     ├── models/                    A     .glb modeller
@@ -273,7 +273,7 @@ Kural: **veri bir yerde, hesap bir yerde, yazma tek yerde.**
 | `GameState` | autoload Node | Verileri tutar (`stats`, `plots` sözlüğü, `pending_crises`, `history`, `phase`, `rng_seed`). Getter'lar (`get_stats`, `get_building_on`, `built_definitions`). `GameController`'ın çağırdığı ayarlayıcılar. Her değişimde `stats_changed`. `reset()`. | Hesap yapmaz, kural kontrol etmez. |
 | `GameController` | Node (Game içinde) | Oyuncu taleplerini dinler (`build_requested`, `end_turn_requested`, `crisis_response_chosen`, `report_closed`). Kural kontrolü (sözleşme §6.3). `GameState`'e yazan tek modül. | Yıl sonu hesabı yapmaz; bunu TurnManager'a bırakır. |
 | `TurnManager` | Node | Yıl sonu adımlarını sıralar, faz makinesini tutar, tur sinyallerini yayar. Simülatörlerin sonuçlarını `GameController.apply_*` ile uygulatır. | Kendi formülü yoktur; oyuncu girdisi dinlemez. |
-| `EconomySimulator` | `RefCounted`, statik fonksiyonlar | `compute_year(stats, buildings, balance) -> Dictionary` (gelir, gider, nüfus değişimi). | Durum tutmaz, sinyal yaymaz. |
+| `EconomySimulator` | `RefCounted`, statik fonksiyonlar | `compute_year(stats, buildings, balance) -> Dictionary` (gelir, gider, nüfus değişimi); `compute_resources(population, buildings, balance)` (enerji/su akışları, yenilenebilir payı); `final_score`. | Durum tutmaz, sinyal yaymaz. |
 | `ClimateSimulator` | `RefCounted`, statik fonksiyonlar | Sektör emisyonları, risk seviyeleri, ekosistem değişimi; `Co2Scenario`'dan o yılın ppm değerini okur. | Küresel CO2'yi oyuncu yatırımıyla değiştirmez. |
 | `EventManager` | `RefCounted`, statik fonksiyonlar | `plan_warnings(...)`: hangi kriz hangi yıl, RNG ile. `resolve(event, response, buildings) -> result`. | Sinyal yaymaz, panel açmaz. |
 
@@ -320,6 +320,7 @@ Hepsi `scripts/data/` altında, `class_name` ile, `extends Resource`. Alanlar `@
 | `yearly_effects` | Dictionary | Her yıl sonu: `{"water_security": 2}` |
 | `emission_multipliers` | Dictionary | Sektör çarpanı: `{"energy": -0.30}` = enerji emisyonu %30 az |
 | `risk_reduction` | Dictionary | Kriz hasarını azaltma: `{&"drought": 0.30}`. Anahtar `StringName` (risk_type ile aynı tip) |
+| `energy_production`, `energy_consumption`, `water_production`, `water_consumption` | float | İsteğe bağlı kaynak akışları (oyun birimi/yıl); üretim yenilenebilir, negatif tüketim tasarruf |
 | `info_card` | InfoCard | |
 
 ### EventDefinition
@@ -335,6 +336,7 @@ Hepsi `scripts/data/` altında, `class_name` ile, `extends Resource`. Alanlar `@
 | `lead_years` | int | Uyarı ile kriz arası, varsayılan 1 |
 | `base_damage` | Dictionary | `{"credits": -150, "water_security": -20}` |
 | `responses` | Array[CrisisResponse] | |
+| `energy_production`, `energy_consumption`, `water_production`, `water_consumption` | float | İsteğe bağlı kaynak akışları (oyun birimi/yıl); üretim yenilenebilir, negatif tüketim tasarruf |
 | `info_card` | InfoCard | |
 
 ### CrisisResponse

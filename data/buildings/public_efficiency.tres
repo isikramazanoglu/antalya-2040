@@ -20,4 +20,5 @@ on_build_effects = {
 emission_multipliers = {
 "buildings": -0.15
 }
+energy_consumption = -5.0
 info_card = ExtResource("1_61fpq")

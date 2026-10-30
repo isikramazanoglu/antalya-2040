@@ -20,4 +20,5 @@ on_build_effects = {
 emission_multipliers = {
 "transport": -0.35
 }
+energy_consumption = 3.0
 info_card = ExtResource("1_lsibo")

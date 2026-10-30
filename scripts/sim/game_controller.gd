@@ -49,6 +49,7 @@ func _on_build_requested(plot_id: StringName, building_id: StringName) -> void:
 	var deltas := def.on_build_effects.duplicate()
 	deltas["credits"] = deltas.get("credits", 0) - def.cost
 	GameState.apply_deltas(deltas)
+	refresh_resources()
 	EventBus.build_approved.emit(plot_id, building_id)
 
 
@@ -68,6 +69,11 @@ func advance_year() -> void:
 
 func record_history() -> void:
 	GameState.record_history()
+
+
+## Enerji ve su akışlarını güncel nüfus ve binalardan yeniden hesaplatıp yazar.
+func refresh_resources() -> void:
+	GameState.set_resources(EconomySimulator.compute_resources(GameState.stats.population, GameState.built_definitions(), Catalog.data.balance))
 
 
 func apply_climate(climate: Dictionary) -> void:

@@ -49,7 +49,7 @@ script = ExtResource("2_chart")
 
 [node name="EmissionText" type="RichTextLabel" parent="VBox/Tabs/Yerel emisyonlar"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 110)
 layout_mode = 2
 bbcode_enabled = true
 

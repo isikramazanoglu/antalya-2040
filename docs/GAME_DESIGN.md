@@ -49,6 +49,11 @@ Hepsi `BalanceConfig` içinde katsayı olarak durur, kodda sabit sayı yazılmaz
 - Yıllık değişim oranı = (yaşam kalitesi − 45) / 1000, −%3 ile +%4 arasında sınırlı.
 - Su güvenliği 30'un altındaysa oran ayrıca −%2.
 
+**Enerji ve su akışları (bilgi amaçlı)**
+- Enerji talebi = nüfus × 0.1 + binaların `energy_consumption` toplamı. Yenilenebilir üretim = binaların `energy_production` toplamı (güneş 20). Yenilenebilir payı = üretim / talep (0–1); kalanı şebekeden, fosil kaynaklı kabul edilir.
+- Su talebi = nüfus × 0.1 + binaların `water_consumption` toplamı (park 1, kent tarımı 2). Su arzı = 55 + binaların `water_production` toplamı (su depolama 10, geri kazanım 15).
+- Bu akışlar İklim Laboratuvarı'nda ve yıl sonu raporunda gösterilir; puanı ve endeksleri doğrudan değiştirmez. Değerler oyun birimidir.
+
 **Emisyon (yerel)**
 - Sektör taban değerleri (500 nüfus için): enerji 40, ulaşım 25, binalar 20, atık 15.
 - Sektör emisyonu = taban × (nüfus / 500) × (1 + o sektördeki `emission_multipliers` toplamı), en düşük %20'ye kadar iner.

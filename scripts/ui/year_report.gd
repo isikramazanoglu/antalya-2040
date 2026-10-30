@@ -31,6 +31,8 @@ func _on_year_ended(report: Dictionary) -> void:
 	for key in REPORT_STATS:
 		t += "%s  %s → %s\n" % [UiText.STAT_NAMES[key],
 				UiText.format_value(before[key]), UiText.format_value(after[key])]
+	t += "Yenilenebilir enerji payı  %%%d → %%%d\nSu arzı / talebi  %d / %d\n" % [
+		roundi(before.renewable_share * 100), roundi(after.renewable_share * 100), roundi(after.water_supply), roundi(after.water_demand)]
 	if not report.built_this_year.is_empty():
 		var names := PackedStringArray()
 		for id in report.built_this_year:
