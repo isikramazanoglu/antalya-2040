@@ -73,6 +73,7 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - Performans (RTX 5060 Laptop, 1080p, vsync kapalı): boş şehir ~520 FPS, 12 bina ~500 FPS, taşkın + yağmur ~450 FPS, ~515 draw call. Orta seviye bir PC'de henüz denenmedi.
 - Harici model yok (`assets/models/LICENSES.md`).
 - Prompt 3 (A, 2026-10-31): belediye binası ve saat kuleli meydan, kordon meydanı, marina (deniz feneri, dalgakıran, yelkenliler), ağaçlarda hafif rüzgâr (`foliage.gdshader`), caddede dolaşan araçlar. Dekor artık MultiMesh ile çiziliyor. Boş arsa turkuaz, dolu arsa kehribar renkte parlar; etiket kimlik + tür gösterir ("U01 · KENT"). CityWorld'e görsel yerleştirme fonksiyonları eklendi: `get_plot_kind`, `is_plot_occupied`, `place_building` (başarısızsa false + uyarı). Sözleşme değişmedi.
+- Prompt 5 sonrası (A, 2026-10-31): Seçilen arsa yan panellerin veya alt çubuğun arkasında kalırsa kamera onu yumuşakça görünür alana kaydırır (`CameraRig.bring_into_view`, güvenli alan `safe_area` ile ayarlanır). Açılış kadrajı sol panel payı kadar sağa kaydırıldı. Yalnızca A dosyaları.
 
 ### Ekip B
 - [x] 12 `BuildingDefinition` + bilgi kartları
@@ -133,6 +134,7 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |
 |---|---|---|---|---|
+| 2026-10-31 | B (öneri) | v1.3: `plot_deselect_requested` (parametresiz). Yayan: B · BuildPanel (kapat düğmesi, Esc). Dinleyen: A · CityWorld → seçimi bırakır ve `plot_deselected` yayar. Neden: panel kapanınca arsa vurgusu kalıyor. | A onayladı (2026-10-31) | B'nin eklemesi bekleniyor |
 | 2026-10-31 | B | v1.2: `stats` enerji/su akışları (ekleme) | B içi, A etkilenmez | Yapıldı |
 | 2026-10-30 | B | v1.1: `report.missions`, `summary.emission_reduction_pct` (ekleme) | B içi, A etkilenmez | Yapıldı |
 
