@@ -10,3 +10,4 @@ body = "Dolu bir otobüs, aynı sayıda insanı taşıyan çok sayıda otomobild
 benefit = "Elektrikli otobüs, tramvay ve bisiklet yollarını birleştirir."
 climate_link = "Kişi başına yakıt tüketimini ve egzoz kirliliğini azaltır."
 strategic = "Ulaşım emisyonunu en çok düşüren yatırımdır; yaşam kalitesini de artırır."
+sources = Array[String](["IEA, Transport: Energy demand and emissions (web sayfası), https://www.iea.org/energy-system/transport, erişim 2026-10-31"])

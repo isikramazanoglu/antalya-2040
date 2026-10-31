@@ -149,6 +149,11 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - `tests/test_crises.gd`: 12 test sorusu (22 kontrol) TAMAM. Diğer 7 test TAMAM. Denge: hiçbir şey 38, koruyucu 77, karma 81; hazırlıklı şehrin kriz kaybı 145, hazırlıksızın 472.
 - Kriz yılları sabit (2043, 2046, 2049): sonuç tekrarlanabilir, oyuncu sürekli felaketle cezalandırılmaz.
 
+### Bilgi kartı kaynakları (B, 2026-10-31)
+- 16 kartın 14'üne kaynak eklendi: IEA (güneş, binalar, ulaşım), US EPA (ısı adası, su geri kazanımı, kompost/gıda atığı), WHO (sıcak ve sağlık), UNCCD (kuraklık), FAO (tarım suyu), NOAA GML (CO2). Her adres 2026-10-31'de açıldı; başlık ve içerik kartın konusuyla karşılaştırıldı.
+- Sıcak hava kartındaki "Akdeniz havzası en çok etkilenen bölgeler arasında" cümlesi çıkarıldı: WHO sayfasında yok, IPCC sayfaları otomatik erişime kapalı olduğu için doğrulanamadı.
+- Kaynaksız kalan 2 kart: `card_coastal_restoration`, `card_event_coastal_flood`. Önerilen kaynak IPCC SROCC (https://www.ipcc.ch/srocc/) ve Akdeniz için IPCC AR6 WGII CCP4; bir kişi tarayıcıda açıp doğrularsa eklenebilir. Kartlarda sayı yok.
+
 ## Sözleşme değişiklik talepleri
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |

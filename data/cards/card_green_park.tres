@@ -10,3 +10,4 @@ body = "Asfalt ve beton gün boyunca ısıyı depolar; bu yüzden şehir merkezl
 benefit = "Yeşil alan miktarını ve yaşam kalitesini artırır."
 climate_link = "Gölge ve buharlaşma sayesinde şehirdeki yerel sıcaklık baskısını azaltmaya yardımcı olur."
 strategic = "Aşırı sıcak olaylarında avantaj sağlar."
+sources = Array[String](["US EPA, Heat Island Effect (web sayfası), https://www.epa.gov/heatislands, erişim 2026-10-31"])
