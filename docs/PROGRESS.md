@@ -95,6 +95,17 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
   - Test: `scripts/world/dev/test_final_presentation.gd` (gerçek Game.tscn 2052'ye kadar; kabul ölçütleri 1–6, Esc, geçici kopya, bilinmeyen kimlik, eksik summary, yatırımsız oyun; 29 kontrol) 1280×720 ve 1920×1080'de TAMAM. B'nin 11 testi + A'nın diğer 4 testi TAMAM. Windows export (geçici klasöre) hatasız, exe açılıyor.
   - Performans (RTX 5060 Laptop, 1080p, vsync kapalı): normal 481 FPS, sunum boyunca ortalama 427 FPS.
   - Bilinen sınır: ısı pusu (ekran efekti) ana görünümde çizildiği için sunumdaki sıcak hava tekrarında görünmez; sıcak ton, sis ve koruma hareleri görünür. Rezervuarın su seviyesi sunumda 2052 değerinde kalır.
+- 10C sonrası kontrol (A, 2026-10-31): develop 1b255c9 alındı; B'nin 12 testi (`test_playthrough` 1280×720 ve 1920×1080 dahil) + A'nın 5 testi TAMAM. `test_final_presentation.gd` titrekliği giderildi: [6]'daki sabit 5,5 sn bekleme ve 0,6 sn'lik bitiş beklemeleri koşul beklemesine çevrildi (yavaş makinede ilk sahne 5,5 sn'yi aşabiliyordu); FPS 20'ye kısılarak da TAMAM. Kontrol mesajı düşerse sunumun durumunu yazar. Kodda: art arda iki sunumda kararma tween'leri çakışmasın diye önceki durdurulur. Windows: güncel develop'tan export alındı, `ANTALYA2040.exe` pencereli açılıyor, hata yok (release şablonu dış test script'i çalıştırmadığı için exe içinde otomatik sunum testi yapılamadı; elle oynanabilir).
+- FPS ölçümü (A, 2026-10-31, Windows, gerçek Game.tscn, vsync kapalı; ortalama / en düşük 1 sn). Orta seviye PC yerine aynı dizüstünün işlemciye gömülü **Intel UHD Graphics** kartı kullanıldı (`--gpu-index 1`); orta seviye bir masaüstü kartından daha zayıf olduğu için alt sınır sayılmalı.
+
+  | Kart · çözünürlük | Normal (boş) | Normal (8 bina) | Kriz anı (2049 taşkın) | Final sunumu |
+  |---|---|---|---|---|
+  | Intel UHD · 1280×720 | 120 / 120 | 113 / 100 | 108 / 107 | 113 / 99 |
+  | Intel UHD · 1920×1080 | 63 / 62 | 62 / 57 | 59 / 58 | 60 / 53 |
+  | RTX 5060 Laptop · 1280×720 | 268 / 232 | 311 / 271 | 297 / 271 | 226 / 190 |
+  | RTX 5060 Laptop · 1920×1080 | 231 / 218 | 225 / 218 | 223 / 220 | 211 / 179 |
+
+  Ölçüm sırasında bulunan ve düzeltilen: final sunumunun ayrı görünümü pencere ne olursa olsun 1920×1080 tabanda çiziliyordu (720p'de 2,25 kat piksel); artık pencerenin gerçek boyutunda çizer. Intel UHD 720p'de final sunumu 68 → 113 FPS.
 
 ### Ekip B
 - [x] 12 `BuildingDefinition` + bilgi kartları
