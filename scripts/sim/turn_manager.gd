@@ -86,6 +86,9 @@ func on_crisis_response(event_id: StringName, response_id: StringName) -> void:
 	controller.apply_deltas(result.damage)
 	controller.refresh_resources()
 	_crisis_results.append(result)
+	var logged := result.duplicate(true)
+	logged["year"] = GameState.stats.year
+	controller.log_crisis(logged)
 	_current_crisis = {}
 	EventBus.crisis_resolved.emit(result)
 	_emit_stage(resolved, &"resolved")
@@ -112,7 +115,8 @@ func _finish_year() -> void:
 		EventBus.crisis_warned.emit(w)
 		_emit_stage(w, &"warning")
 
-	var missions := MissionTracker.evaluate(Catalog.data.missions, GameState.get_stats(), GameState.missions)
+	var context := {"built": GameState.plots.values(), "crisis_results": _crisis_results}
+	var missions := MissionTracker.evaluate(Catalog.data.missions, GameState.get_stats(), GameState.missions, context)
 	for id in missions.completed:
 		controller.set_mission_state(id, &"done")
 	for id in missions.failed:
@@ -147,6 +151,7 @@ func close_report() -> void:
 		var summary := EconomySimulator.final_score(final_stats, _start_stats)
 		summary["final_stats"] = final_stats
 		summary["history"] = GameState.history.duplicate(true)
+		summary["start_stats"] = _start_stats.duplicate(true)  # v1.7
 		EventBus.game_over.emit(summary)
 		return
 	controller.advance_year()

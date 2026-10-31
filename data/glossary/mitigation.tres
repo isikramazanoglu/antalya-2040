@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_2w63x"]
+
+[resource]
+script = ExtResource("1_2w63x")
+id = &"mitigation"
+title = "İklim değişikliğini azaltım"
+definition = "Sera gazı salımını azaltarak ya da atmosferden uzaklaştırarak iklim değişikliğinin kendisini sınırlamaya yönelik önlemler."
+example = "Fosil elektrik yerine güneş enerjisi kullanmak."
+game_link = "Güneş, toplu taşıma, kompost gibi yatırımlar emisyonu düşürür."
+sources = Array[String](["NASA Science, Mitigation and Adaptation (web sayfası), https://science.nasa.gov/climate-change/adaptation-mitigation/, erişim 2026-10-31"])

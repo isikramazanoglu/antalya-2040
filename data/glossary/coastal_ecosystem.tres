@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_iyv1s"]
+
+[resource]
+script = ExtResource("1_iyv1s")
+id = &"coastal_ecosystem"
+title = "Kıyı ekosistemi"
+definition = "Kumullar, kıyı bitkileri ve sığ deniz alanlarından oluşan, dalgaları ve fırtınaları yavaşlatabilen doğal sistem."
+example = "Restore edilmiş kumulların taşkın suyunu yavaşlatması."
+game_link = "Kıyı restorasyonu taşkın hasarını azaltır ve ekosistem sağlığını artırır."
+sources = Array[String](["IPCC, Special Report on the Ocean and Cryosphere in a Changing Climate (SROCC), 2019, https://www.ipcc.ch/srocc/, erişim 2026-10-31"])

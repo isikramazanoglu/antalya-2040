@@ -139,10 +139,11 @@ func _process(_d: float) -> bool:
 			_find("HUD", "LabButton").pressed.emit()
 		160:
 			_check(_ui("ClimateLab").visible and not _ui("BuildPanel").visible and _visible_panels().size() == 1, "16) İklim Laboratuvarı açıldı, BuildPanel kapandı (tek panel)")
-			_check(_find("ClimateLab", "ResourceText").text.contains("yenilenebilir payı %40"), "13) Laboratuvar güncel enerji verisini gösteriyor")
 			var chart = _find("ClimateLab", "EmissionChart")
 			var expected: float = gs.stats.emissions_by_sector.energy
 			_check(chart.series.size() == 4 and is_equal_approx(chart.series[0].values[-1], expected), "14) emisyon grafiği gerçek veriyle (enerji %.1f)" % expected)
+			_ui("ClimateLab").open_tab("C · Kaynaklar")
+			_check(_find("ClimateLab", "ResourceText").text.contains("yenilenebilir payı %40"), "13) Laboratuvar (C) güncel enerji verisini gösteriyor")
 			_esc()
 		165:
 			_check(not _ui("ClimateLab").visible, "16) Esc ile Laboratuvar kapandı")

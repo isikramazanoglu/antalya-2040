@@ -37,7 +37,8 @@ antalya-2040/
 │   │   ├── info_card.gd
 │   │   ├── balance_config.gd
 │   │   ├── co2_scenario.gd
-│   │   ├── mission_definition.gd
+│   │   ├── mission_definition.gd    (+ category, kind, required_buildings, info_card)
+│   │   ├── glossary_term.gd         Sözlük kavramı
 │   │   └── game_catalog.gd
 │   ├── sim/                       B
 │   │   ├── game_controller.gd     Oyuncu taleplerini karşılar, GameState'e tek yazan
@@ -85,6 +86,7 @@ antalya-2040/
 │   │   ├── EventPanel.tscn
 │   │   ├── YearReport.tscn
 │   │   ├── CityInfo.tscn
+│   │   ├── EducationCard.tscn
 │   │   └── SettingsPanel.tscn
 │   └── dev/
 │       ├── CitySandbox.tscn       A     Şehri B olmadan test etme sahnesi
@@ -96,10 +98,11 @@ antalya-2040/
 │   ├── co2_scenario.tres          Co2Scenario: kaynaklı ppm tablosu
 │   ├── buildings/<id>.tres        BuildingDefinition × 12
 │   ├── events/<id>.tres           EventDefinition × 3+
-│   ├── missions/<id>.tres         MissionDefinition × 4
+│   ├── missions/<id>.tres         MissionDefinition × 9 (4 hedef + 5 öğrenme)
+│   ├── glossary/<id>.tres         GlossaryTerm × 17
 │   └── cards/<id>.tres            InfoCard (bina, olay ve İklim Laboratuvarı kartları)
 │
-├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy, test_crises), pencereli testler (test_menu, test_e2e_game, test_ui), denge simülasyonu (balance_sim)
+├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy, test_crises), pencereli testler (test_menu, test_e2e_game, test_ui, test_integration, test_education), denge simülasyonu (balance_sim)
 │
 └── assets/
     ├── models/                    A     .glb modeller

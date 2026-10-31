@@ -4,7 +4,7 @@ Bu belge Ekip A (şehir ve 3D) ile Ekip B (simülasyon ve arayüz) arasındaki t
 İki taraf birbirinin koduna yalnızca burada yazan sinyaller, fonksiyonlar ve veri şekilleri üzerinden dokunur.
 Burada yazmayan bir şeye güvenen kod, sözleşme dışıdır.
 
-Sürüm: **v1.6** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
+Sürüm: **v1.7** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
 
 ---
 
@@ -188,7 +188,7 @@ Bütün aşamalarda bu sekiz anahtarın hepsi vardır. `mitigation` ve `advantag
 ### 5.5 `summary` (oyun sonu)
 
 ```
-{ "final_stats": Dictionary, "history": Array, "score": int, "grade": String, "emission_reduction_pct": int }   # emission_reduction_pct: v1.1
+{ "final_stats": Dictionary, "history": Array, "score": int, "grade": String, "emission_reduction_pct": int, "start_stats": Dictionary }   # emission_reduction_pct: v1.1, start_stats: v1.7
 ```
 
 `history`: her yıl sonunun `stats` kopyası (ClimateLab grafikleri de bunu kullanır).
@@ -325,6 +325,7 @@ MVP üçlüsü: `solar_plant`, `water_storage`, `green_park`.
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
 | v1.0 | 2026-10-30 | İlk sürüm. |
+| v1.7 | 2026-10-31 | Ekleme: `summary.start_stats` (final ekranında başlangıç ↔ final). Yalnızca B'nin YearReport'u kullanır. |
 | v1.6 | 2026-10-31 | Ekleme: `crisis_stage_changed` info'suna `mitigation` ve `advantages`. Ekip A talebi. |
 | v1.5 | 2026-10-31 | Ekleme: `crisis_stage_changed` sinyali (§5.6), `result` içine `severity` ve `assessment`. Mevcut kriz sinyalleri değişmedi; A etkilenmez. |
 | v1.4 | 2026-10-31 | Ekleme: iki ret nedeni (`scene_unavailable`, `unknown_plot`). Sinyal değişikliği yok; A ret nedenlerini kullanmaz. |

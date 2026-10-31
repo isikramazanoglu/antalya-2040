@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_u65ef"]
+
+[resource]
+script = ExtResource("1_u65ef")
+id = &"water_stress"
+title = "Su stresi"
+definition = "Tatlı su talebinin belirli bir bölge ve dönemde mevcut arzı aşması durumu."
+example = "Yazın nüfus artarken barajların çekilmesi."
+game_link = "C bölümünde su arzı ve talebi karşılaştırılır."
+sources = Array[String](["FAO, Water scarcity (web sayfası), https://www.fao.org/land-water/water/water-scarcity/en/, erişim 2026-10-31"])

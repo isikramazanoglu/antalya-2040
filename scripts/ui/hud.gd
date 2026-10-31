@@ -25,6 +25,9 @@ func _ready() -> void:
 	%BuildMenuButton.pressed.connect(_open_panel.bind("build_panel"))
 	%LabButton.pressed.connect(_open_panel.bind("climate_lab"))
 	%CityInfoButton.pressed.connect(_open_panel.bind("city_info"))
+	%GlossaryButton.pressed.connect(func():
+		get_tree().call_group("ui_panel", "close")
+		get_tree().call_group("climate_lab", "open_tab", "Sözlük"))
 	%ReportButton.pressed.connect(_open_panel.bind("year_report"))
 	%SettingsButton.pressed.connect(_open_panel.bind("settings"))
 	%MenuButton.pressed.connect(%QuitConfirm.popup_centered)
@@ -206,7 +209,7 @@ func _refresh_missions() -> void:
 		child.queue_free()
 	var stats := GameState.get_stats()
 	for m in Catalog.data.missions:
-		if GameState.missions.get(m.id, &"active") != &"active":
+		if m.category != &"goal" or GameState.missions.get(m.id, &"active") != &"active":
 			continue
 		var label := _side_label("Görev · %s %s%d · şu an %d · son yıl %d · +%d" % [
 				UiText.STAT_NAMES.get(m.stat, m.stat), "en çok " if m.at_most else "", roundi(m.target), roundi(stats[m.stat]), m.deadline_year, m.reward_credits], Color.WHITE)

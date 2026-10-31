@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_u465v"]
+
+[resource]
+script = ExtResource("1_u465v")
+id = &"renewable_energy"
+title = "Yenilenebilir enerji"
+definition = "Güneş, rüzgâr ve su gibi kendini yenileyen kaynaklardan üretilen enerji."
+example = "Güneş paneli tesisi."
+game_link = "Güneş tesisi yenilenebilir üretimi ve yenilenebilir payını artırır."
+sources = Array[String](["IEA, Renewables (web sayfası), https://www.iea.org/energy-system/renewables, erişim 2026-10-31"])

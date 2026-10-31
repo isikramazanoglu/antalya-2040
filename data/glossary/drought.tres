@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_6dp8w"]
+
+[resource]
+script = ExtResource("1_6dp8w")
+id = &"drought"
+title = "Kuraklık"
+definition = "Yağışın uzun süre normalin altında kalmasıyla suyun yetersiz kalması."
+example = "Birkaç kurak yıl üst üste geldiğinde tarımın zarar görmesi."
+game_link = "2046'daki kuraklık krizi su güvenliğini düşürür; su deposu hasarı azaltır."
+sources = Array[String](["UNCCD, Drought (web sayfası), https://www.unccd.int/land-and-life/drought/overview, erişim 2026-10-31"])

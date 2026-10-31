@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_oo7yo"]
+
+[resource]
+script = ExtResource("1_oo7yo")
+id = &"carbon_footprint"
+title = "Karbon ayak izi"
+definition = "Bir kişinin, kurumun ya da etkinliğin yol açtığı toplam sera gazı salımı."
+example = "Toplu taşıma kullanmak, aynı yolculuğu tek başına arabayla yapmaktan genellikle daha küçük ayak izi bırakır."
+game_link = "Ulaşım ve atık yatırımları şehrin göreli ayak izini düşürür."
+sources = Array[String](["The Nature Conservancy, What is your carbon footprint? (web sayfası), https://www.nature.org/en-us/get-involved/how-to-help/carbon-footprint-calculator/, erişim 2026-10-31"])

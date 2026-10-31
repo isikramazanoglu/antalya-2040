@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_k0xvu"]
+
+[resource]
+script = ExtResource("1_k0xvu")
+id = &"urban_heat_island"
+title = "Kentsel ısı adası"
+definition = "Asfalt ve betonun ısıyı tutması nedeniyle şehirlerin çevrelerine göre daha sıcak olması."
+example = "Ağaçlı bir parkın, çevresindeki asfalt caddeden daha serin olması."
+game_link = "Yeşil park sıcak hava dalgası hasarını azaltır."
+sources = Array[String](["US EPA, Heat Island Effect (web sayfası), https://www.epa.gov/heatislands, erişim 2026-10-31"])

@@ -63,7 +63,8 @@ func _run() -> void:
 	_check(_gs.phase == &"report", "faz report")
 	_check(report != null and report.income == 250 and report.upkeep == 120, "gelir 250, gider 100+10+10")
 	_check(report.built_this_year.size() == 2, "rapor bu yıl 2 bina listeliyor")
-	_check(_gs.stats.credits == 580, "kredi 450+130 = 580")
+	# Prompt 8: güneş ve park iki öğrenme görevini tamamlar; öğrenme görevleri kredi vermez (denge bozulmasın).
+	_check(_gs.stats.credits == 580 and report.missions.completed.size() == 2, "kredi 450+130 = 580, iki öğrenme görevi tamamlandı (kredisiz)")
 	_check(_gs.stats.population == 507, "nüfus 500 → 507 (yaşam 58)")
 	_bus.build_requested.emit(&"O02", &"water_storage")
 	_check(_last_reason() == &"wrong_phase", "rapor açıkken inşaat reddedildi")

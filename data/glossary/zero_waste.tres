@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_1mqp1"]
+
+[resource]
+script = ExtResource("1_1mqp1")
+id = &"zero_waste"
+title = "Sıfır atık"
+definition = "Atığı kaynağında önleyerek, yeniden kullanarak ve geri dönüştürerek çöplüğe giden atığı en aza indirme yaklaşımı."
+example = "Organik atığı kompostlamak, ambalajı geri dönüştürmek."
+game_link = "Geri dönüşüm ve kompost tesisi atık emisyonunu düşürür."
+sources = Array[String](["US EPA, How Communities Have Defined Zero Waste (web sayfası), https://www.epa.gov/transforming-waste-tool/how-communities-have-defined-zero-waste, erişim 2026-10-31"])

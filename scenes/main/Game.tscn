@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/EventPanel.tscn" id="7_event"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ClimateLab.tscn" id="8_lab"]
 [ext_resource type="PackedScene" path="res://scenes/ui/CityInfo.tscn" id="9_info"]
+[ext_resource type="PackedScene" path="res://scenes/ui/EducationCard.tscn" id="11_edu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/SettingsPanel.tscn" id="10_settings"]
 
 [node name="Game" type="Node"]
@@ -33,6 +34,8 @@ script = ExtResource("3_turn")
 [node name="CityInfo" parent="UI" instance=ExtResource("9_info")]
 
 [node name="SettingsPanel" parent="UI" instance=ExtResource("10_settings")]
+
+[node name="EducationCard" parent="UI" instance=ExtResource("11_edu")]
 
 [node name="EventPanel" parent="UI" instance=ExtResource("7_event")]
 

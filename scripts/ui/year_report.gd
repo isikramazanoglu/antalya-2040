@@ -126,11 +126,23 @@ func _on_game_over(summary: Dictionary) -> void:
 	_review_only = false
 	var s: Dictionary = summary.final_stats
 	%Title.text = "2052 · Şehrin geleceği"
-	var t := "[b]Puan: %d[/b]\n[b]%s[/b]\nKişi başı emisyon azalması: %%%d\nTamamlanan görev: %d / %d\n\n" % [
+	var goals := Catalog.data.missions.filter(func(m): return m.category == &"goal")
+	var t := "[b]Puan: %d[/b]\n[b]%s[/b]\nKişi başı emisyon azalması: %%%d\nTamamlanan hedef görev: %d / %d\n\n" % [
 		summary.score, summary.grade, summary.emission_reduction_pct,
-		GameState.missions.values().count(&"done"), Catalog.data.missions.size()]
+		goals.filter(func(m): return GameState.missions.get(m.id) == &"done").size(), goals.size()]
+	var start: Dictionary = summary.get("start_stats", {})
+	t += "[b]Başlangıç ve final[/b]\n[table=4][cell][color=#b8c4c2]Gösterge[/color][/cell][cell][color=#b8c4c2]%d[/color][/cell][cell][color=#b8c4c2]2052[/color][/cell][cell][color=#b8c4c2]Değişim[/color][/cell]" % Catalog.data.balance.start_year
 	for row in ROWS:
-		t += "%s  %s\n" % [row[1], UiText.thousands(roundi(s[row[0]]))]
+		var a: float = start.get(row[0], s[row[0]])
+		var f: float = s[row[0]]
+		t += "[cell]%s      [/cell][cell]%s      [/cell][cell]%s      [/cell][cell][color=#%s]%s[/color][/cell]" % [
+			row[1], UiText.thousands(roundi(a)), UiText.thousands(roundi(f)), UiText.delta_color(roundf(f - a), row[2]).to_html(false), UiText.format_delta(f - a)]
+	t += "[/table]\n"
+	var edu := get_tree().get_first_node_in_group("education")
+	if edu:
+		var p: Dictionary = edu.progress()
+		t += "\n[b]Öğrenme[/b]\nTamamlanan öğrenme görevi %d/%d · görüntülenen bilgi kartı %d/%d · incelenen kavram %d/%d\n[color=#b8c4c2]Bu sayılar yalnızca neleri incelediğini gösterir.[/color]" % [
+			p.tasks_done, p.tasks_total, p.cards_seen, p.cards_total, p.terms_viewed, p.terms_total]
 	%Body.text = t
 	%ContinueButton.text = "Ana menü"
 	UiText.pop_in(self)

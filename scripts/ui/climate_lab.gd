@@ -1,19 +1,37 @@
 extends PanelContainer
-## Sahip: B. İklim Laboratuvarı: yerel emisyonlar, küresel CO2, yerel riskler, bilgi kartları.
-## Hesap yapmaz; GameState geçmişi, Catalog verisi ve ClimateSimulator'ın salt okunur fonksiyonlarını gösterir.
+## Sahip: B. İklim Laboratuvarı (Prompt 8): A emisyonlar, B küresel CO₂, C kaynaklar, D riskler ve dayanıklılık, Sözlük, Öğrenme.
+## Hesap yapmaz: GameState, ClimateSimulator ve EventManager'ın değerlerini ve salt okunur fonksiyonlarını gösterir.
+## İçerik panel açılınca ve sekme değişince yeniden kurulur; arka planda güncellenmez.
 
-const SECTORS := {"energy": ["Enerji", Color(0.98, 0.75, 0.25)], "transport": ["Ulaşım", Color(0.4, 0.7, 1.0)],
+const SECTORS := {"energy": ["Enerji (elektrik)", Color(0.98, 0.75, 0.25)], "transport": ["Ulaşım", Color(0.45, 0.72, 1.0)],
 		"buildings": ["Binalar", Color(0.85, 0.45, 0.35)], "waste": ["Atık", Color(0.55, 0.85, 0.5)]}
 const RISKS := {"drought": "Kuraklık", "heat": "Aşırı sıcak", "coastal_flood": "Kıyı taşkını"}
+const SECTIONS := ["A · Emisyonlar", "B · Küresel CO₂", "C · Kaynaklar", "D · Riskler ve dayanıklılık", "Sözlük", "Öğrenme"]
+const TAG_SIM := "[color=#4dd9d1]OYUN SİMÜLASYONU[/color]"
+const TAG_SCI := "[color=#73b8ff]BİLİMSEL ÖLÇÜM[/color]"
+
+var _tabs: TabContainer
+var _pages: Dictionary = {}  # bölüm adı -> VBoxContainer
+var _selected_term: GlossaryTerm
 
 
 func _ready() -> void:
 	add_to_group("ui_panel")
 	add_to_group("climate_lab")
-	var tabs: TabContainer = %Cards.get_parent()
-	tabs.set_tab_title(tabs.get_tab_idx_from_control(%Cards), "Bilgi kartları")
 	hide()
-	%CloseButton.pressed.connect(hide)
+	%CloseButton.pressed.connect(close)
+	_tabs = %Tabs
+	for title in SECTIONS:
+		var scroll := ScrollContainer.new()
+		scroll.name = title
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		var page := VBoxContainer.new()
+		page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		page.add_theme_constant_override("separation", 14)
+		scroll.add_child(page)
+		_tabs.add_child(scroll)
+		_pages[title] = page
+	_tabs.tab_changed.connect(func(_i): if visible: _refresh())
 	EventBus.phase_changed.connect(_on_phase_changed)
 
 
@@ -33,129 +51,378 @@ func open() -> void:
 	UiText.pop_in(self)
 
 
+## HUD "Bilgi arşivi": Laboratuvarı istenen sekmede açar.
+func open_tab(title: String) -> void:
+	_tabs.current_tab = SECTIONS.find(title)
+	open()
+
+
 func close() -> void:
 	hide()
 
 
-func _refresh() -> void:
-	var timeline: Array = GameState.history.duplicate()
-	timeline.append(GameState.get_stats())
-	var years := PackedStringArray()
-	for s in timeline:
-		years.append(str(s.year))
+func _education() -> Node:
+	return get_tree().get_first_node_in_group("education")
 
-	# Yerel emisyonlar
+
+func _refresh() -> void:
+	var title: String = SECTIONS[_tabs.current_tab]
+	var page: VBoxContainer = _pages[title]
+	for child in page.get_children():
+		child.free()
+	if _tabs.current_tab < 4 and _education():
+		_education().mark_section(title)
+	match _tabs.current_tab:
+		0: _build_emissions(page)
+		1: _build_co2(page)
+		2: _build_resources(page)
+		3: _build_risks(page)
+		4: _build_glossary(page)
+		5: _build_learning(page)
+
+
+# --- Ortak parçalar ---
+
+func _timeline() -> Array:
+	var t: Array = GameState.history.duplicate()
+	t.append(GameState.get_stats())
+	return t
+
+
+func _years(timeline: Array) -> PackedStringArray:
+	var y := PackedStringArray()
+	for s in timeline:
+		y.append(str(s.year))
+	return y
+
+
+func _rich(text: String, min_h := 0.0) -> RichTextLabel:
+	var r := RichTextLabel.new()
+	r.bbcode_enabled = true
+	r.fit_content = true
+	r.text = text
+	r.custom_minimum_size.y = min_h
+	r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return r
+
+
+func _card(parent: Control, body: Control) -> PanelContainer:
+	var p := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(1, 1, 1, 0.04)
+	sb.set_corner_radius_all(8)
+	sb.set_content_margin_all(12)
+	p.add_theme_stylebox_override("panel", sb)
+	p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	p.add_child(body)
+	parent.add_child(p)
+	return p
+
+
+## Grafik kartı: başlık, birim · dönem · veri türü, grafik, açıklama/kaynak.
+func _chart_card(parent: Control, title: String, meta: String, chart: Control, note := "", chart_name := "") -> void:
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	box.add_child(_rich("[b]%s[/b]\n[font_size=13][color=#b8c4c2]%s[/color][/font_size]" % [title, meta]))
+	if chart_name != "":
+		chart.name = chart_name
+	chart.custom_minimum_size.y = maxf(chart.custom_minimum_size.y, 220.0)
+	box.add_child(chart)
+	if note != "":
+		box.add_child(_rich("[font_size=13][color=#b8c4c2]%s[/color][/font_size]" % note))
+	_card(parent, box)
+
+
+func _kpis(parent: Control, items: Array) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	for it in items:
+		var box := VBoxContainer.new()
+		box.add_child(_rich("[font_size=13][color=#b8c4c2]%s[/color][/font_size]" % it[0]))
+		box.add_child(_rich("[font_size=24][b]%s[/b][/font_size]" % it[1]))
+		if it.size() > 2:
+			box.add_child(_rich("[font_size=13]%s[/font_size]" % it[2]))
+		_card(row, box)
+	parent.add_child(row)
+
+
+func _delta_text(value: float, higher_is_better: bool, unit := "") -> String:
+	return "[color=#%s]%s%s[/color]" % [UiText.delta_color(roundf(value), higher_is_better).to_html(false), UiText.format_delta(value), unit]
+
+
+## Son tamamlanan iki yıl sonu arasındaki fark; tek yıl varsa "—".
+func _last_year_change(key: String, higher_is_better: bool) -> String:
+	var h := GameState.history
+	if h.size() < 2:
+		return "—"
+	return _delta_text(float(h[-1][key]) - float(h[-2][key]), higher_is_better)
+
+
+func _start_total() -> float:
+	var total := 0.0
+	for v in Catalog.data.balance.base_emissions.values():
+		total += v
+	return total
+
+
+# --- A · Emisyonlar ---
+
+func _build_emissions(page: VBoxContainer) -> void:
+	var timeline := _timeline()
+	var now: Dictionary = timeline[-1]
+	var start := _start_total()
+	var cumulative := 0.0  # başlangıç düzeyine göre yıllar boyunca biriken fark (birim·yıl)
+	for s in GameState.history:
+		cumulative += start - s.emissions_total
+	_kpis(page, [
+		["Yerel emisyon endeksi", str(roundi(now.emissions_total)), "oyun birimi · başlangıç %d" % roundi(start)],
+		["Son yıl değişimi", _last_year_change("emissions_total", false), "son iki yıl sonu arasında"],
+		["Başlangıca göre", _delta_text((now.emissions_total - start) / start * 100.0, false, "%"), "%d yılından bu yana" % Catalog.data.balance.start_year],
+		["Yenilenebilir enerji payı", "%%%d" % roundi(now.renewable_share * 100), "enerji talebinin"],
+		["Birikimli göreli azaltım", _delta_text(cumulative, true), "birim·yıl, başlangıç düzeyine göre"],
+	])
 	var series := []
 	for sector in SECTORS:
 		var values := PackedFloat32Array()
 		for s in timeline:
 			values.append(s.emissions_by_sector[sector])
 		series.append({"name": SECTORS[sector][0], "color": SECTORS[sector][1], "values": values})
-	%EmissionChart.set_data(series, years)
-	var now := GameState.get_stats()
-	var text := "Toplam: [b]%d[/b] (oyun birimi; gerçek ton değeri değildir)" % roundi(now.emissions_total)
-	if timeline.size() >= 2:
-		var change: float = now.emissions_total - timeline[-2].emissions_total
-		text += "   [color=#%s]önceki yıla göre %+d[/color]" % [UiText.delta_color(change, false).to_html(false), roundi(change)]
-	text += "\n"
+	var chart := LineChart.new()
+	chart.set_data(series, _years(timeline))
+	_chart_card(page, "Sektörlere göre yerel emisyon", "oyun birimi/yıl · %s–%d · %s" % [_years(timeline)[0], now.year, TAG_SIM], chart,
+			"Göreli oyun endeksidir; gerçek emisyon envanteri olmadığı için tCO₂e değildir.", "EmissionChart")
+	var bars := []
 	for sector in SECTORS:
-		text += "%s: %d   " % [SECTORS[sector][0], roundi(now.emissions_by_sector[sector])]
-	var effects := PackedStringArray()
+		bars.append({"label": SECTORS[sector][0], "value": now.emissions_by_sector[sector] / now.emissions_total * 100.0, "color": SECTORS[sector][1]})
+	var bar := BarChart.new()
+	bar.set_data(bars, "%")
+	_chart_card(page, "Emisyon kaynaklarının dağılımı", "toplamın yüzdesi · %d · %s" % [now.year, TAG_SIM], bar,
+			"\"Diğer şehir faaliyetleri\" simülasyonda ayrı bir sektör olarak yok; dört sektör hesaplanır.")
+	var why := "[b]Emisyon neden değişti?[/b]\n"
+	why += "• Nüfus arttıkça bütün sektörlerin emisyonu aynı oranda artar (şu an %d kişi, başlangıç 500).\n" % now.population
+	var any := false
 	for def in GameState.built_definitions():
 		for sector in def.emission_multipliers:
-			effects.append("%s: %s %+d%%" % [def.display_name, UiText.SECTOR_NAMES.get(sector, sector), roundi(def.emission_multipliers[sector] * 100)])
-	text += "\n[b]Yatırımların etkisi:[/b] " + (", ".join(effects) if effects.size() > 0 else "henüz emisyon azaltan yatırım yok")
-	%EmissionText.text = text
+			any = true
+			why += "• %s: %s emisyonu %+d%%. %s\n" % [def.display_name, SECTORS[sector][0].to_lower(), roundi(def.emission_multipliers[sector] * 100),
+					def.info_card.climate_link if def.info_card else ""]
+	if not any:
+		why += "• Henüz emisyon azaltan yatırım yok. Güneş enerjisi, toplu taşıma, kompost ve verimlilik yatırımları farklı sektörleri etkiler.\n"
+	_card(page, _rich(why))
 
-	# Enerji ve su
+
+# --- B · Küresel CO₂ ---
+
+func _build_co2(page: VBoxContainer) -> void:
+	var co2: Co2Scenario = Catalog.data.co2
+	if co2 and co2.years.size() > 1:
+		var chart := LineChart.new()
+		chart.set_data([{"name": "Atmosferik CO₂", "color": Color(0.45, 0.72, 1.0), "values": co2.ppm}],
+				PackedStringArray([str(co2.years[0]), str(co2.years[-1])]), "")
+		_chart_card(page, "Atmosferik CO₂ yoğunluğu", "ppm (milyonda bir) · %d–%d · %s · %s" % [co2.years[0], co2.years[-1], TAG_SCI, co2.scenario_name], chart,
+				"Son ölçüm: %.2f ppm (%d). Kaynak: %s" % [co2.ppm[-1], co2.years[-1], co2.source], "Co2Chart")
+	else:
+		_card(page, _rich("[b]Atmosferik CO₂[/b]\nVeri yok: ölçüm dosyası yüklenemedi."))
+	_card(page, _rich("[b]Gelecek senaryosu verisi henüz eklenmedi.[/b]\n%d–%d için CO₂ tahmini gösterilmiyor. Ölçümler ile senaryo projeksiyonları aynı seri gibi birleştirilmez." % [
+			Catalog.data.balance.start_year, Catalog.data.balance.end_year]))
+	_card(page, _rich("[b]Şehrin emisyonu ve küresel CO₂ neden aynı ölçek değil?[/b]\nYerel emisyon endeksi senin şehrinin göreli salımını (oyun birimi) gösterir. Atmosferdeki CO₂ ise bütün dünyadaki kaynakların yıllar boyunca birikmesiyle oluşur ve ppm ile ölçülür. Bir güneş tesisi kurduğunda şehrinin endeksi düşer ama küresel eğri anında değişmez; etki ancak çok sayıda şehir ve ülke aynı yönde ilerlediğinde ortaya çıkar."))
+	for id in [&"carbon_dioxide", &"greenhouse_gases", &"greenhouse_effect", &"ppm", &"co2e", &"carbon_footprint", &"climate_change"]:
+		var g := _term(id)
+		if g:
+			_card(page, _rich(_term_text(g, false)))
+
+
+# --- C · Kaynaklar ---
+
+func _build_resources(page: VBoxContainer) -> void:
+	var timeline := _timeline()
+	var now: Dictionary = timeline[-1]
+	var grid: float = maxf(now.energy_demand - now.renewable_energy, 0.0)
+	_card(page, _rich("[b]Enerji[/b]  " + TAG_SIM))
+	_kpis(page, [
+		["Toplam üretim", str(roundi(now.renewable_energy + grid)), "yenilenebilir + şebeke"],
+		["Tüketim (talep)", str(roundi(now.energy_demand)), "son yıl değişimi %s" % _last_year_change("energy_demand", false)],
+		["Yenilenebilir üretim", str(roundi(now.renewable_energy)), "son yıl değişimi %s" % _last_year_change("renewable_energy", true)],
+		["Yenilenebilir payı", "%%%d" % roundi(now.renewable_share * 100), ""],
+		["Yenilenebilir dengesi", _delta_text(now.renewable_energy - now.energy_demand, true), "eksik kısmı şebeke karşılar"],
+	])
 	var e_demand := PackedFloat32Array()
-	var e_renew := PackedFloat32Array()
-	var w_demand := PackedFloat32Array()
-	var w_supply := PackedFloat32Array()
-	for s in timeline:
-		e_demand.append(s.energy_demand)
-		e_renew.append(s.renewable_energy)
-		w_demand.append(s.water_demand)
-		w_supply.append(s.water_supply)
-	%ResourceChart.set_data([
-		{"name": "Enerji talebi", "color": Color(0.98, 0.75, 0.25), "values": e_demand},
-		{"name": "Yenilenebilir üretim", "color": Color(0.42, 0.82, 0.52), "values": e_renew},
-		{"name": "Su talebi", "color": Color(0.45, 0.72, 1.0), "values": w_demand},
-		{"name": "Su arzı", "color": Color(0.3, 0.85, 0.82), "values": w_supply}], years)
-	%ResourceText.text = ("[b]Enerji[/b] · üretim (yenilenebilir) %d · tüketim %d · denge %+d · [b]yenilenebilir payı %%%d[/b] (kalanı şebekeden, fosil kaynaklı)\n" % [
-			roundi(now.renewable_energy), roundi(now.energy_demand), roundi(now.renewable_energy - now.energy_demand), roundi(now.renewable_share * 100)]
-			+ "[b]Su[/b] · arz %d · talep %d · denge %+d · su güvenliği %d/100\n" % [
-			roundi(now.water_supply), roundi(now.water_demand), roundi(now.water_supply - now.water_demand), roundi(now.water_security)]
-			+ "[color=#b8c4c2]Oyun birimi; şebekeden gelen enerji yenilenebilir üretimin karşılamadığı talebi kapatır.[/color]")
-
-	# Ekosistem
+	var e_ren := PackedFloat32Array()
+	var e_grid := PackedFloat32Array()
+	var w_sup := PackedFloat32Array()
+	var w_dem := PackedFloat32Array()
 	var eco := PackedFloat32Array()
 	for s in timeline:
+		e_demand.append(s.energy_demand)
+		e_ren.append(s.renewable_energy)
+		e_grid.append(maxf(s.energy_demand - s.renewable_energy, 0.0))
+		w_sup.append(s.water_supply)
+		w_dem.append(s.water_demand)
 		eco.append(s.ecosystem_health)
-	%EcoChart.set_data([{"name": "Ekosistem sağlığı", "color": Color(0.42, 0.82, 0.52), "values": eco}], years)
+	var years := _years(timeline)
+	var range_text := "%s–%d" % [years[0], now.year]
+	var ec := LineChart.new()
+	ec.set_data([{"name": "Tüketim", "color": Color(0.98, 0.75, 0.25), "values": e_demand},
+			{"name": "Yenilenebilir", "color": Color(0.42, 0.82, 0.52), "values": e_ren},
+			{"name": "Şebeke (fosil)", "color": Color(0.7, 0.7, 0.75), "values": e_grid}], years)
+	_chart_card(page, "Enerji üretimi ve tüketimi", "oyun birimi/yıl · %s · %s" % [range_text, TAG_SIM], ec,
+			"Şebeke, yenilenebilir üretimin karşılamadığı talebi kapatır.", "ResourceChart")
+	_card(page, _rich("[b]Su[/b]  %s\nSu arzı %d · su talebi %d · denge %s · su güvenliği %d/100\nKuraklık hazırlığı: yatırımlar kuraklık hasarını %%%d azaltır.\n[color=#b8c4c2]Su rezervi miktarı ve su verimliliği simülasyonda ayrı tutulmuyor; su güvenliği endeksi bunların yerine kullanılır.[/color]" % [
+			TAG_SIM, roundi(now.water_supply), roundi(now.water_demand), _delta_text(now.water_supply - now.water_demand, true), roundi(now.water_security),
+			roundi(ClimateSimulator.mitigation(GameState.built_definitions(), &"drought", Catalog.data.balance) * 100)]))
+	var wc := LineChart.new()
+	wc.set_data([{"name": "Su arzı", "color": Color(0.3, 0.85, 0.82), "values": w_sup}, {"name": "Su talebi", "color": Color(0.45, 0.72, 1.0), "values": w_dem}], years)
+	_chart_card(page, "Su arzı ve talebi", "oyun birimi/yıl · %s · %s" % [range_text, TAG_SIM], wc)
+	# Kontrol ve testler için tek satırlık özet (aynı değerler).
+	var summary := _rich("[b]Özet:[/b] enerji · üretim (yenilenebilir) %d · tüketim %d · [b]yenilenebilir payı %%%d[/b] · su arz %d / talep %d" % [
+			roundi(now.renewable_energy), roundi(now.energy_demand), roundi(now.renewable_share * 100), roundi(now.water_supply), roundi(now.water_demand)])
+	summary.name = "ResourceText"
+	_card(page, summary)
+
+	var waste_cut := 0.0
+	var waste_built := PackedStringArray()
+	for def in GameState.built_definitions():
+		var m: float = def.emission_multipliers.get("waste", 0.0)
+		if m < 0.0:
+			waste_cut -= m
+			waste_built.append(def.display_name)
+	var start_waste: float = Catalog.data.balance.base_emissions.waste
+	_card(page, _rich("[b]Atık[/b]  %s\nAtık kaynaklı emisyon: %d (başlangıç %d)\nAtık azaltma oranı: %%%d (yatırımların atık sektörü çarpanı)\nKompost / geri dönüşüm / gıda kurtarma: %s\n[color=#b8c4c2]Toplam atık miktarı (ton) simülasyonda yok; yalnızca atık sektörünün emisyonu hesaplanır.[/color]" % [
+			TAG_SIM, roundi(now.emissions_by_sector.waste), roundi(start_waste), roundi(minf(waste_cut, 1.0) * 100), ", ".join(waste_built) if waste_built.size() > 0 else "henüz yok"]))
+
 	var built := GameState.built_definitions()
 	var green := built.filter(func(d): return d.id in [&"green_park", &"urban_farming"]).map(func(d): return d.display_name)
-	var coast := built.any(func(d): return d.id == &"coastal_restoration")
-	var waste_cut := 0.0
-	for def in built:
-		waste_cut -= def.emission_multipliers.get("waste", 0.0)
 	var st := UiText.status(now.ecosystem_health)
-	%EcoText.text = ("Ekosistem sağlığı [b]%d/100[/b] · [color=#%s]%s[/color]\n" % [roundi(now.ecosystem_health), st[1].to_html(false), st[0]]
-			+ "Yeşil alanlar: %s\n" % (", ".join(green) if green.size() > 0 else "yok")
-			+ "Kıyı ekosistemi: %s\n" % ("restore edildi" if coast else "korumasız")
-			+ "Atık geri kazanım / azaltma oranı: %%%d (oyun parametresi)" % roundi(minf(waste_cut, 1.0) * 100))
+	var eco_chart := LineChart.new()
+	eco_chart.set_data([{"name": "Ekosistem sağlığı", "color": Color(0.42, 0.82, 0.52), "values": eco}], years)
+	_chart_card(page, "Ekosistem sağlığı", "0–100 · %s · %s" % [range_text, TAG_SIM], eco_chart,
+			"Şu an %d/100 (%s) · Yeşil alan yatırımları: %s · Kıyı ekosistemi: %s · Aşırı sıcağa yerel uyum: %%%d" % [
+			roundi(now.ecosystem_health), st[0], ", ".join(green) if green.size() > 0 else "yok",
+			"restore edildi" if built.any(func(d): return d.id == &"coastal_restoration") else "korumasız",
+			roundi(ClimateSimulator.mitigation(built, &"heat", Catalog.data.balance) * 100)], "EcoChart")
 
-	# Küresel CO2
-	var co2: Co2Scenario = Catalog.data.co2
-	if co2 and co2.years.size() > 0:
-		var labels := PackedStringArray([str(co2.years[0]), str(co2.years[-1])])
-		%Co2Chart.set_data([{"name": "Atmosferik CO2 (ppm)", "color": Color(0.3, 0.85, 0.82), "values": co2.ppm}], labels, "")
-		%Co2Text.text = ("Son ölçüm: [b]%.2f ppm[/b] (%d)\n" % [co2.ppm[-1], co2.years[-1]]
-				+ "Şehrinin yatırımları bu eğriyi doğrudan değiştirmez. Atmosferdeki CO2, dünyadaki bütün kaynakların toplamıyla belirlenir; "
-				+ "tek bir şehrin payı çok küçüktür. Etki, birçok şehir aynı yönde adım attığında oluşur.\n"
-				+ "%s yılları için doğrulanmış senaryo verisi eklenmediğinden tahmin gösterilmiyor.\n[font_size=12]Kaynak: %s[/font_size]" % [
-					"%d sonrası" % co2.years[-1], co2.source])
-	else:
-		%Co2Chart.set_data([], PackedStringArray())
-		%Co2Text.text = "Veri yok."
 
-	# Yerel riskler
-	for child in %Risks.get_children():
-		child.queue_free()
-	var buildings := GameState.built_definitions()
+# --- D · Riskler ve dayanıklılık ---
+
+func _build_risks(page: VBoxContainer) -> void:
+	var now := GameState.get_stats()
 	var b: BalanceConfig = Catalog.data.balance
+	var built := GameState.built_definitions()
+	var built_ids := built.map(func(d): return d.id)
+	_card(page, _rich("Değerler EventManager ve ClimateSimulator'dan okunur; bu ekran kendi risk hesabı yapmaz. Risk 0–100 oyun ölçeğidir, bilimsel tahmin değildir. %s" % TAG_SIM))
 	for risk_type in RISKS:
 		var raw := ClimateSimulator.raw_risk(risk_type, now.year, b)
-		var mit := ClimateSimulator.mitigation(buildings, risk_type, b)
-		var label := Label.new()
-		label.text = "%s · ham risk %d · yatırım koruması %%%d · kalan risk %d" % [RISKS[risk_type], roundi(raw), roundi(mit * 100), roundi(now.risks[risk_type])]
-		var bar := ProgressBar.new()
-		bar.value = now.risks[risk_type]
-		bar.show_percentage = false
-		bar.custom_minimum_size.y = 14
-		%Risks.add_child(label)
-		%Risks.add_child(bar)
-	var note := Label.new()
-	note.text = "Risk değerleri oyun ölçeğidir (0-100), bilimsel tahmin değildir. Yatırımlar riski değil, krizin hasarını azaltır."
-	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	note.modulate.a = 0.7
-	%Risks.add_child(note)
+		var mit := ClimateSimulator.mitigation(built, risk_type, b)
+		var st := UiText.status(100.0 - float(now.risks[risk_type]))
+		var t := "[b][font_size=20]%s dayanıklılığı[/font_size][/b]\n" % RISKS[risk_type]
+		t += "Risk seviyesi: [color=#%s]%s[/color] · ham risk %d · hazırlık kapasitesi %%%d · kalan risk %d\n" % [st[1].to_html(false), st[0], roundi(raw), roundi(mit * 100), roundi(now.risks[risk_type])]
+		var missing := PackedStringArray()
+		t += "İlgili yatırımlar: "
+		var parts := PackedStringArray()
+		for def in Catalog.data.buildings:
+			if def.risk_reduction.get(risk_type, 0.0) > 0.0:
+				var has := built_ids.has(def.id)
+				parts.append("%s [color=#%s](%s)[/color]" % [def.display_name, (UiText.C_GOOD if has else UiText.C_MUTED).to_html(false), "mevcut" if has else "henüz yapılmadı"])
+				if not has:
+					missing.append(def.display_name)
+		t += ", ".join(parts) + "\n"
+		var event := _event_for(risk_type)
+		if event:
+			var unlocked := EventManager.available_responses(event, built).filter(func(r): return r.required_building != &"").map(func(r): return r.label)
+			t += "Açılan özel müdahaleler: %s\n" % (", ".join(unlocked) if unlocked.size() > 0 else "yok")
+			var pending := GameState.pending_crises.filter(func(w): return w.event_id == event.id)
+			t += "Mevcut uyarı: %s\n" % ("[color=#ffbf66]%d sonunda %s bekleniyor[/color]" % [pending[0].due_year, event.display_name] if pending.size() > 0 else "yok")
+			var past := GameState.crisis_log.filter(func(r): return r.event_id == event.id)
+			if past.size() > 0:
+				var last: Dictionary = past[-1]
+				var response := EventManager.find_response(event, last.response_id)
+				t += "Son kriz: %d · alınan önlem: %s · yatırımlar hasarı %%%d azalttı\n" % [last.year, response.label if response else str(last.response_id), roundi(last.mitigation * 100)]
+			else:
+				t += "Son kriz: henüz yaşanmadı\n"
+		if missing.size() > 0:
+			t += "[color=#4dd9d1]Öneri:[/color] %s riskine karşı %s altyapını geliştir." % [RISKS[risk_type].to_lower(), " ve ".join(missing)]
+		else:
+			t += "[color=#6bd185]Bu risk için bütün koruyucu yatırımlar yapıldı.[/color]"
+		_card(page, _rich(t))
 
-	# Bilgi kartları
-	var cards := ""
-	for card in Catalog.data.lab_cards:
-		cards += _card_text(card)
-	for def in Catalog.data.buildings:
-		if def.info_card:
-			cards += _card_text(def.info_card)
-	for def in Catalog.data.events:
-		if def.info_card:
-			cards += _card_text(def.info_card)
-	%Cards.text = cards
+
+func _event_for(risk_type: StringName) -> EventDefinition:
+	for e in Catalog.data.events:
+		if e.risk_type == risk_type:
+			return e
+	return null
 
 
-func _card_text(card: InfoCard) -> String:
-	var t := "[b]%s[/b]\n%s\n" % [card.title, card.body]
-	for source in card.sources:
-		t += "[font_size=12]Kaynak: %s[/font_size]\n" % source
-	return t + "\n"
+# --- Sözlük ---
+
+func _term(id: StringName) -> GlossaryTerm:
+	for g in Catalog.data.glossary:
+		if g.id == id:
+			return g
+	return null
+
+
+func _term_text(g: GlossaryTerm, full := true) -> String:
+	var t := "[b]%s[/b]\n%s\n[color=#b8c4c2]Örnek:[/color] %s\n" % [g.title, g.definition, g.example]
+	if full:
+		t += "[color=#4dd9d1]Oyundaki bağlantısı:[/color] %s\n" % g.game_link
+	for s in g.sources:
+		t += "[font_size=12][color=#b8c4c2]Kaynak: %s[/color][/font_size]\n" % s
+	return t
+
+
+func _build_glossary(page: VBoxContainer) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	var list := VBoxContainer.new()
+	list.custom_minimum_size.x = 300
+	var detail := _rich("", 300)
+	detail.name = "GlossaryDetail"
+	for g in Catalog.data.glossary:
+		var button := Button.new()
+		button.text = g.title
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.pressed.connect(_show_term.bind(g, detail))
+		list.add_child(button)
+	row.add_child(list)
+	var box := VBoxContainer.new()
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.add_child(detail)
+	_card(row, box)
+	page.add_child(row)
+	if Catalog.data.glossary.is_empty():
+		detail.text = "Sözlük verisi yüklenemedi."
+	else:
+		_show_term(_selected_term if _selected_term else Catalog.data.glossary[0], detail)
+
+
+func _show_term(g: GlossaryTerm, detail: RichTextLabel) -> void:
+	_selected_term = g
+	detail.text = _term_text(g)
+	if _education():
+		_education().mark_term(g.id)
+
+
+# --- Öğrenme ---
+
+func _build_learning(page: VBoxContainer) -> void:
+	var t := "[b]Öğrenme görevleri[/b]\n"
+	for m in Catalog.data.missions:
+		if m.category != &"learning":
+			continue
+		var done: bool = GameState.missions.get(m.id) == &"done"
+		t += "%s [b]%s[/b]%s\n    %s\n" % ["[color=#6bd185]Tamamlandı ·[/color]" if done else "[color=#fad159]Sürüyor ·[/color]", m.title, " · ödül %d kredi" % m.reward_credits if m.reward_credits > 0 else "", m.description]
+		if m.info_card:
+			t += "    [color=#b8c4c2]İlgili bilgi kartı: %s[/color]\n" % m.info_card.title
+	t += "[font_size=13][color=#b8c4c2]Görevler yıl sonunda değerlendirilir. Öğrenme görevleri kredi vermez; ekonomiyi değil öğrenmeyi ödüllendirir.[/color][/font_size]"
+	_card(page, _rich(t))
+	var p: Dictionary = _education().progress() if _education() else {}
+	if p.is_empty():
+		return
+	_kpis(page, [
+		["Tamamlanan öğrenme görevi", "%d / %d" % [p.tasks_done, p.tasks_total]],
+		["Görüntülenen bilgi kartı", "%d / %d" % [p.cards_seen, p.cards_total]],
+		["İncelenen kavram", "%d / %d" % [p.terms_viewed, p.terms_total]],
+		["İncelenen Laboratuvar bölümü", "%d / %d" % [p.sections_viewed, p.sections_total]],
+	])
+	_card(page, _rich("[color=#b8c4c2]Bu sayılar yalnızca neleri açıp incelediğini gösterir; konuyu öğrendiğini ölçmez. İleride kısa bilgi testleri eklenebilir.[/color]"))
