@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "bld_greenhouse"
+transparency = 1
+albedo_color = Color(0.82, 0.93, 0.92, 0.42)
+roughness = 0.1

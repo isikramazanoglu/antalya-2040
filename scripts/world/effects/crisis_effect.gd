@@ -4,7 +4,9 @@ extends Node3D
 ## DisasterFX seviyeyi (0 = yok, 1 = tam) ve şiddeti verir; efekt atmosfere katkısını ekler ve kendi
 ## yerel görsellerini uygular. Hiçbir hesap yapmaz, GameState'e yazmaz; kriz kararını Ekip B verir.
 ## Koruyucu binalar, Catalog'daki BuildingDefinition.risk_reduction alanında bu risk_type'ı taşıyanlardır;
-## koruma oranı burada hesaplanmaz, yalnızca bu binaların yerinde bir hare gösterilir.
+## koruma oranı burada hesaplanmaz: Ekip B'nin aşama bilgisindeki `mitigation` (sözleşme v1.6) görseli
+## hafifletir, koruyucu binaların yerinde bir hare görünür ve binalar kendi kriz tepkilerini gösterir
+## (Building.set_crisis_level).
 
 ## Sözleşme §5.6 visual_effect_id: heat_haze, drought_dust, storm_surge.
 @export var visual_effect_id: StringName
@@ -17,9 +19,13 @@ extends Node3D
 @export var focus_point := Vector3.ZERO
 
 const MARKER_HEIGHT := 0.25
+## Tam koruma (mitigation 1) görselin bu kadarını alır; kriz yine de görünür kalır.
+const MITIGATION_DAMPING := 0.5
 
 var level := 0.0
 var severity := 0.5
+## Ekip B'nin koruma oranı 0..0.8 (sözleşme §5.6, v1.6); aşama bilgisi yoksa 0.
+var mitigation := 0.0
 var affected_plot_kinds: Array = []
 
 var _fx: DisasterFX
@@ -40,9 +46,14 @@ func setup(fx: DisasterFX) -> void:
 	set_process(false)
 
 
-## Etkin şiddet: seviye × şiddet (zayıf kriz de görünür kalsın diye en az %55).
+## Etkin şiddet: seviye × şiddet (zayıf kriz de görünür kalsın diye en az %55) × koruma payı.
 func strength() -> float:
-	return level * lerpf(0.55, 1.0, severity)
+	return level * lerpf(0.55, 1.0, severity) * damping()
+
+
+## Koruma oranının görsele etkisi: 1 (korumasız) → 0.6 (en yüksek koruma, 0.8).
+func damping() -> float:
+	return 1.0 - MITIGATION_DAMPING * clampf(mitigation, 0.0, 1.0)
 
 
 func animate_to(target: float, time: float, delay := 0.0) -> void:
@@ -86,6 +97,15 @@ func rebuild_markers() -> void:
 		if not _markers.has(plot_id):
 			_markers[plot_id] = _make_marker(wanted[plot_id])
 	_update_markers()
+	apply_buildings()
+
+
+## Kurulu binaların kendi kriz tepkileri (Model/Live/Crisis_<risk_type>) seviyeyi izler.
+func apply_buildings() -> void:
+	for plot in _fx.get_city_plots():
+		var building := plot.get_building() as Building
+		if building:
+			building.set_crisis_level(risk_type, level)
 
 
 func protective_plots() -> Array[BuildPlot]:
@@ -111,6 +131,7 @@ func _set_level(value: float) -> void:
 	level = value
 	set_process(is_active())
 	_fx.refresh()
+	apply_buildings()
 
 
 func _process(delta: float) -> void:

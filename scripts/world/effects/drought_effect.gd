@@ -1,6 +1,7 @@
 extends CrisisEffect
 ## Sahip: A. Kuraklık: tarlalar, zeytinlik ve boş açık alan arsaları sararır, hafif toz sisi.
-## Şehir merkezi ve kurulu binalar (parklar, kent tarımı) yeşil kalır: bina materyallerine dokunulmaz.
+## Kurulu binaların bitkileri (park, kent tarımı, yeşil çatı) yalnızca hafifçe solar (building_weight);
+## kent tarımında gölge filesi gerilir (bina sahnesindeki Crisis_drought).
 ## Su depolama gibi kuraklığa karşı koruyan binaların çevresinde mavi hare.
 ## Rezervuarın su seviyesi bu efektte değil, Reservoir'da GameState'in su güvenliğinden gelir.
 
@@ -15,6 +16,9 @@ const DRY_PAD := Color(0.78, 0.68, 0.44)
 ## Şehrin her yerini kaplayan zemin materyali; çölleşmiş görünmesin diye daha az sararır.
 @export var ground_material: StandardMaterial3D
 @export var ground_weight := 0.35
+## Bina bitkileri (assets/materials/buildings): yeşil alan ayırt edilebilir kalsın diye az solar.
+@export var building_materials: Array[Material] = []
+@export var building_weight := 0.3
 
 var _bases := {}
 
@@ -25,6 +29,8 @@ func setup(fx: DisasterFX) -> void:
 		_bases[material] = _get_albedo(material)
 	if ground_material:
 		_bases[ground_material] = ground_material.albedo_color
+	for material in building_materials:
+		_bases[material] = _get_albedo(material)
 
 
 func contribute(a: Dictionary) -> void:
@@ -39,7 +45,11 @@ func contribute(a: Dictionary) -> void:
 func apply_local() -> void:
 	var s := strength()
 	for material in _bases:
-		var weight := ground_weight if material == ground_material else 1.0
+		var weight := 1.0
+		if material == ground_material:
+			weight = ground_weight
+		elif material in building_materials:
+			weight = building_weight
 		_set_albedo(material, (_bases[material] as Color).lerp(DRY_COLOR, s * weight))
 	for plot in affected_plots():
 		plot.set_weather_tint(DRY_PAD, s * 0.85 if plot.is_empty() else 0.0)

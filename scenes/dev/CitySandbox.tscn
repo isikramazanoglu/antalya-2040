@@ -20,4 +20,4 @@ offset_bottom = 120.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
 theme_override_constants/outline_size = 6
-text = "CitySandbox · Sol tık arsa seç · Sağ tık/Esc bırak · WASD kaydır · Q/E döndür · Tekerlek yakınlaş · Orta tuş sürükle\nB sıradaki bina · N tüm binalar · 1/2/3 sıcak hava / kuraklık / kıyı taşkını (her basış bir sonraki aşama) · R krizleri bitir · P faz build/report"
+text = "CitySandbox · Sol tık arsa seç · Sağ tık/Esc bırak · WASD kaydır · Q/E döndür · Tekerlek yakınlaş · Orta tuş sürükle\nB sıradaki bina · N tüm binalar · 1/2/3 sıcak hava / kuraklık / kıyı taşkını (her basış bir sonraki aşama) · R krizleri bitir · M koruma oranı · P faz build/report"

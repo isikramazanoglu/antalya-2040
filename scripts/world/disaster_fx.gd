@@ -62,6 +62,7 @@ func set_stage(stage: StringName, info: Dictionary) -> bool:
 		push_warning("DisasterFX: bilinmeyen kriz görseli/aşaması: %s / %s" % [info.get("visual_effect_id"), stage])
 		return false
 	effect.severity = clampf(info.get("severity", effect.severity), 0.0, 1.0)
+	effect.mitigation = clampf(float(info.get("mitigation", 0.0)), 0.0, 1.0)
 	if info.has("affected_plot_kinds"):
 		effect.affected_plot_kinds = info.affected_plot_kinds.duplicate()
 	var target: float = STAGE_LEVELS[stage]
@@ -77,6 +78,7 @@ func play(risk_type: StringName, severity: float) -> void:
 		push_warning("DisasterFX: '%s' için görsel yok" % risk_type)
 		return
 	effect.severity = clampf(severity, 0.0, 1.0)
+	effect.mitigation = 0.0
 	effect.rebuild_markers()
 	effect.animate_to(1.0, fade_in_time)
 
