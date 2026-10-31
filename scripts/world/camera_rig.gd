@@ -3,6 +3,7 @@ extends Node3D
 ## Sahip: A. İzometrik kamera (mimari §2.4). Kök = bakılan nokta, Y ekseninde döner;
 ## Pitch sabit eğim; yakınlaştırma Camera3D'yi Pitch ekseninde ileri geri iter.
 ## WASD kaydırma, Q/E ±30° döndürme, tekerlek yakınlaştırma, orta tuşla sürükleme.
+## Sinematik modda (final sunumu) oyuncu girdisi yok sayılır; kamerayı glide_to / play_tour yönetir.
 
 @export var pan_speed := 30.0
 ## Bakılan noktanın gezebileceği alan (x, z, genişlik, derinlik).
@@ -26,6 +27,9 @@ var _target_zoom: float
 var _base_yaw: float
 var _yaw_offset := 0.0
 var _dragging := false
+## true iken oyuncu girdisi kamerayı oynatmaz (final sunumu).
+var cinematic := false
+var _glide: Tween
 
 
 func _ready() -> void:
@@ -35,6 +39,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if cinematic:
+		return
 	if event.is_action_pressed("cam_zoom_in"):
 		_target_zoom = clampf(_target_zoom - zoom_step, zoom_min, zoom_max)
 	elif event.is_action_pressed("cam_zoom_out"):
@@ -47,11 +53,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
-	var input := Input.get_vector("cam_left", "cam_right", "cam_forward", "cam_back")
+	var input := Vector2.ZERO if cinematic else Input.get_vector("cam_left", "cam_right", "cam_forward", "cam_back")
 	if input != Vector2.ZERO:
 		var speed := pan_speed * (_target_zoom / 50.0)
 		_target_pos += (_flat_right() * input.x + _flat_back() * input.y) * speed * delta
-	var turn := Input.get_axis("cam_rotate_right", "cam_rotate_left")
+	var turn := 0.0 if cinematic else Input.get_axis("cam_rotate_right", "cam_rotate_left")
 	if turn != 0.0:
 		var limit := deg_to_rad(rotate_limit_deg)
 		_yaw_offset = clampf(_yaw_offset + turn * deg_to_rad(rotate_speed_deg) * delta, -limit, limit)
@@ -68,6 +74,47 @@ func _process(delta: float) -> void:
 ## Kamerayı bir noktaya yumuşakça götürür (CitySandbox ve ileride odaklama için).
 func focus_on(point: Vector3) -> void:
 	_target_pos = Vector3(point.x, position.y, point.z)
+
+
+## Kameranın hedef görünümü: bakılan nokta, yakınlık, döndürme (radyan). set_view ile geri yüklenir.
+func get_view() -> Dictionary:
+	return {"position": _target_pos, "zoom": _target_zoom, "yaw": _yaw_offset}
+
+
+## Görünümü geri yükler; instant ise yumuşatmadan hemen oraya geçer (kesme).
+func set_view(view: Dictionary, instant := false) -> void:
+	if _glide:
+		_glide.kill()
+	_target_pos = view.position
+	_target_zoom = view.zoom
+	_yaw_offset = view.yaw
+	if instant:
+		position = Vector3(_target_pos.x, position.y, _target_pos.z)
+		rotation.y = _base_yaw + _yaw_offset
+		_camera.position.z = _target_zoom
+
+
+## Sinematik geçiş: hedef nokta, yakınlık ve döndürmeye (derece, açılış açısına göre) yumuşak gider.
+## Sınır ve yakınlık limitleri oyuncu kamerasıyla aynıdır. Dönen Tween beklenebilir (await tween.finished).
+func glide_to(point: Vector3, zoom: float, yaw_deg := 0.0, duration := 2.0) -> Tween:
+	if _glide:
+		_glide.kill()
+	var target := Vector3(clampf(point.x, bounds.position.x, bounds.end.x), position.y,
+			clampf(point.z, bounds.position.y, bounds.end.y))
+	_glide = create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_glide.tween_property(self, "_target_pos", target, duration)
+	_glide.tween_property(self, "_target_zoom", clampf(zoom, zoom_min, zoom_max), duration)
+	_glide.tween_property(self, "_yaw_offset", deg_to_rad(yaw_deg), duration)
+	return _glide
+
+
+## Final görsel sözleşmesi §D: noktaları sırayla gezen kamera turu (toplam süre eşit bölünür).
+func play_tour(points: Array[Vector3], duration: float, zoom := 40.0) -> void:
+	if points.is_empty():
+		return
+	var step := duration / points.size()
+	for point in points:
+		await glide_to(point, zoom, 0.0, step).finished
 
 
 ## Nokta ekranın güvenli alanı dışındaysa kamerayı yalnızca alanın içine girecek kadar kaydırır;
