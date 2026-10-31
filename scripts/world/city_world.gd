@@ -15,6 +15,8 @@ const BUILDING_SCENE_PATH := "res://scenes/buildings/b_%s.tscn"
 var _selected: BuildPlot
 var _hovered: BuildPlot
 var _selection_enabled := true
+## Aşama sinyali bir kez geldiyse görseller onunla sürülür; crisis_started/resolved yalnızca yedektir.
+var _stage_driven := false
 
 
 func _ready() -> void:
@@ -24,6 +26,8 @@ func _ready() -> void:
 	EventBus.crisis_resolved.connect(_on_crisis_resolved)
 	# Sözleşme v1.3: BuildPanel kapanınca seçim bırakılır; seçili arsa varsa plot_deselected yayılır.
 	EventBus.plot_deselect_requested.connect(_deselect)
+	# Sözleşme v1.5: krizin aşamaları (uyarı → hazırlık → kriz → çözüldü → bitti).
+	EventBus.crisis_stage_changed.connect(_on_crisis_stage_changed)
 	# Sahne yeniden açıldıysa GameState'teki binaları animasyonsuz geri kur.
 	for plot in get_plots():
 		var building_id := GameState.get_building_on(plot.plot_id)
@@ -48,7 +52,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func get_plots() -> Array[BuildPlot]:
 	var result: Array[BuildPlot] = []
-	for child in _plots.get_children():
+	# Alt node'lar (DisasterFX) CityWorld'ün _ready'sinden önce de çağırabilir; @onready'e güvenme.
+	for child in get_node("Plots").get_children():
 		if child is BuildPlot:
 			result.append(child)
 	return result
@@ -89,7 +94,11 @@ func place_building(plot_id: StringName, building_id: StringName, animate := tru
 			scene = load(path)
 		else:
 			push_warning("CityWorld: '%s' için bina sahnesi yok, yer tutucu gösteriliyor" % building_id)
-	return plot.place_building(scene, animate) != null
+	if plot.place_building(scene, animate, building_id) == null:
+		return false
+	# Kriz sürerken (ör. hazırlık yılında) kurulan koruyucu bina hemen görünsün.
+	_fx.refresh_protection()
+	return true
 
 
 # --- Seçim ---
@@ -149,9 +158,22 @@ func _on_build_approved(plot_id: StringName, building_id: StringName) -> void:
 	place_building(plot_id, building_id)
 
 
+func _on_crisis_stage_changed(_event_id: StringName, stage: StringName, info: Dictionary) -> void:
+	_stage_driven = true
+	if not _fx.set_stage(stage, info):
+		return
+	# Kriz başlarken etkilenen bölge ekran dışındaysa kamera yalnızca görünür olacak kadar kayar.
+	if stage == &"active":
+		var effect := _fx.get_effect(info.get("visual_effect_id", &""))
+		if effect:
+			_camera_rig.bring_into_view(effect.focus_point)
+
+
 func _on_crisis_started(_event_id: StringName, risk_type: StringName, severity: float) -> void:
-	_fx.play(risk_type, severity)
+	if not _stage_driven:
+		_fx.play(risk_type, severity)
 
 
 func _on_crisis_resolved(_result: Dictionary) -> void:
-	_fx.stop()
+	if not _stage_driven:
+		_fx.stop()

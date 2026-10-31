@@ -29,7 +29,11 @@ const HOVER_OCCUPIED := Color(1.0, 0.7, 0.3)
 @onready var _shape: CollisionShape3D = $PickArea/CollisionShape3D
 @onready var _anchor: Marker3D = $BuildingAnchor
 
+## Arsadaki binanın kimliği (sözleşme §8); boşsa &"". Yalnızca görsel amaçlı, GameState'in kopyası değildir.
+var building_id: StringName = &""
+
 var _pad_material: StandardMaterial3D
+var _pad_base_color: Color
 var _highlight_material: StandardMaterial3D
 var _selected := false
 var _hovered := false
@@ -45,6 +49,7 @@ func _ready() -> void:
 	_shape.position.y = PICK_HEIGHT * 0.5
 	_pad_material = KIND_MATERIALS.get(plot_kind, KIND_MATERIALS[&"urban"]).duplicate()
 	_pad.material_override = _pad_material
+	_pad_base_color = _pad_material.albedo_color
 	_highlight_material = _highlight.get_surface_override_material(0).duplicate()
 	_highlight.set_surface_override_material(0, _highlight_material)
 	_label.text = "%s · %s" % [plot_id, KIND_NAMES.get(plot_kind, String(plot_kind))]
@@ -81,12 +86,18 @@ func set_hovered(value: bool) -> void:
 		_refresh()
 
 
+## Kriz görselleri için zemin rengini geçici olarak bir tona çeker (0 = asıl renk).
+func set_weather_tint(color: Color, amount: float) -> void:
+	_pad_material.albedo_color = _pad_base_color.lerp(color, clampf(amount, 0.0, 1.0))
+
+
 ## Sahne yoksa yer tutucu kutu koyar (sözleşme §4). Arsada bina varsa yeni bina eklenmez.
-func place_building(scene: PackedScene, animate := true) -> Node3D:
+func place_building(scene: PackedScene, animate := true, id: StringName = &"") -> Node3D:
 	if not is_empty():
 		push_warning("BuildPlot %s: arsa dolu, ikinci bina eklenmedi" % plot_id)
 		return null
 	var building: Node3D = scene.instantiate() if scene else _make_placeholder()
+	building_id = id
 	_anchor.add_child(building)
 	if animate and building.has_method("play_build_animation"):
 		building.play_build_animation()

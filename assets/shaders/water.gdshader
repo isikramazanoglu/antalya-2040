@@ -17,6 +17,9 @@ uniform float min_alpha : hint_range(0.0, 1.0) = 0.7;
 uniform sampler2D normal_a : hint_normal, filter_linear_mipmap, repeat_enable;
 uniform sampler2D normal_b : hint_normal, filter_linear_mipmap, repeat_enable;
 uniform sampler2D depth_tex : hint_depth_texture, filter_linear_mipmap;
+// Taşkın suyunun girmediği korunan alanlar (dünya x0, z0, x1, z1); boyutu 0 olan alan etkisizdir.
+uniform vec4 protect_a = vec4(0.0);
+uniform vec4 protect_b = vec4(0.0);
 
 varying vec3 world_pos;
 
@@ -30,7 +33,14 @@ void vertex() {
 	world_pos = wp;
 }
 
+bool in_rect(vec2 p, vec4 r) {
+	return p.x > r.x && p.x < r.z && p.y > r.y && p.y < r.w;
+}
+
 void fragment() {
+	if (in_rect(world_pos.xz, protect_a) || in_rect(world_pos.xz, protect_b)) {
+		discard;
+	}
 	vec2 uv1 = world_pos.xz * normal_scale + vec2(TIME * 0.020, TIME * 0.012);
 	vec2 uv2 = world_pos.xz * normal_scale * 1.7 - vec2(TIME * 0.015, -TIME * 0.020);
 	NORMAL_MAP = mix(texture(normal_a, uv1).rgb, texture(normal_b, uv2).rgb, 0.5);

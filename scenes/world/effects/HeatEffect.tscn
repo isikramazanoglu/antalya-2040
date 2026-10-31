@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://assets/shaders/heat_haze.gdshader" id="1_heat_haze"]
+[ext_resource type="Script" path="res://scripts/world/effects/heat_effect.gd" id="2_heat_effect"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1"]
+shader = ExtResource("1_heat_haze")
+shader_parameter/strength = 0.0
+
+[node name="HeatEffect" type="Node3D"]
+script = ExtResource("2_heat_effect")
+visual_effect_id = &"heat_haze"
+risk_type = &"heat"
+default_plot_kinds = Array[StringName]([&"urban"])
+marker_color = Color(0.35, 0.95, 0.95, 1)
+focus_point = Vector3(0, 0, -4)
+
+[node name="HeatHaze" type="CanvasLayer" parent="."]
+layer = 0
+visible = false
+
+[node name="Haze" type="ColorRect" parent="HeatHaze"]
+material = SubResource("ShaderMaterial_1")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
