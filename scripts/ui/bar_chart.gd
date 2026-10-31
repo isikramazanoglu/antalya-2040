@@ -5,6 +5,7 @@ extends Control
 ## Her öğe: {"label": String, "value": float, "color": Color}
 var bars: Array = []
 var suffix := ""
+var label_width := 150.0
 
 
 func set_data(new_bars: Array, value_suffix := "") -> void:
@@ -22,7 +23,7 @@ func _draw() -> void:
 	if bars.is_empty() or top <= 0.0:
 		draw_string(font, Vector2(4, 22), "Henüz veri yok", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color(1, 1, 1, 0.6))
 		return
-	var label_w := 150.0
+	var label_w := label_width
 	var value_w := 70.0
 	var bar_w := size.x - label_w - value_w - 8.0
 	for i in bars.size():

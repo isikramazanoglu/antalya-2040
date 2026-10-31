@@ -47,7 +47,8 @@ antalya-2040/
 │   │   ├── economy_simulator.gd   Saf hesap: gelir, gider, nüfus
 │   │   ├── climate_simulator.gd   Saf hesap: emisyon, risk, ekosistem, CO2 okuma
 │   │   ├── event_manager.gd       Saf hesap: kriz planlama ve hasar
-│   │   └── mission_tracker.gd     Saf hesap: görev değerlendirme
+│   │   ├── mission_tracker.gd     Saf hesap: görev değerlendirme
+│   │   └── final_evaluator.gd     Saf hesap: 2052 final değerlendirmesi (7 alt puan, karşılaştırma, toplamlar)
 │   ├── world/                     A
 │   │   ├── city_world.gd          Arsa seçimi, bina yerleştirme, efekt tetikleme
 │   │   ├── camera_rig.gd          İzometrik kamera
@@ -88,6 +89,7 @@ antalya-2040/
 │   │   ├── YearReport.tscn
 │   │   ├── CityInfo.tscn
 │   │   ├── EducationCard.tscn
+│   │   ├── FinalReport.tscn
 │   │   └── SettingsPanel.tscn
 │   └── dev/
 │       ├── CitySandbox.tscn       A     Şehri B olmadan test etme sahnesi
@@ -104,7 +106,7 @@ antalya-2040/
 │   ├── synergies/<id>.tres        SynergyDefinition × 6
 │   └── cards/<id>.tres            InfoCard (bina, olay ve İklim Laboratuvarı kartları)
 │
-├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy, test_crises, test_investments), pencereli testler (test_menu, test_e2e_game, test_ui, test_integration, test_education), denge simülasyonu (balance_sim)
+├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy, test_crises, test_investments, test_final), pencereli testler (test_menu, test_e2e_game, test_ui, test_integration, test_education), denge simülasyonu (balance_sim)
 │
 └── assets/
     ├── models/                    A     .glb modeller
@@ -290,7 +292,7 @@ Kural: **veri bir yerde, hesap bir yerde, yazma tek yerde.**
 
 | Modül | Tür | Yapar | Yapmaz |
 |---|---|---|---|
-| `GameState` | autoload Node | Verileri tutar (`stats`, `plots` sözlüğü, `pending_crises`, `history`, `phase`, `rng_seed`). Getter'lar (`get_stats`, `get_building_on`, `built_definitions`). `GameController`'ın çağırdığı ayarlayıcılar. Her değişimde `stats_changed`. `reset()`. | Hesap yapmaz, kural kontrol etmez. |
+| `GameState` | autoload Node | Verileri tutar (`stats`, `plots`, `pending_crises`, `history`, `year_reports`, `build_log`, `crisis_log`, `missions`, `phase`, `rng_seed`). Getter'lar (`get_stats`, `get_building_on`, `built_definitions`). `GameController`'ın çağırdığı ayarlayıcılar. Her değişimde `stats_changed`. `reset()`. | Hesap yapmaz, kural kontrol etmez. |
 | `GameController` | Node (Game içinde) | Oyuncu taleplerini dinler (`build_requested`, `end_turn_requested`, `crisis_response_chosen`, `report_closed`). Kural kontrolü (sözleşme §6.3). `GameState`'e yazan tek modül. | Yıl sonu hesabı yapmaz; bunu TurnManager'a bırakır. |
 | `TurnManager` | Node | Yıl sonu adımlarını sıralar, faz makinesini tutar, tur sinyallerini yayar. Simülatörlerin sonuçlarını `GameController.apply_*` ile uygulatır. | Kendi formülü yoktur; oyuncu girdisi dinlemez. |
 | `EconomySimulator` | `RefCounted`, statik fonksiyonlar | `compute_year(stats, buildings, balance) -> Dictionary` (gelir, gider, nüfus değişimi); `compute_resources(population, buildings, balance)` (enerji/su akışları, yenilenebilir payı); `final_score`. | Durum tutmaz, sinyal yaymaz. |

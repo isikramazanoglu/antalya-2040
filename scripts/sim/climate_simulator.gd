@@ -39,7 +39,18 @@ static func compute_emissions(population: int, buildings: Array[BuildingDefiniti
 			mult += def.emission_multipliers.get(sector, 0.0)
 		by_sector[sector] = b.base_emissions[sector] * pop_factor * maxf(mult, b.emission_floor)
 		total += by_sector[sector]
-	return {"emissions_by_sector": by_sector, "emissions_total": total}
+	var waste_cut := 0.0
+	for def in buildings:
+		waste_cut -= def.emission_multipliers.get("waste", 0.0)
+	return {"emissions_by_sector": by_sector, "emissions_total": total, "waste_recovery": clampf(waste_cut, 0.0, 1.0)}
+
+
+## İklim dayanıklılığı: üç risk için yatırım korumasının ortalaması (0..max_mitigation). Oyun göstergesidir.
+static func resilience(buildings: Array[BuildingDefinition], b: BalanceConfig) -> float:
+	var sum := 0.0
+	for risk_type in b.start_risks:
+		sum += mitigation(buildings, risk_type, b)
+	return sum / maxf(b.start_risks.size(), 1.0)
 
 
 ## Yatırım öncesi risk: başlangıç + yıllık artış × başlangıçtan beri geçen yıl.
