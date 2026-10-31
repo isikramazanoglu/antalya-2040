@@ -55,7 +55,9 @@ var _image_2040: ImageTexture
 var _fade_tween: Tween
 
 var _layer: CanvasLayer
-var _view: SubViewportContainer
+## Sunum görüntüsü: SubViewport'un dokusu tam ekran. SubViewport pencerenin gerçek piksel boyutunda çizer
+## (proje 1920x1080 tabanla ölçeklendiği için kapsayıcıyla gerilen görünüm 720p'de 2,25 kat fazla piksel çiziyordu).
+var _view: TextureRect
 var _viewport: SubViewport
 var _camera: Camera3D
 var _before: TextureRect
@@ -273,6 +275,7 @@ func _setup(start_plots: Dictionary) -> void:
 	_city.set_plot_labels_visible(false)
 	_city.show_city_state(start_plots, false)
 	_rig.set_view(OVERVIEW, true)
+	_fit_viewport()
 	_view.visible = true
 	_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	_city.get_viewport().disable_3d = true
@@ -449,12 +452,6 @@ func _build_overlay() -> void:
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_layer.add_child(root)
 
-	_view = SubViewportContainer.new()
-	_view.stretch = true
-	_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_view.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_view.visible = false
-	root.add_child(_view)
 	_viewport = SubViewport.new()
 	_viewport.gui_disable_input = true
 	_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
@@ -465,7 +462,17 @@ func _build_overlay() -> void:
 	_viewport.use_debanding = main.use_debanding
 	_viewport.scaling_3d_mode = main.scaling_3d_mode
 	_viewport.scaling_3d_scale = main.scaling_3d_scale
-	_view.add_child(_viewport)
+	add_child(_viewport)  # CityWorld'ün dünyasını paylaşır (own_world_3d kapalı)
+	get_window().size_changed.connect(_fit_viewport)
+	_view = TextureRect.new()
+	_view.texture = _viewport.get_texture()
+	_view.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_view.stretch_mode = TextureRect.STRETCH_SCALE
+	_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_view.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_view.visible = false
+	root.add_child(_view)
+	root.move_child(_view, 0)
 	_camera = Camera3D.new()
 	_camera.current = true
 	_camera.near = 0.5
@@ -537,6 +544,12 @@ func _build_overlay() -> void:
 	_fade.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_fade)
+
+
+## SubViewport pencerenin piksel boyutunda çizer; ekrana TextureRect gerer.
+func _fit_viewport() -> void:
+	var size := get_window().size
+	_viewport.size = Vector2i(maxi(size.x, 64), maxi(size.y, 64))
 
 
 func _make_label(parent: Control, font_size: int, text: String) -> Label:
