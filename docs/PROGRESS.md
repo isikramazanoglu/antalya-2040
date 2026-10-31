@@ -3,7 +3,7 @@
 Her ekip yalnızca kendi bölümündeki kutuları işaretler. Ortak bölümlere satır **eklenir**, var olan satır silinmez.
 İşaret: `[ ]` yapılmadı, `[~]` sürüyor, `[x]` bitti ve kendi dalında çalışıyor, `[D]` develop'a birleşti.
 
-Son güncelleme: 2026-10-31 · Aşama: **Prompt 10C (B) tamam; Ekip A'nın 10B final sunumu bekleniyor → sonra main + v1.0**
+Son güncelleme: 2026-10-31 · Aşama: **10A, 10B, 10C tamam ve `feature/simulation-ui`'de birleşik; sırada PR → develop, sonra main + v1.0**
 Repo: https://github.com/isikramazanoglu/antalya-2040 (gizli)
 
 ---
@@ -118,7 +118,7 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 
 - [x] A: ışık/gölge cilası, kamera hissi, performans testi (yalnızca RTX 5060 dizüstünde; orta seviye PC testi kaldı)
 - [x] B: denge (5 stratejili simülasyon, GAME_DESIGN §9), görevler (4 görev), arayüz teması (ilerleme çubukları)
-- [~] Birlikte: uçtan uca test ✓ (test_playthrough), Windows export ✓ (build/), `main`'e son birleştirme ve `v1.0` etiketi Ekip A'nın 10B'sini bekliyor
+- [~] Birlikte: uçtan uca test ✓ (test_playthrough), final sunumu ✓ (A 10B, B entegrasyonu), Windows export ✓ (build/, 10B dahil yeniden üretildi); kalan: `main`'e son birleştirme ve `v1.0` etiketi
 - [x] Sunum için 2 dakikalık demo senaryosu (aşağıda; krizler sabit yıllı, seed gerekmez)
 
 ---
@@ -206,13 +206,20 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - Windows demo: `build/windows/ANTALYA2040.exe` (110 MB, PCK gömülü) + `OKUBENI.txt`, `build/ANTALYA2040_Windows_Demo.zip` (38 MB). Paket Mac'te `--main-pack` ile proje klasörü olmadan 2052'ye kadar oynandı, hata yok. .exe'nin Windows'ta çalıştırılması A'da.
 - Düşük: headless/çıkışta görülen "RID leaked at exit" satırları kapanış sırasında; oyun sırasında hata yok.
 
+### Prompt 10B entegrasyonu (B, 2026-10-31)
+- A'nın 10B'si (PR #18, develop 10a1c98) `feature/simulation-ui`'ye birleştirildi (f7a1456), çakışma yok. A yalnızca kendi dosyalarına dokunmuş (scripts/world, assets/shaders, PROGRESS A bölümü).
+- Testler: B'nin 12 testi (pencereliler 1280×720 ve 1920×1080) + A'nın 5 testi (test_city, test_city_fx, test_buildings, test_deselect_real, test_final_presentation 29 kontrol) TAMAM. balance_sim sonuçları 10C ile aynı (74 / 41 / 37 / 67).
+- Gerçek pencerede tam oyun + "Şehrin dönüşümünü izle" (1280×720 ve 1920×1080): düğme görünür, sunum ~54 sn (2040 binasız → yıl yıl yatırımlar ve krizler → 2052 → karşılaştırma), bitişte rapor geri geliyor, GameState değişmiyor, kamera eski görünüme dönüyor, arayüzle çakışma yok. FINAL_VISUAL_CONTRACT kabul ölçütlerinin 6'sı da sağlandı (hiç yatırım yok durumu A'nın testinde).
+- Windows demo yeniden üretildi (10B dahil): `build/windows/ANTALYA2040.exe` (110 MB) + `OKUBENI.txt`, `build/ANTALYA2040_Windows_Demo.zip` (38 MB). Pakette final_presentation var, tests/ ve dev/ yok; `--main-pack` ile açılıyor, script hatası yok.
+- A'ya not (düşük): `test_final_presentation.gd` 1920×1080'de bir kez [6] kenar durumlarında 3 kontrol düşürdü, iki tekrarda TAMAM. Zamanlamaya bağlı titreklik; oyunda karşılığı görülmedi.
+
 ### Jüri demo akışı (5–7 dk, sabit kriz yılları, ek demo modu gerekmez)
 1. Giriş (30 sn): ana menü, arkada canlı şehir; "Oyun hakkında".
 2. 2040 şehri (45 sn): HUD; kaynak paneli, enerji üretim/tüketim, yerel emisyon.
 3. Yatırım (1 dk): O01'e güneş, U01'e park; kartta etki ve eğitim özeti, bütçe düşer, bilgi kartı çıkar, emisyon hemen düşer.
 4. İklim Laboratuvarı (1 dk): A emisyonlar → B küresel CO₂ ("şehrin bu eğriyi tek başına değiştiremez") → D riskler ve öneri.
 5. Afet (1,5 dk): 2042 sonu uyarı → 2043'te serinleme merkezi (hazırlık) → kriz paneli: koruma %70, "Serinleme merkezlerini devreye al", olası etkiler → rapor.
-6. Final dönüşümü (1 dk): yılları ilerlet (2046, 2049 krizleri), 2052 → "Şehrin dönüşümünü izle" (A'nın 10B'si gelince).
+6. Final dönüşümü (1 dk): yılları ilerlet (2046, 2049 krizleri), 2052 → "Şehrin dönüşümünü izle" (~55 sn; Esc ile atlanır).
 7. Sonuç raporu (45 sn): genel puan, en güçlü/zayıf alan, 2040↔2052 tablosu, grafikler; ana mesaj.
 
 ## Sözleşme değişiklik talepleri

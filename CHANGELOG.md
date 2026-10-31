@@ -1,7 +1,12 @@
 # Değişiklik günlüğü
 
 ## Yayın adayı (2026-10-31, develop)
-Ekip A'nın final şehir sunumu (Prompt 10B) bekleniyor; v1.0 etiketi ondan sonra.
+Tüm Prompt 10 işleri birleşik; v1.0 etiketi main'e birleştirme ve demo provasından sonra.
+
+### Prompt 10B · Final şehir sunumu (A) ve entegrasyonu (B)
+- "Şehrin dönüşümünü izle": 2040 binasız şehir → yatırımlar inşa yılına göre → geçmiş krizler ve koruma oranı → 2052 → karşılaştırma; sinematik kamera, Esc ile atlama.
+- Sunum GameState'e yazmaz, bitince kamera ve rapor geri gelir. 1280×720 ve 1920×1080'de doğrulandı.
+- Windows demo paketi 10B ile yeniden üretildi.
 
 ### Prompt 10C · Final entegrasyon ve kalite (B)
 - Gerçek oyuncu gibi tam oynanış testi (`tests/test_playthrough.gd`): menüden 2052 final raporuna, tıklama ve UI düğmeleriyle.

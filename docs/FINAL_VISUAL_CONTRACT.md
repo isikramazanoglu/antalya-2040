@@ -3,7 +3,7 @@
 Sürüm: **v1.0** (2026-10-31) · Ana sözleşmenin **v1.9** eklemesine dayanır (`docs/INTEGRATION_CONTRACT.md`).
 Hazırlayan: Ekip B. Kullanan: Ekip A (2040 ↔ 2052 şehir sunumu, final kamera geçişleri, görsel dönüşüm).
 
-**Durum (2026-10-31, Prompt 10C):** B tarafı tamam ve test edildi (`tests/test_final.gd`). A tarafı (10B) henüz develop'ta değil; FinalReport'taki "Şehrin dönüşümünü izle" düğmesi A dinlemeye başlayınca kendiliğinden görünecek.
+**Durum (2026-10-31, 10B entegrasyonu):** İki taraf da tamam. A: `scripts/world/final_presentation.gd`, `CityWorld.show_city_state` / `restore_city_state`, `CameraRig.play_tour`. B testleri + A'nın `test_final_presentation.gd`'si TAMAM; 6 kabul ölçütü gerçek pencerede 1280×720 ve 1920×1080'de sağlandı. Aşağıdaki "Ekip A tarafından geliştirilecek" satırları tarihsel kayıttır.
 
 Bu belgede "mevcut" diye geçen her sinyal, fonksiyon ve veri projede **bugün vardır** ve test edilmiştir (`tests/test_final.gd`). Henüz olmayanlar açıkça **"Ekip A tarafından geliştirilecek"** diye işaretlidir. Ekip A simülasyon koduna dokunmadan çalışabilir.
 
