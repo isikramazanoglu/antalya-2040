@@ -179,12 +179,22 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - Ekip A için yeni model gerekmiyor: 12 bina sahnesi mevcut (`scenes/buildings/b_<id>.tscn`); kombinasyonların görseli yok.
 - `tests/test_investments.gd`: 18 test sorusu (25 kontrol) TAMAM.
 
+### Prompt 10A notları (B, 2026-10-31) · Final simülasyon ve değerlendirme
+- Yıllık arşiv: `GameState.year_reports` (her yılın raporu), `build_log` (yatırım, yıl, maliyet), `crisis_log`; `history` zaten vardı. Yeni göstergeler: `waste_recovery`, `climate_resilience` (merkezi, ClimateSimulator).
+- `FinalEvaluator`: 7 alt puan + ağırlıklı genel puan, 2040 ↔ 2052 karşılaştırması (yön ve yüzde, sıfıra bölme yok), toplamlar; eski tek formül kaldırıldı. Not ve sonuç metni puana göre değişir.
+- `FinalReport` paneli: genel değerlendirme, alt puan grafiği, karşılaştırma tablosu, Ekonomi/Enerji/Su/Ekosistem/İklim ve afetler/Yatırımlar bölümleri, 4 grafik, JSON dışa aktarma (`user://reports/`). YearReport artık yalnızca yıllık rapor.
+- Düzeltilen hata: 2040 başlangıç kaydı enerji/su akışları hesaplanmadan alınıyordu.
+- Sözleşme v1.9 + `docs/FINAL_VISUAL_CONTRACT.md`: final sunum sinyalleri, `city_2040`/`city_2052`, kabul ölçütleri. Sunum bitiş sinyali gelmezse Esc / 120 sn yedeği.
+- `tests/test_final.gd` 30 kontrol TAMAM.
+- **Ekip A için iş listesi:** (1) `final_presentation_requested(summary)`'i dinle, (2) 2040 görünümü (binasız) ↔ 2052 yerleşimi (`city_2052.plots`, `builds[].year`) geçişi, (3) kamera turu, (4) isteğe bağlı: `GameState.crisis_log`'dan geçmiş krizlerin kısa tekrarı, (5) bitişte `final_presentation_finished`. Ayrıntı: FINAL_VISUAL_CONTRACT.md.
+
 ## Sözleşme değişiklik talepleri
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |
 |---|---|---|---|---|
 | 2026-10-31 | B | v1.5: `crisis_stage_changed` + `result.severity/assessment` (ekleme) | A'nın kullanması isteğe bağlı | Yapıldı |
 | 2026-10-31 | B | v1.4: ret nedenleri `scene_unavailable`, `unknown_plot` (ekleme) | B içi, A ret nedenlerini kullanmaz | Yapıldı |
+| 2026-10-31 | B | v1.9: final sunum sinyalleri, summary/report/stats eklemeleri (ekleme) | A'nın kullanması isteğe bağlı; final sunum için A'ya iş listesi | Yapıldı |
 | 2026-10-31 | B | v1.8: `stats.recycled_water`, `recycled_water_used` (ekleme) | B içi | Yapıldı |
 | 2026-10-31 | B | v1.7: `summary.start_stats` (ekleme) | B içi | Yapıldı |
 | 2026-10-31 | A | v1.6: `crisis_stage_changed` info'suna `mitigation` (0..0.8, o risk için yatırımların koruma oranı) ve `advantages` (koruma sağlayan bina kimlikleri). Neden: Prompt 7B koruma düzeyini görselde B'nin değerinden almayı istiyor; şu an yalnızca `crisis_resolved` sonucunda var. | B onayladı | B ekledi (2026-10-31) |

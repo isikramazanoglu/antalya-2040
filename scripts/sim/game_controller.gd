@@ -51,6 +51,7 @@ func _on_build_requested(plot_id: StringName, building_id: StringName) -> void:
 		return
 	var def := Catalog.get_building(building_id)
 	GameState.place_building(plot_id, building_id)
+	GameState.log_build({"plot_id": plot_id, "building_id": building_id, "year": GameState.stats.year, "cost": def.cost})
 	var deltas := def.on_build_effects.duplicate()
 	deltas["credits"] = deltas.get("credits", 0) - def.cost
 	GameState.apply_deltas(deltas)
@@ -81,6 +82,7 @@ func refresh_resources() -> void:
 	var buildings := GameState.built_definitions()
 	var values := EconomySimulator.compute_resources(GameState.stats.population, buildings, Catalog.data.balance)
 	values.merge(ClimateSimulator.compute_emissions(GameState.stats.population, buildings, Catalog.data.balance))
+	values["climate_resilience"] = ClimateSimulator.resilience(buildings, Catalog.data.balance)
 	GameState.set_resources(values)
 
 
@@ -90,6 +92,10 @@ func apply_climate(climate: Dictionary) -> void:
 
 func set_mission_state(mission_id: StringName, state: StringName) -> void:
 	GameState.set_mission_state(mission_id, state)
+
+
+func record_report(report: Dictionary) -> void:
+	GameState.record_report(report)
 
 
 func log_crisis(result: Dictionary) -> void:

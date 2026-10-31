@@ -73,9 +73,19 @@ Hepsi `BalanceConfig` içinde katsayı olarak durur, kodda sabit sayı yazılmaz
 - Uygulanan hasar = `base_damage` × (1 − koruma oranı) × seçilen müdahalenin `damage_multiplier` değeri.
 - `scripted_year` dolu olan kriz yalnızca o yıl gelir (demo garantisi). Boşsa her yıl olasılık = `base_probability` × (gösterilen risk / 50).
 
-**Final puanı**
-- Puan = (su + enerji + yaşam kalitesi + ekosistem) / 4 + **kişi başı** emisyon azalma yüzdesi × 0.3 (en çok 30). Kişi başına bakılır ki şehri büyütmek cezalandırılmasın.
-- Not: 85+ "İklim Lideri", 70+ "Dayanıklı Şehir", 50+ "Gelişen Şehir", altı "Risk Altında".
+**Final değerlendirmesi (Prompt 10A, `FinalEvaluator`)** — oyun içi değerlendirmedir, bilimsel ölçüm değildir. Yedi alt puan (0–100):
+
+| Alt puan | Ağırlık | Nasıl |
+|---|---|---|
+| Ekonomik sürdürülebilirlik | 15 | borçsuz yıl oranı ×60 + final kasa (500 kredi = tam) ×40 |
+| Su yönetimi | 15 | su güvenliği ×0.7 + arzın talebi karşılama oranı ×30 (geri kazanılmış su yalnızca içme dışı) |
+| Enerji yönetimi | 15 | enerji güvenliği ×0.4 + yenilenebilir payı ×30 + kişi başı emisyon azalması (%50 = tam) ×30 |
+| İklim değişikliğine uyum | 15 | üç risk için ortalama koruma / %80 |
+| Ekosistem koruma | 15 | final ekosistem sağlığı |
+| Yaşam kalitesi | 15 | final yaşam kalitesi |
+| Afetlere hazırlık | 10 | krizler anındaki ortalama koruma / %80 (kriz yoksa uyum puanı) |
+
+Genel puan ağırlıklı ortalamadır. Not: 80+ İklim Lideri, 65+ Dayanıklı Şehir, 50+ Gelişen Şehir, altı Risk Altında; her not için ayrı sonuç metni, ayrıca en başarılı ve en zayıf alan önerisiyle gösterilir. 2040 ↔ 2052 karşılaştırmasında bütçe ve nüfus "nötr" (tek başına başarı değil), emisyonda düşüş olumludur; başlangıcı 0 olan göstergede yüzde hesaplanmaz.
 
 ## 5. On iki yatırım (taslak sayılar)
 
@@ -213,13 +223,13 @@ Kaynak kuralları:
 
 | Strateji | Puan | Not | Görev | Kriz kredi kaybı |
 |---|---|---|---|---|
-| Hiçbir şey yapma | 38 | Risk Altında | 0/4 | −472 |
-| En ucuzdan başla | 78 | Dayanıklı Şehir | – | – |
-| Önce koruma | 78 | Dayanıklı Şehir | – | – |
-| Yalnız emisyon | 69 | Gelişen Şehir | – | – |
-| Karma | 79 | Dayanıklı Şehir | – | – |
+| Hiçbir şey yapma | 37 | Risk Altında | – | −472 |
+| En ucuzdan başla | 72 | Dayanıklı Şehir | – | – |
+| Önce koruma | 74 | Dayanıklı Şehir | – | – |
+| Yalnız emisyon | 51 | Gelişen Şehir | – | – |
+| Karma | 67 | Dayanıklı Şehir | – | – |
 
-(Prompt 9A sonrası; görev sütunu artık 9 görev içerdiği için ayrıntı `tests/balance_sim.gd` çıktısındadır.)
+(Prompt 10A'nın 7 boyutlu final değerlendirmesiyle; tek göstergeyi kovalayan strateji dengesiz kaldığı için geride. Ayrıntı `tests/balance_sim.gd` çıktısında.)
 
 "İklim Lideri" (85+) hiçbir otomatik stratejiyle gelmiyor; bilinçli, dengeli oyun ister. Sayılar değişince simülasyon yeniden çalıştırılır.
 

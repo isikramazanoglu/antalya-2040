@@ -50,24 +50,3 @@ static func compute_resources(population: int, buildings: Array[BuildingDefiniti
 		"recycled_water": recycled,
 		"recycled_water_used": minf(recycled, maxf(water_demand, 0.0) * b.non_potable_water_share),
 	}
-
-
-## Sözleşme §5.5 için puan ve not.
-## Emisyon bonusu kişi başı emisyondaki azalmadan gelir; şehri büyütmek cezalandırılmaz.
-static func final_score(final_stats: Dictionary, start_stats: Dictionary) -> Dictionary:
-	var avg: float = (final_stats.water_security + final_stats.energy_security
-			+ final_stats.quality_of_life + final_stats.ecosystem_health) / 4.0
-	var reduction_pct := 0.0
-	var start_per_capita: float = start_stats.emissions_total / maxf(start_stats.population, 1.0)
-	var final_per_capita: float = final_stats.emissions_total / maxf(final_stats.population, 1.0)
-	if start_per_capita > 0.0:
-		reduction_pct = maxf(0.0, (start_per_capita - final_per_capita) / start_per_capita * 100.0)
-	var score := roundi(avg + minf(reduction_pct * 0.3, 30.0))
-	var grade := "Risk Altında"
-	if score >= 85:
-		grade = "İklim Lideri"
-	elif score >= 70:
-		grade = "Dayanıklı Şehir"
-	elif score >= 50:
-		grade = "Gelişen Şehir"
-	return {"score": score, "grade": grade, "emission_reduction_pct": roundi(reduction_pct)}

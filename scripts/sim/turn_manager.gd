@@ -7,6 +7,7 @@ extends Node
 @onready var controller: GameController = get_parent()
 
 var _start_stats: Dictionary = {}
+var _start_plots: Dictionary = {}  # 2040 başındaki yerleşim (final görsel sözleşmesi city_2040)
 var _built_this_year: Array = []
 var _crisis_queue: Array = []
 var _current_crisis: Dictionary = {}
@@ -39,9 +40,10 @@ func _emit_stage(warning: Dictionary, stage: StringName) -> void:
 
 
 func start_game() -> void:
+	controller.refresh_resources()  # başlangıç kaydında enerji/su akışları da dolu olsun
 	_start_stats = GameState.get_stats()
+	_start_plots = GameState.plots.duplicate()
 	_rng.seed = GameState.rng_seed
-	controller.refresh_resources()
 	_set_phase(&"build")
 	EventBus.year_started.emit(GameState.stats.year)
 
@@ -135,7 +137,9 @@ func _finish_year() -> void:
 		"crisis_results": _crisis_results.duplicate(true),
 		"new_warnings": warnings,
 		"missions": missions,
+		"investment_cost": GameState.build_log.filter(func(e): return e.year == before.year).reduce(func(acc, e): return acc + e.cost, 0),  # v1.9
 	}
+	controller.record_report(report)
 	_set_phase(&"report")
 	EventBus.year_ended.emit(report)
 
@@ -148,10 +152,19 @@ func close_report() -> void:
 	if GameState.stats.year >= Catalog.data.balance.end_year:
 		_set_phase(&"game_over")
 		var final_stats := GameState.get_stats()
-		var summary := EconomySimulator.final_score(final_stats, _start_stats)
-		summary["final_stats"] = final_stats
-		summary["history"] = GameState.history.duplicate(true)
-		summary["start_stats"] = _start_stats.duplicate(true)  # v1.7
+		var ev := FinalEvaluator.evaluate(_start_stats, final_stats, GameState.history, GameState.year_reports,
+				GameState.crisis_log, GameState.build_log, Catalog.data.balance)
+		var summary := {
+			"score": ev.overall,
+			"grade": ev.grade,
+			"emission_reduction_pct": ev.emission_reduction_pct,
+			"final_stats": final_stats,
+			"history": GameState.history.duplicate(true),
+			"start_stats": _start_stats.duplicate(true),  # v1.7
+			"evaluation": ev,  # v1.9
+			"city_2040": {"year": Catalog.data.balance.start_year, "plots": _start_plots.duplicate()},  # v1.9
+			"city_2052": {"year": final_stats.year, "plots": GameState.plots.duplicate(), "builds": GameState.build_log.duplicate(true)},  # v1.9
+		}
 		EventBus.game_over.emit(summary)
 		return
 	controller.advance_year()

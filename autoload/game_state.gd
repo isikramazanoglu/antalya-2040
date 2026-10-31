@@ -8,6 +8,8 @@ var pending_crises: Array = []  # sözleşme §5.2 warning sözlükleri
 var history: Array = []  # her yıl sonunun stats kopyası
 var missions: Dictionary = {}  # mission id -> &"active" | &"done" | &"failed"
 var crisis_log: Array = []  # yaşanan krizlerin sonuçları (+ "year"), İklim Laboratuvarı ve şehir bilgileri için
+var build_log: Array = []  # Prompt 10A: {"plot_id", "building_id", "year", "cost"} her onaylanan inşaat
+var year_reports: Array = []  # Prompt 10A: her yıl sonu raporunun kopyası (sözleşme §5.4)
 var phase: StringName = &"build"
 var rng_seed: int = 0
 
@@ -38,6 +40,8 @@ func reset() -> void:
 		"water_supply": 0.0,
 		"recycled_water": 0.0,
 		"recycled_water_used": 0.0,
+		"waste_recovery": 0.0,  # v1.9: atık azaltma oranı 0..1
+		"climate_resilience": 0.0,  # v1.9: üç risk için ortalama koruma 0..0.8
 	}
 	var total := 0.0
 	for value in b.base_emissions.values():
@@ -48,6 +52,8 @@ func reset() -> void:
 	history.clear()
 	missions.clear()
 	crisis_log.clear()
+	build_log.clear()
+	year_reports.clear()
 	phase = &"build"
 	rng_seed = randi()
 	EventBus.stats_changed.emit(get_stats())
@@ -116,6 +122,14 @@ func set_resources(resources: Dictionary) -> void:
 
 func set_mission_state(mission_id: StringName, state: StringName) -> void:
 	missions[mission_id] = state
+
+
+func log_build(entry: Dictionary) -> void:
+	build_log.append(entry)
+
+
+func record_report(report: Dictionary) -> void:
+	year_reports.append(report.duplicate(true))
 
 
 func log_crisis(result: Dictionary) -> void:

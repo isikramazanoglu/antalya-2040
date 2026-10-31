@@ -1,6 +1,6 @@
 extends Node
 ## ORTAK dosya. Sözleşme: docs/INTEGRATION_CONTRACT.md
-## Sürüm v1.6. Yalnızca sinyal bildirimleri. Değişken, fonksiyon, mantık eklenmez.
+## Sürüm v1.9. Yalnızca sinyal bildirimleri. Değişken, fonksiyon, mantık eklenmez.
 ## Değişiklik yalnızca sözleşme §11 süreciyle, yalnızca ekleme olarak.
 
 # Sinyaller başka script'lerden yayılır; bu dosyada kullanılmamaları normal.
@@ -30,3 +30,9 @@ signal crisis_response_chosen(event_id: StringName, response_id: StringName)  # 
 signal crisis_resolved(result: Dictionary)  # B: TurnManager
 ## v1.5: krizin yaşam döngüsü (görseller için). stage: warning, preparation, active, resolved, ended. info: sözleşme §5.6 (v1.6: mitigation, advantages)
 signal crisis_stage_changed(event_id: StringName, stage: StringName, info: Dictionary)  # B: TurnManager
+
+# --- 3.4 Final sunumu (v1.9, docs/FINAL_VISUAL_CONTRACT.md) ---
+## Oyuncu final raporundaki "Şehrin dönüşümünü izle" düğmesine bastı. summary: game_over ile aynı sözlük.
+signal final_presentation_requested(summary: Dictionary)  # B: FinalReport → A: CityWorld
+## A'nın 2040 → 2052 sunumu bitti (veya hiç başlamadı); final raporu yeniden görünür.
+signal final_presentation_finished  # A: CityWorld → B: FinalReport

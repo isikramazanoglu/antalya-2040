@@ -4,7 +4,7 @@ Bu belge Ekip A (şehir ve 3D) ile Ekip B (simülasyon ve arayüz) arasındaki t
 İki taraf birbirinin koduna yalnızca burada yazan sinyaller, fonksiyonlar ve veri şekilleri üzerinden dokunur.
 Burada yazmayan bir şeye güvenen kod, sözleşme dışıdır.
 
-Sürüm: **v1.8** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
+Sürüm: **v1.9** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
 
 ---
 
@@ -130,7 +130,9 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
   "water_demand": float,
   "water_supply": float,          # içme suyu kalitesinde arz
   "recycled_water": float,        # v1.8: geri kazanılmış su üretimi (içme suyu sayılmaz)
-  "recycled_water_used": float    # v1.8: bunun içme dışı talebi karşılayan kısmı
+  "recycled_water_used": float,   # v1.8: bunun içme dışı talebi karşılayan kısmı
+  "waste_recovery": float,        # v1.9: atık azaltma oranı 0..1
+  "climate_resilience": float     # v1.9: üç risk için ortalama yatırım koruması 0..0.8
 }
 ```
 
@@ -154,6 +156,15 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
   "assessment": Dictionary        # v1.5: {"hazard", "exposure", "vulnerability", "mitigation": float, "advantages": Array[StringName]}
 }
 ```
+
+### 3.4 Final sunumu (v1.9)
+
+| Sinyal | Parametreler | Yayan | Dinleyen |
+|---|---|---|---|
+| `final_presentation_requested` | `summary: Dictionary` (§5.5) | B · FinalReport ("Şehrin dönüşümünü izle") | A · CityWorld (geliştirilecek) |
+| `final_presentation_finished` | yok | A (geliştirilecek) | B · FinalReport |
+
+Ayrıntı ve kabul ölçütleri: `docs/FINAL_VISUAL_CONTRACT.md`.
 
 ### 5.6 `info` (crisis_stage_changed, v1.5)
 
@@ -183,14 +194,16 @@ Bütün aşamalarda bu sekiz anahtarın hepsi vardır. `mitigation` ve `advantag
   "built_this_year": Array,       # building_id listesi
   "crisis_results": Array,        # §5.3 listesi
   "new_warnings": Array,          # §5.2 listesi
-  "missions": { "completed": Array, "failed": Array, "reward": int }   # v1.1
+  "missions": { "completed": Array, "failed": Array, "reward": int },  # v1.1
+  "investment_cost": int          # v1.9: o yıl onaylanan yatırımların maliyet toplamı
 }
 ```
 
 ### 5.5 `summary` (oyun sonu)
 
 ```
-{ "final_stats": Dictionary, "history": Array, "score": int, "grade": String, "emission_reduction_pct": int, "start_stats": Dictionary }   # emission_reduction_pct: v1.1, start_stats: v1.7
+{ "final_stats": Dictionary, "history": Array, "score": int, "grade": String, "emission_reduction_pct": int, "start_stats": Dictionary,
+  "evaluation": Dictionary, "city_2040": Dictionary, "city_2052": Dictionary }   # v1.1, v1.7, v1.9 (evaluation, city_2040, city_2052: FINAL_VISUAL_CONTRACT.md)
 ```
 
 `history`: her yıl sonunun `stats` kopyası (ClimateLab grafikleri de bunu kullanır).
@@ -327,6 +340,7 @@ MVP üçlüsü: `solar_plant`, `water_storage`, `green_park`.
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
 | v1.0 | 2026-10-30 | İlk sürüm. |
+| v1.9 | 2026-10-31 | Ekleme: §3.4 final sunum sinyalleri, `summary.evaluation/city_2040/city_2052`, `report.investment_cost`, `stats.waste_recovery/climate_resilience`. `docs/FINAL_VISUAL_CONTRACT.md`. A'nın kullanması isteğe bağlı. |
 | v1.8 | 2026-10-31 | Ekleme: `stats.recycled_water`, `stats.recycled_water_used`. A etkilenmez. Not: `GameState.built_definitions()` artık etkin kombinasyonları (`SynergyDefinition`) da döndürür; `advantages` listesinde yalnızca bina kimlikleri kalır. |
 | v1.7 | 2026-10-31 | Ekleme: `summary.start_stats` (final ekranında başlangıç ↔ final). Yalnızca B'nin YearReport'u kullanır. |
 | v1.6 | 2026-10-31 | Ekleme: `crisis_stage_changed` info'suna `mitigation` ve `advantages`. Ekip A talebi. |
