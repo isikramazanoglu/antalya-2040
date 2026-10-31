@@ -99,6 +99,10 @@ func _render(report: Dictionary) -> void:
 		t += "\n[b]Yeni yatırımlar[/b]\n" + ", ".join(names) + "\n"
 	for result in report.crisis_results:
 		t += "\n[b]İklim olayı[/b]\n%s\n" % result.summary_text
+		if result.has("assessment"):
+			var a: Dictionary = result.assessment
+			t += "  [color=#b8c4c2]Şiddet %%%d · tehlike ×%.2f · maruziyet ×%.2f · hassasiyet ×%.2f · uyum −%%%d[/color]\n" % [
+				roundi(result.severity * 100), a.hazard, a.exposure, a.vulnerability, roundi(a.mitigation * 100)]
 		for key in result.damage:
 			t += "  %s %s\n" % [UiText.STAT_NAMES.get(key, key), UiText.format_delta(result.damage[key])]
 	for id in report.missions.completed:
@@ -108,7 +112,7 @@ func _render(report: Dictionary) -> void:
 		t += "\n[color=#ff8c73][b]Görev kaçtı:[/b] %s[/color]\n" % _mission(id).title
 	for w in report.new_warnings:
 		var def := Catalog.get_event(w.event_id)
-		t += "\n[color=#ffbf66][b]Uyarı:[/b] %d sonunda %s bekleniyor. Hazırlanmak için bir yılın var.[/color]\n" % [w.due_year, def.display_name]
+		t += "\n[color=#ffbf66][b]Uyarı:[/b] %s %d sonunda %s bekleniyor; hazırlanmak için bir yılın var.[/color]\n" % [def.warning_text, w.due_year, def.display_name]
 	%Body.text = t
 	%Body.scroll_to_line(0)
 

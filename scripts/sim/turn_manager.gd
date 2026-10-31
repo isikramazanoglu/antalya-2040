@@ -19,6 +19,22 @@ func _ready() -> void:
 	EventBus.build_approved.connect(func(_plot_id, building_id): _built_this_year.append(building_id))
 
 
+## Sözleşme v1.5: aşama bilgisini görsel sisteme bildirir.
+const STAGE_PROGRESS := {&"warning": 0.0, &"preparation": 0.25, &"active": 0.5, &"resolved": 0.75, &"ended": 1.0}
+
+
+func _emit_stage(warning: Dictionary, stage: StringName) -> void:
+	var def := Catalog.get_event(warning.event_id)
+	EventBus.crisis_stage_changed.emit(warning.event_id, stage, {
+		"severity": warning.severity,
+		"due_year": warning.due_year,
+		"visual_effect_id": def.visual_effect_id,
+		"affected_area": def.affected_area,
+		"affected_plot_kinds": def.affected_plot_kinds.duplicate(),
+		"progress": STAGE_PROGRESS[stage],
+	})
+
+
 func start_game() -> void:
 	_start_stats = GameState.get_stats()
 	_rng.seed = GameState.rng_seed
@@ -40,9 +56,12 @@ func end_year() -> void:
 ## Kriz varsa sıradakini başlatıp yanıt bekler; yoksa yılı bitirir.
 func _continue_year() -> void:
 	if not _crisis_queue.is_empty():
-		_current_crisis = _crisis_queue.pop_front()
+		var crisis: Dictionary = _crisis_queue.pop_front()
+		_current_crisis = crisis
 		_set_phase(&"crisis")
-		EventBus.crisis_started.emit(_current_crisis.event_id, _current_crisis.risk_type, _current_crisis.severity)
+		# Yerel kopya: bir dinleyici crisis_started içinde hemen yanıt verirse _current_crisis boşalır.
+		_emit_stage(crisis, &"active")
+		EventBus.crisis_started.emit(crisis.event_id, crisis.risk_type, crisis.severity)
 		return
 	_finish_year()
 
@@ -52,15 +71,21 @@ func on_crisis_response(event_id: StringName, response_id: StringName) -> void:
 		return
 	var def := Catalog.get_event(event_id)
 	var response := EventManager.find_response(def, response_id)
-	if response == null:
-		push_warning("TurnManager: bilinmeyen müdahale %s" % response_id)
+	var buildings := GameState.built_definitions()
+	# Geçersiz seçim (altyapı yok, bütçe yetmiyor) durumu değiştirmeden yok sayılır; kriz açık kalır.
+	var reason := EventManager.validate(def, response, buildings, GameState.stats.credits)
+	if reason != &"":
+		push_warning("TurnManager: müdahale reddedildi %s (%s)" % [response_id, reason])
 		return
-	var result := EventManager.resolve(def, response, GameState.built_definitions(), Catalog.data.balance)
+	var result := EventManager.resolve(def, response, _current_crisis.severity, GameState.get_stats(), buildings, Catalog.data.balance)
+	var resolved := _current_crisis
 	controller.remove_pending(_current_crisis)
 	controller.apply_deltas(result.damage)
+	controller.refresh_resources()
 	_crisis_results.append(result)
 	_current_crisis = {}
 	EventBus.crisis_resolved.emit(result)
+	_emit_stage(resolved, &"resolved")
 	_continue_year()
 
 
@@ -82,6 +107,7 @@ func _finish_year() -> void:
 	for w in warnings:
 		controller.add_pending(w)
 		EventBus.crisis_warned.emit(w)
+		_emit_stage(w, &"warning")
 
 	var missions := MissionTracker.evaluate(Catalog.data.missions, GameState.get_stats(), GameState.missions)
 	for id in missions.completed:
@@ -110,6 +136,8 @@ func _finish_year() -> void:
 func close_report() -> void:
 	if GameState.phase != &"report":
 		return
+	for r in _crisis_results:
+		_emit_stage({"event_id": r.event_id, "severity": r.severity, "due_year": GameState.stats.year}, &"ended")
 	if GameState.stats.year >= Catalog.data.balance.end_year:
 		_set_phase(&"game_over")
 		var final_stats := GameState.get_stats()
@@ -122,6 +150,9 @@ func close_report() -> void:
 	_built_this_year.clear()
 	_set_phase(&"build")
 	EventBus.year_started.emit(GameState.stats.year)
+	for w in GameState.pending_crises:
+		if w.due_year == GameState.stats.year:
+			_emit_stage(w, &"preparation")
 
 
 func _set_phase(phase: StringName) -> void:

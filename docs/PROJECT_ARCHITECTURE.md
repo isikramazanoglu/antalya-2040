@@ -99,7 +99,7 @@ antalya-2040/
 │   ├── missions/<id>.tres         MissionDefinition × 4
 │   └── cards/<id>.tres            InfoCard (bina, olay ve İklim Laboratuvarı kartları)
 │
-├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy), pencereli testler (test_menu, test_e2e_game, test_ui), denge simülasyonu (balance_sim)
+├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy, test_crises), pencereli testler (test_menu, test_e2e_game, test_ui), denge simülasyonu (balance_sim)
 │
 └── assets/
     ├── models/                    A     .glb modeller
@@ -290,7 +290,7 @@ Kural: **veri bir yerde, hesap bir yerde, yazma tek yerde.**
 | `TurnManager` | Node | Yıl sonu adımlarını sıralar, faz makinesini tutar, tur sinyallerini yayar. Simülatörlerin sonuçlarını `GameController.apply_*` ile uygulatır. | Kendi formülü yoktur; oyuncu girdisi dinlemez. |
 | `EconomySimulator` | `RefCounted`, statik fonksiyonlar | `compute_year(stats, buildings, balance) -> Dictionary` (gelir, gider, nüfus değişimi); `compute_resources(population, buildings, balance)` (enerji/su akışları, yenilenebilir payı); `final_score`. | Durum tutmaz, sinyal yaymaz. |
 | `ClimateSimulator` | `RefCounted`, statik fonksiyonlar | Sektör emisyonları, risk seviyeleri, ekosistem değişimi; `Co2Scenario`'dan o yılın ppm değerini okur. | Küresel CO2'yi oyuncu yatırımıyla değiştirmez. |
-| `EventManager` | `RefCounted`, statik fonksiyonlar | `plan_warnings(...)`: hangi kriz hangi yıl, RNG ile. `resolve(event, response, buildings) -> result`. | Sinyal yaymaz, panel açmaz. |
+| `EventManager` | `RefCounted`, statik fonksiyonlar | `plan_warnings`, `severity`, `assess` (tehlike/maruziyet/hassasiyet/uyum), `available_responses`, `validate`, `preview`, `resolve`. | Sinyal yaymaz, panel açmaz. |
 
 Saf fonksiyonların faydası: Ekip B bunları sahne açmadan küçük bir test script'iyle sınayabilir ve iki modül birbirinin işini üstlenemez.
 
@@ -351,12 +351,15 @@ Hepsi `scripts/data/` altında, `class_name` ile, `extends Resource`. Alanlar `@
 | `lead_years` | int | Uyarı ile kriz arası, varsayılan 1 |
 | `base_damage` | Dictionary | `{"credits": -150, "water_security": -20}` |
 | `responses` | Array[CrisisResponse] | |
+| `warning_text` | String | Uyarıda gösterilen cümle |
+| `vulnerability_stats` | Dictionary | Hassasiyet ağırlıkları `{"water_security": 1.0}` |
+| `visual_effect_id`, `affected_area`, `affected_plot_kinds` | StringName / Array | A'nın görselleri için (sözleşme v1.5) |
 | `energy_production`, `energy_consumption`, `water_production`, `water_consumption` | float | İsteğe bağlı kaynak akışları (oyun birimi/yıl); üretim yenilenebilir, negatif tüketim tasarruf |
 | `info_card` | InfoCard | |
 
 ### CrisisResponse
 
-`id: StringName`, `label: String`, `description: String`, `cost: int`, `damage_multiplier: float` (0..1), `extra_effects: Dictionary`.
+`id: StringName`, `label: String`, `description: String`, `cost: int`, `damage_multiplier: float` (0..1), `extra_effects: Dictionary`, `required_building: StringName` (boş değilse yalnızca bu bina kuruluysa seçilebilir).
 
 ### InfoCard
 

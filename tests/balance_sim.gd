@@ -48,7 +48,7 @@ func _play(strategy: String) -> void:
 	var on_crisis := func(id, _r, _s):
 		var def = _cat.get_event(id)
 		var best = null
-		for r in def.responses:
+		for r in EventManager.available_responses(def, _gs.built_definitions()):
 			if r.cost <= _gs.stats.credits and (best == null or r.damage_multiplier < best.damage_multiplier):
 				best = r
 		_bus.crisis_response_chosen.emit(id, best.id if strategy != "hiçbir şey" else &"do_nothing")

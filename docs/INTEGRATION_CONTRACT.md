@@ -4,7 +4,7 @@ Bu belge Ekip A (şehir ve 3D) ile Ekip B (simülasyon ve arayüz) arasındaki t
 İki taraf birbirinin koduna yalnızca burada yazan sinyaller, fonksiyonlar ve veri şekilleri üzerinden dokunur.
 Burada yazmayan bir şeye güvenen kod, sözleşme dışıdır.
 
-Sürüm: **v1.4** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
+Sürüm: **v1.5** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
 
 ---
 
@@ -79,6 +79,9 @@ Ekip A, `phase_changed` ile gelen değer `&"build"` değilse arsa seçimini kapa
 | `crisis_started` | `event_id: StringName, risk_type: StringName, severity: float` | B · `TurnManager` | A · `CityWorld` (görsel efekt), B · `EventPanel` |
 | `crisis_response_chosen` | `event_id: StringName, response_id: StringName` | B · `EventPanel` | B · `GameController` |
 | `crisis_resolved` | `result: Dictionary` (şekil §5.3) | B · `TurnManager` | A · `CityWorld` (efekti bitir), B · `EventPanel` |
+| `crisis_stage_changed` (v1.5) | `event_id: StringName, stage: StringName, info: Dictionary` (şekil §5.6) | B · `TurnManager` | A · `CityWorld` (isteğe bağlı: aşamaya göre görsel) |
+
+`stage` değerleri (v1.5), sırayla: `&"warning"` (yıl N sonu, `crisis_warned` ile aynı an) → `&"preparation"` (yıl N+1 başı) → `&"active"` (yıl N+1 sonu, `crisis_started`'dan hemen önce) → `&"resolved"` (`crisis_resolved`'dan hemen sonra) → `&"ended"` (rapor kapanınca). Mevcut `crisis_started` / `crisis_resolved` aynen yayılmaya devam eder; A yeni sinyali kullanmak zorunda değildir.
 
 `risk_type` değerleri: `&"drought"` (kuraklık), `&"heat"` (aşırı sıcak), `&"coastal_flood"` (kıyı taşkını).
 `severity`: 0.0 ile 1.0 arası. Ekip A bunu efekt şiddeti için kullanır (ör. su seviyesi yüksekliği).
@@ -144,9 +147,25 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
   "risk_type": StringName,
   "mitigation": float,            # 0..0.8, yatırımlardan gelen koruma oranı
   "damage": { "<stat_adı>": float },   # uygulanan değişimler, ör. {"credits": -120, "water_security": -8}
-  "summary_text": String          # rapora yazılacak tek cümle
+  "summary_text": String,         # rapora yazılacak tek cümle
+  "severity": float,              # v1.5: tehlike şiddeti 0.2..1 (yatırımdan bağımsız ham risk)
+  "assessment": Dictionary        # v1.5: {"hazard", "exposure", "vulnerability", "mitigation": float, "advantages": Array[StringName]}
 }
 ```
+
+### 5.6 `info` (crisis_stage_changed, v1.5)
+
+```
+{
+  "severity": float,              # 0.2..1
+  "due_year": int,
+  "visual_effect_id": StringName, # heat_haze, drought_dust, storm_surge
+  "affected_area": StringName,    # city, farmland, coast
+  "affected_plot_kinds": Array,   # ör. [&"coastal"]; A bunu arsa kimliklerine çevirebilir
+  "progress": float               # warning 0.0, preparation 0.25, active 0.5, resolved 0.75, ended 1.0
+}
+```
+`ended` aşamasında yalnızca `severity`, `due_year`, `visual_effect_id`, `affected_area`, `affected_plot_kinds`, `progress` garanti edilir.
 
 ### 5.4 `report` (yıl sonu)
 
@@ -304,6 +323,7 @@ MVP üçlüsü: `solar_plant`, `water_storage`, `green_park`.
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
 | v1.0 | 2026-10-30 | İlk sürüm. |
+| v1.5 | 2026-10-31 | Ekleme: `crisis_stage_changed` sinyali (§5.6), `result` içine `severity` ve `assessment`. Mevcut kriz sinyalleri değişmedi; A etkilenmez. |
 | v1.4 | 2026-10-31 | Ekleme: iki ret nedeni (`scene_unavailable`, `unknown_plot`). Sinyal değişikliği yok; A ret nedenlerini kullanmaz. |
 | v1.3 | 2026-10-31 | Ekleme: `plot_deselect_requested` sinyali. Neden: panel kapanınca arsa vurgusu kalıyordu. A onayladı. |
 | v1.2 | 2026-10-31 | Ekleme: `stats` içine enerji ve su akışları (5 anahtar). Sinyal değişikliği yok, A etkilenmez. |
