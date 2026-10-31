@@ -1,6 +1,7 @@
 extends Node3D
 ## Sahip: A. Arsa seçimi, bina yerleştirme, efekt tetikleme (mimari §2.3, sözleşme §6.1, §6.4).
 ## Ekip B ile yalnızca EventBus ve sözleşme §4 fonksiyonları üzerinden konuşur.
+## Final sunumu (sözleşme v1.9, FINAL_VISUAL_CONTRACT.md): final_presentation_requested → FinalPresentation.
 
 ## Sözleşme §10: katman 2 = plots.
 const PLOTS_LAYER_MASK := 1 << 1
@@ -17,6 +18,9 @@ var _hovered: BuildPlot
 var _selection_enabled := true
 ## Aşama sinyali bir kez geldiyse görseller onunla sürülür; crisis_started/resolved yalnızca yedektir.
 var _stage_driven := false
+## Final sunumu: yerleşimde olup şehirde (henüz) olmayan binaların geçici kopyaları, plot_id → Node3D.
+var _stand_ins := {}
+var _presentation: FinalPresentation
 
 
 func _ready() -> void:
@@ -28,6 +32,11 @@ func _ready() -> void:
 	EventBus.plot_deselect_requested.connect(_deselect)
 	# Sözleşme v1.5: krizin aşamaları (uyarı → hazırlık → kriz → çözüldü → bitti).
 	EventBus.crisis_stage_changed.connect(_on_crisis_stage_changed)
+	# Sözleşme v1.9: final raporundaki "Şehrin dönüşümünü izle" düğmesi bu dinleyici varsa görünür.
+	_presentation = FinalPresentation.new()
+	_presentation.name = "FinalPresentation"
+	add_child(_presentation)
+	EventBus.final_presentation_requested.connect(_presentation.play)
 	# Sahne yeniden açıldıysa GameState'teki binaları animasyonsuz geri kur.
 	for plot in get_plots():
 		var building_id := GameState.get_building_on(plot.plot_id)
@@ -86,19 +95,98 @@ func place_building(plot_id: StringName, building_id: StringName, animate := tru
 	if plot.is_occupied():
 		push_warning("CityWorld: '%s' arsası dolu, '%s' yerleştirilmedi" % [plot_id, building_id])
 		return false
-	var def := Catalog.get_building(building_id)
-	var scene: PackedScene = def.scene if def else null
+	var scene := building_scene(building_id)
 	if scene == null:
-		var path := BUILDING_SCENE_PATH % building_id
-		if ResourceLoader.exists(path):
-			scene = load(path)
-		else:
-			push_warning("CityWorld: '%s' için bina sahnesi yok, yer tutucu gösteriliyor" % building_id)
+		push_warning("CityWorld: '%s' için bina sahnesi yok, yer tutucu gösteriliyor" % building_id)
 	if plot.place_building(scene, animate, building_id) == null:
 		return false
 	# Kriz sürerken (ör. hazırlık yılında) kurulan koruyucu bina hemen görünsün.
 	_fx.refresh_protection()
 	return true
+
+
+## Sözleşme §8: tanımın `scene` alanı, yoksa b_<id>.tscn; ikisi de yoksa null.
+func building_scene(building_id: StringName) -> PackedScene:
+	var def := Catalog.get_building(building_id)
+	if def and def.scene:
+		return def.scene
+	var path := BUILDING_SCENE_PATH % building_id
+	return load(path) if ResourceLoader.exists(path) else null
+
+
+# --- Final sunumu (FINAL_VISUAL_CONTRACT.md §B, §C) ---
+
+## Şehri verilen yerleşime (plot_id → building_id) göre yalnızca GÖRSEL olarak gösterir: GameState'e yazmaz,
+## place_building ile kalıcı bina eklemez. Arsadaki gerçek bina gizlenir ya da gösterilir; yerleşimde olup
+## şehirde olmayan (ya da farklı olan) bina geçici bir kopyayla çizilir. restore_city_state() asıl hâle döndürür.
+func show_city_state(plots: Dictionary, animate: bool) -> void:
+	for plot in get_plots():
+		show_plot_state(plot.plot_id, _layout_id(plots, plot.plot_id), animate)
+
+
+## Tek arsanın görünümü (bina inşa sırasıyla tek tek göstermek için). Görünen binayı döndürür; boşsa null.
+func show_plot_state(plot_id: StringName, building_id: StringName, animate: bool) -> Node3D:
+	var plot := find_plot(plot_id)
+	if plot == null:
+		push_warning("CityWorld: sunumda bilinmeyen arsa '%s'" % plot_id)
+		return null
+	var real := plot.get_building()
+	var real_matches := real != null and building_id != &"" and plot.building_id == building_id
+	if real:
+		var was_hidden := not real.visible
+		real.visible = real_matches
+		if real_matches and was_hidden and animate and real.has_method("play_build_animation"):
+			real.play_build_animation()
+	var stand_in: Node3D = _stand_ins.get(plot_id)
+	if stand_in and (real_matches or stand_in.get_meta(&"building_id") != building_id):
+		_stand_ins.erase(plot_id)
+		stand_in.queue_free()
+		stand_in = null
+	if real_matches:
+		return real
+	if building_id == &"" or stand_in:
+		return stand_in
+	if Catalog.get_building(building_id) == null or building_scene(building_id) == null:
+		push_warning("CityWorld: sunumda '%s' arsasındaki '%s' tanınmadı, boş gösteriliyor" % [plot_id, building_id])
+		return null
+	stand_in = building_scene(building_id).instantiate()
+	stand_in.set_meta(&"building_id", building_id)
+	add_child(stand_in)
+	stand_in.global_transform = plot.get_node("BuildingAnchor").global_transform
+	_stand_ins[plot_id] = stand_in
+	if animate and stand_in.has_method("play_build_animation"):
+		stand_in.play_build_animation()
+	return stand_in
+
+
+## Sunum sonrası: gerçek binalar görünür, geçici kopyalar silinir, arsa etiketleri geri gelir.
+func restore_city_state() -> void:
+	for plot_id in _stand_ins:
+		_stand_ins[plot_id].queue_free()
+	_stand_ins.clear()
+	for plot in get_plots():
+		plot.set_label_visible(true)
+		var real := plot.get_building()
+		if real:
+			real.visible = true
+
+
+func set_plot_labels_visible(value: bool) -> void:
+	for plot in get_plots():
+		plot.set_label_visible(value)
+
+
+func get_camera_rig() -> CameraRig:
+	return _camera_rig
+
+
+func get_disaster_fx() -> DisasterFX:
+	return _fx
+
+
+## Yerleşim sözlüğünde anahtar StringName ya da String olabilir.
+func _layout_id(plots: Dictionary, plot_id: StringName) -> StringName:
+	return StringName(plots.get(plot_id, plots.get(String(plot_id), &"")))
 
 
 # --- Seçim ---

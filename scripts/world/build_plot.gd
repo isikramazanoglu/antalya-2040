@@ -86,6 +86,11 @@ func set_hovered(value: bool) -> void:
 		_refresh()
 
 
+## Final sunumunda arsa etiketi gizlenir (sinematik görüntü); sunum bitince geri gelir.
+func set_label_visible(value: bool) -> void:
+	_label.visible = value
+
+
 ## Kriz görselleri için zemin rengini geçici olarak bir tona çeker (0 = asıl renk).
 func set_weather_tint(color: Color, amount: float) -> void:
 	_pad_material.albedo_color = _pad_base_color.lerp(color, clampf(amount, 0.0, 1.0))
