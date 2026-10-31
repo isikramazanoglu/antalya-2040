@@ -210,10 +210,22 @@ func _on_card_pressed(def: BuildingDefinition) -> void:
 	_selected = def
 	_show_error("")
 	_refresh()
+	_scroll_to_selected()
+
+
+## Ayrıntı alanı açılınca liste kısalır; seçilen kart görünür kalsın.
+func _scroll_to_selected() -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+	for card in %Cards.get_children():
+		if card is Button and card.button_pressed and not card.is_queued_for_deletion():
+			%Cards.get_parent().ensure_control_visible(card)
 
 
 func _show_detail(def: BuildingDefinition) -> void:
 	%Detail.visible = def != null
+	# Seçim yokken ayrıntı alanı gizlenir; kart listesi paneli boydan boya kullanır (alttaki kartlar da görünür).
+	%Detail.get_parent().visible = def != null
 	if def == null:
 		return
 	var card := def.info_card
