@@ -2,14 +2,13 @@
 
 [ext_resource type="PackedScene" path="res://scenes/buildings/Building.tscn" id="1_Building"]
 [ext_resource type="StandardMaterial3D" path="res://assets/materials/sand.tres" id="2_sand"]
-[ext_resource type="StandardMaterial3D" path="res://assets/materials/hill_green.tres" id="3_hill_green"]
-[ext_resource type="StandardMaterial3D" path="res://assets/materials/grass.tres" id="4_grass"]
-[ext_resource type="StandardMaterial3D" path="res://assets/materials/stone.tres" id="5_stone"]
-[ext_resource type="StandardMaterial3D" path="res://assets/materials/wood.tres" id="6_wood"]
-[ext_resource type="StandardMaterial3D" path="res://assets/materials/metal.tres" id="7_metal"]
-[ext_resource type="StandardMaterial3D" path="res://assets/materials/accent_turquoise.tres" id="8_accent_turqu"]
-[ext_resource type="StandardMaterial3D" path="res://assets/materials/signal_light.tres" id="9_signal_light"]
-[ext_resource type="StandardMaterial3D" path="res://assets/materials/solar_panel.tres" id="10_solar_panel"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/grass.tres" id="3_grass"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/stone.tres" id="4_stone"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/wood.tres" id="5_wood"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/metal.tres" id="6_metal"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/accent_turquoise.tres" id="7_accent_turqu"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/signal_light.tres" id="8_signal_light"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/solar_panel.tres" id="9_solar_panel"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
 size = Vector3(5.8, 0.05, 5.8)
@@ -78,94 +77,94 @@ cast_shadow = 0
 [node name="Dune" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, 0.2)
 mesh = SubResource("SphereMesh_2")
-surface_material_override/0 = ExtResource("3_hill_green")
+surface_material_override/0 = ExtResource("3_grass")
 
 [node name="Dune2" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0, 0.8)
 mesh = SubResource("SphereMesh_3")
-surface_material_override/0 = ExtResource("3_hill_green")
+surface_material_override/0 = ExtResource("3_grass")
 
 [node name="Dune3" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, -1.6)
 mesh = SubResource("SphereMesh_4")
-surface_material_override/0 = ExtResource("3_hill_green")
+surface_material_override/0 = ExtResource("3_grass")
 
 [node name="DuneGrass" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1, 0.45, -0.4)
 mesh = SubResource("CylinderMesh_5")
-surface_material_override/0 = ExtResource("4_grass")
+surface_material_override/0 = ExtResource("3_grass")
 
 [node name="DuneGrass2" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.45, 0.9)
 mesh = SubResource("CylinderMesh_5")
-surface_material_override/0 = ExtResource("4_grass")
+surface_material_override/0 = ExtResource("3_grass")
 
 [node name="DuneGrass3" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.45, 1.4)
 mesh = SubResource("CylinderMesh_5")
-surface_material_override/0 = ExtResource("4_grass")
+surface_material_override/0 = ExtResource("3_grass")
 
 [node name="DuneGrass4" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.45, 0.4)
 mesh = SubResource("CylinderMesh_5")
-surface_material_override/0 = ExtResource("4_grass")
+surface_material_override/0 = ExtResource("3_grass")
 
 [node name="DuneGrass5" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.45, -2.1)
 mesh = SubResource("CylinderMesh_5")
-surface_material_override/0 = ExtResource("4_grass")
+surface_material_override/0 = ExtResource("3_grass")
 
 [node name="DuneGrass6" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.45, -1)
 mesh = SubResource("CylinderMesh_5")
-surface_material_override/0 = ExtResource("4_grass")
+surface_material_override/0 = ExtResource("3_grass")
 
 [node name="DuneGrass7" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7, 0.45, 1.5)
 mesh = SubResource("CylinderMesh_5")
-surface_material_override/0 = ExtResource("4_grass")
+surface_material_override/0 = ExtResource("3_grass")
 
 [node name="Rock" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(0.034899, 0, -0.999391, 0, 1, 0, 0.999391, 0, 0.034899, -2.2, 0.2, 2.5)
 mesh = SubResource("SphereMesh_6")
-surface_material_override/0 = ExtResource("5_stone")
+surface_material_override/0 = ExtResource("4_stone")
 
 [node name="Rock2" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, 0.809017, -0.9, 0.2, 2.5)
 mesh = SubResource("SphereMesh_6")
-surface_material_override/0 = ExtResource("5_stone")
+surface_material_override/0 = ExtResource("4_stone")
 
 [node name="Rock3" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(0.961262, 0, 0.275637, 0, 1, 0, -0.275637, 0, 0.961262, 0.4, 0.2, 2.5)
 mesh = SubResource("SphereMesh_6")
-surface_material_override/0 = ExtResource("5_stone")
+surface_material_override/0 = ExtResource("4_stone")
 
 [node name="Rock4" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(0.374607, 0, 0.927184, 0, 1, 0, -0.927184, 0, 0.374607, 1.7, 0.2, 2.5)
 mesh = SubResource("SphereMesh_6")
-surface_material_override/0 = ExtResource("5_stone")
+surface_material_override/0 = ExtResource("4_stone")
 
 [node name="Boardwalk" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.3, 0.2)
 mesh = SubResource("BoxMesh_7")
-surface_material_override/0 = ExtResource("6_wood")
+surface_material_override/0 = ExtResource("5_wood")
 
 [node name="Tower" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 2.25, -2.2)
 mesh = SubResource("CylinderMesh_8")
-surface_material_override/0 = ExtResource("7_metal")
+surface_material_override/0 = ExtResource("6_metal")
 
 [node name="Siren" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 4.4, -2.2)
 mesh = SubResource("BoxMesh_9")
-surface_material_override/0 = ExtResource("8_accent_turqu")
+surface_material_override/0 = ExtResource("7_accent_turqu")
 
 [node name="Beacon" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 4.8, -2.2)
 mesh = SubResource("SphereMesh_10")
-surface_material_override/0 = ExtResource("9_signal_light")
+surface_material_override/0 = ExtResource("8_signal_light")
 
 [node name="TowerSolar" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 0.819152, -0.573576, 0, 0.573576, 0.819152, 1.8, 3.6, -1.85)
 mesh = SubResource("BoxMesh_11")
-surface_material_override/0 = ExtResource("10_solar_panel")
+surface_material_override/0 = ExtResource("9_solar_panel")

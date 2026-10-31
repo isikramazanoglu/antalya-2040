@@ -8,12 +8,7 @@
 [ext_resource type="ShaderMaterial" path="res://assets/materials/sea.tres" id="6_sea"]
 [ext_resource type="StandardMaterial3D" path="res://assets/materials/ground.tres" id="7_ground"]
 [ext_resource type="StandardMaterial3D" path="res://assets/materials/sand.tres" id="8_sand"]
-[ext_resource type="StandardMaterial3D" path="res://assets/materials/grass.tres" id="9_grass"]
-[ext_resource type="StandardMaterial3D" path="res://assets/materials/canopy_olive.tres" id="10_canopy_olive"]
-[ext_resource type="StandardMaterial3D" path="res://assets/materials/hill_green.tres" id="11_hill_green"]
-[ext_resource type="ShaderMaterial" path="res://assets/materials/foliage_olive.tres" id="12_foliage_oliv"]
-[ext_resource type="ShaderMaterial" path="res://assets/materials/foliage_cypress.tres" id="13_foliage_cypr"]
-[ext_resource type="ShaderMaterial" path="res://assets/materials/foliage_palm.tres" id="14_foliage_palm"]
+[ext_resource type="PackedScene" path="res://scenes/world/Reservoir.tscn" id="9_Reservoir"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.3, 0.55, 0.82, 1)
@@ -194,6 +189,9 @@ plot_id = &"C02"
 plot_kind = &"coastal"
 size = 6.0
 
+[node name="Reservoir" parent="." instance=ExtResource("9_Reservoir")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -40)
+
 [node name="Decor" type="Node3D" parent="."]
 script = ExtResource("5_city_decor")
 
@@ -201,4 +199,3 @@ script = ExtResource("5_city_decor")
 world_environment = NodePath("../WorldEnvironment")
 sun = NodePath("../Sun")
 sea = NodePath("../Sea")
-dry_materials = Array[Material]([ExtResource("7_ground"), ExtResource("9_grass"), ExtResource("10_canopy_olive"), ExtResource("11_hill_green"), ExtResource("12_foliage_oliv"), ExtResource("13_foliage_cypr"), ExtResource("14_foliage_palm")])

@@ -1,53 +1,36 @@
 class_name DisasterFX
 extends Node3D
-## Sahip: A. Kriz görselleri (mimari §5):
-## sıcak = güneş ve sis sıcak tona döner + ısı pusu, kuraklık = zemin ve bitki örtüsü sararır + toz sisi,
-## kıyı taşkını = deniz ve kıyı şeridinde su yükselir + fırtına ışığı + yağmur.
-## CityWorld: crisis_started → play(), crisis_resolved → stop(). Şiddet (0..1) etkinin büyüklüğünü ölçekler.
+## Sahip: A. Kriz görsellerinin yöneticisi (mimari §2.3, §5). Prompt 7B'deki CityEffectManager görevi.
+## Her kriz görseli ayrı bir CrisisEffect alt node'udur (sıcak, kuraklık, taşkın); bu node olay kimliğini
+## doğru efekte yönlendirir, aşamaya göre seviyeyi ayarlar, atmosferi (güneş, gök, sis, renk) tüm
+## efektlerin katkısından taban değerlere göre yeniden hesaplar ve sahne kapanınca her şeyi geri yükler.
+## Ekonomi veya kriz hesabı yapmaz, GameState'e yazmaz.
+##
+## CityWorld bağlantısı:
+## - crisis_stage_changed (sözleşme v1.5) → set_stage(): warning / preparation / active / resolved / ended
+## - crisis_started / crisis_resolved → play() / stop() (aşama sinyali gelmeyen durumlar, ör. CitySandbox)
 
-const HEAT_SUN := Color(1.0, 0.7, 0.42)
-const HEAT_FOG := Color(1.0, 0.72, 0.48)
-const DUST_FOG := Color(0.86, 0.74, 0.5)
-const STORM_FOG := Color(0.45, 0.5, 0.55)
+## Aşamaya göre görsel seviye: uyarıda hafif belirti, hazırlıkta biraz daha, krizde tam, sonra toparlanma.
+const STAGE_LEVELS := {&"warning": 0.15, &"preparation": 0.3, &"active": 1.0, &"resolved": 0.35, &"ended": 0.0}
+const RISK_TO_VISUAL := {&"heat": &"heat_haze", &"drought": &"drought_dust", &"coastal_flood": &"storm_surge"}
 
 @export var world_environment: WorldEnvironment
 @export var sun: DirectionalLight3D
 @export var sea: MeshInstance3D
-## Kuraklıkta sararan ortak materyaller; sahne kapanınca asıl renklerine döner.
-## StandardMaterial3D'de albedo_color, ShaderMaterial'da (foliage) `albedo` parametresi değişir.
-@export var dry_materials: Array[Material] = []
-@export var dry_color := Color(0.8, 0.66, 0.36)
-## Şiddet 1 iken denizin yükselmesi (metre).
-@export var max_sea_rise := 0.45
-## Şiddet 1 iken kıyı şeridindeki taşkın suyunun zeminden yüksekliği (metre).
-@export var max_flood_height := 0.35
 @export var fade_in_time := 2.5
 @export var fade_out_time := 3.0
-## Kriz çözüldükten sonra efektin bir süre daha görünmesi.
+## crisis_resolved'dan (aşama sinyali yokken) sonra efektin bir süre daha görünmesi.
 @export var fade_out_delay := 1.5
 
-@onready var _rain: GPUParticles3D = $Rain
-@onready var _flood: MeshInstance3D = $FloodWater
-@onready var _haze_layer: CanvasLayer = $HeatHaze
-@onready var _haze: ColorRect = $HeatHaze/Haze
-
 var _env: Environment
-var _sea_material: ShaderMaterial
 var _base := {}
-var _dry_base := {}
-var _flood_base_y := 0.0
-var _risk_type: StringName = &""
-var _severity := 0.0
-var _level := 0.0
-var _tween: Tween
+var _effects := {}  # visual_effect_id -> CrisisEffect
 
 
 func _ready() -> void:
 	# Sahnenin alt kaynakları örnekler arasında paylaşılır; değiştirdiklerimizin kopyasıyla çalışırız.
 	_env = world_environment.environment.duplicate()
 	world_environment.environment = _env
-	_sea_material = (sea.material_override as ShaderMaterial).duplicate()
-	sea.material_override = _sea_material
 	_base = {
 		"sun_color": sun.light_color,
 		"sun_energy": sun.light_energy,
@@ -59,92 +42,108 @@ func _ready() -> void:
 		"adjustment_enabled": _env.adjustment_enabled,
 		"saturation": _env.adjustment_saturation,
 		"contrast": _env.adjustment_contrast,
-		"sea_y": sea.position.y,
-		"wave_height": _sea_material.get_shader_parameter("wave_height"),
 	}
-	for material in dry_materials:
-		_dry_base[material] = _get_albedo(material)
-	_flood_base_y = _flood.position.y
-	_apply(0.0)
+	for child in get_children():
+		if child is CrisisEffect:
+			_effects[child.visual_effect_id] = child
+			child.setup(self)
+	refresh()
 
 
 func _exit_tree() -> void:
-	for material in _dry_base:
-		_set_albedo(material, _dry_base[material])
+	for effect in _effects.values():
+		effect.restore()
 
 
+## Sözleşme §5.6. Bilinmeyen görsel kimliğinde false döner ve uyarı yazar.
+func set_stage(stage: StringName, info: Dictionary) -> bool:
+	var effect: CrisisEffect = _effects.get(info.get("visual_effect_id", &""))
+	if effect == null or not STAGE_LEVELS.has(stage):
+		push_warning("DisasterFX: bilinmeyen kriz görseli/aşaması: %s / %s" % [info.get("visual_effect_id"), stage])
+		return false
+	effect.severity = clampf(info.get("severity", effect.severity), 0.0, 1.0)
+	if info.has("affected_plot_kinds"):
+		effect.affected_plot_kinds = info.affected_plot_kinds.duplicate()
+	var target: float = STAGE_LEVELS[stage]
+	effect.rebuild_markers()
+	effect.animate_to(target, fade_in_time if target > effect.level else fade_out_time)
+	return true
+
+
+## Aşama sinyali olmadan krizi doğrudan başlatır (sözleşme §3.3 crisis_started).
 func play(risk_type: StringName, severity: float) -> void:
-	if risk_type != _risk_type:
-		_apply(0.0)
-	_risk_type = risk_type
-	_severity = clampf(severity, 0.0, 1.0)
-	_animate_to(1.0, fade_in_time, 0.0)
+	var effect := get_effect_for_risk(risk_type)
+	if effect == null:
+		push_warning("DisasterFX: '%s' için görsel yok" % risk_type)
+		return
+	effect.severity = clampf(severity, 0.0, 1.0)
+	effect.rebuild_markers()
+	effect.animate_to(1.0, fade_in_time)
 
 
+## Açık bütün efektleri kısa bir gecikmeyle söndürür.
 func stop() -> void:
-	if _risk_type != &"":
-		_animate_to(0.0, fade_out_time, fade_out_delay)
+	for effect in _effects.values():
+		if effect.is_active():
+			effect.animate_to(0.0, fade_out_time, fade_out_delay)
 
 
+func get_effect(visual_effect_id: StringName) -> CrisisEffect:
+	return _effects.get(visual_effect_id)
+
+
+func get_effect_for_risk(risk_type: StringName) -> CrisisEffect:
+	return _effects.get(RISK_TO_VISUAL.get(risk_type, &""))
+
+
+## En güçlü açık efektin risk_type'ı; hiçbiri açık değilse &"".
 func current_risk() -> StringName:
-	return _risk_type
+	var best: CrisisEffect = null
+	for effect in _effects.values():
+		if effect.is_active() and (best == null or effect.level > best.level):
+			best = effect
+	return best.risk_type if best else &""
 
 
-func _animate_to(target: float, time: float, delay: float) -> void:
-	if _tween:
-		_tween.kill()
-	_tween = create_tween()
-	if delay > 0.0:
-		_tween.tween_interval(delay)
-	_tween.tween_method(_apply, _level, target, time).set_trans(Tween.TRANS_SINE)
-	if target == 0.0:
-		_tween.tween_callback(func(): _risk_type = &"")
+## Yeni bina kurulunca koruyucu bina hareleri güncellenir.
+func refresh_protection() -> void:
+	for effect in _effects.values():
+		effect.rebuild_markers()
+	refresh()
 
 
-## level: 0 = efekt yok, 1 = tam efekt. Her şey taban değerlerden hesaplanır, birikme olmaz.
-func _apply(level: float) -> void:
-	_level = level
-	var strength := level * lerpf(0.55, 1.0, _severity)
-	var heat := strength if _risk_type == &"heat" else 0.0
-	var dry := strength if _risk_type == &"drought" else 0.0
-	var storm := level if _risk_type == &"coastal_flood" else 0.0
-	var rise := storm * lerpf(0.5, 1.0, _severity)
-
-	sun.light_color = (_base.sun_color as Color).lerp(HEAT_SUN, heat * 0.65 + dry * 0.35)
-	sun.light_energy = _base.sun_energy * (1.0 + 0.3 * heat + 0.1 * dry - 0.6 * storm)
-	_env.background_energy_multiplier = _base.sky_energy * (1.0 - 0.45 * storm)
-	_env.ambient_light_energy = _base.ambient_energy * (1.0 - 0.3 * storm)
-
-	var fog_amount := maxf(heat, maxf(dry, storm))
-	_env.fog_enabled = _base.fog_enabled or fog_amount > 0.01
-	_env.fog_light_color = (_base.fog_color as Color).lerp(HEAT_FOG, heat).lerp(DUST_FOG, dry).lerp(STORM_FOG, storm)
-	_env.fog_density = _base.fog_density + 0.003 * heat + 0.0035 * dry + 0.004 * storm
-	_env.adjustment_enabled = _base.adjustment_enabled or fog_amount > 0.01
-	_env.adjustment_saturation = _base.saturation * (1.0 + 0.15 * heat - 0.25 * dry - 0.3 * storm)
-	_env.adjustment_contrast = _base.contrast * (1.0 + 0.05 * heat)
-
-	for material in _dry_base:
-		_set_albedo(material, (_dry_base[material] as Color).lerp(dry_color, dry))
-
-	_haze_layer.visible = heat > 0.01
-	(_haze.material as ShaderMaterial).set_shader_parameter("strength", heat)
-
-	sea.position.y = _base.sea_y + max_sea_rise * rise
-	_sea_material.set_shader_parameter("wave_height", _base.wave_height * (1.0 + 3.0 * storm))
-	_flood.visible = rise > 0.01
-	_flood.position.y = _flood_base_y + max_flood_height * rise
-	_rain.emitting = storm > 0.05
-	_rain.amount_ratio = storm
+func get_city_plots() -> Array[BuildPlot]:
+	var city := get_parent()
+	if city and city.has_method("get_plots"):
+		return city.get_plots()
+	return []
 
 
-func _get_albedo(material: Material) -> Color:
-	if material is ShaderMaterial:
-		return material.get_shader_parameter("albedo")
-	return (material as StandardMaterial3D).albedo_color
-
-
-func _set_albedo(material: Material, color: Color) -> void:
-	if material is ShaderMaterial:
-		material.set_shader_parameter("albedo", color)
-	else:
-		(material as StandardMaterial3D).albedo_color = color
+## Atmosferi taban değerlerden ve tüm efektlerin katkısından yeniden kurar; birikme olmaz.
+func refresh() -> void:
+	var a := {
+		"sun_color": _base.sun_color,
+		"sun_energy": _base.sun_energy,
+		"sky_energy": _base.sky_energy,
+		"ambient_energy": _base.ambient_energy,
+		"fog_color": _base.fog_color,
+		"fog_density": _base.fog_density,
+		"saturation": _base.saturation,
+		"contrast": _base.contrast,
+		"weight": 0.0,
+	}
+	for effect in _effects.values():
+		if effect.is_active():
+			effect.contribute(a)
+	sun.light_color = a.sun_color
+	sun.light_energy = a.sun_energy
+	_env.background_energy_multiplier = a.sky_energy
+	_env.ambient_light_energy = a.ambient_energy
+	_env.fog_enabled = _base.fog_enabled or a.weight > 0.01
+	_env.fog_light_color = a.fog_color
+	_env.fog_density = a.fog_density
+	_env.adjustment_enabled = _base.adjustment_enabled or a.weight > 0.01
+	_env.adjustment_saturation = a.saturation
+	_env.adjustment_contrast = a.contrast
+	for effect in _effects.values():
+		effect.apply_local()

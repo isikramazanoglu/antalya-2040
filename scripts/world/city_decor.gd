@@ -1,7 +1,7 @@
 @tool
 extends Node3D
 ## Sahip: A. Akdeniz dekoru (mimari §2.3 Decor): yollar, belediye meydanı ve kordon meydanı, mevcut evler,
-## zeytinlik, servi ve palmiyeler, marina (iskele, fener, dalgakıran, tekneler), plaj şemsiyeleri,
+## zeytinlik (rezervuar çevresi boş), servi ve palmiyeler, marina (iskele, fener, dalgakıran, tekneler), plaj şemsiyeleri,
 ## arkada dağ silüeti ve caddede dolaşan birkaç araç.
 ## Sahneye kaydedilmez: her açılışta aynı seed ile kodla kurulur (editörde de görünür).
 ## Aynı mesh + materyal çiftleri tek bir MultiMeshInstance3D'de toplanır (az draw call).
@@ -13,7 +13,7 @@ const M_STONE := preload("res://assets/materials/stone.tres")
 const M_CONCRETE := preload("res://assets/materials/concrete.tres")
 const M_ASPHALT := preload("res://assets/materials/asphalt.tres")
 const M_MARKING := preload("res://assets/materials/road_marking.tres")
-const M_GRASS := preload("res://assets/materials/grass.tres")
+const M_FIELD := preload("res://assets/materials/field_grass.tres")
 const M_OLIVE := preload("res://assets/materials/foliage_olive.tres")
 const M_CYPRESS := preload("res://assets/materials/foliage_cypress.tres")
 const M_PALM := preload("res://assets/materials/foliage_palm.tres")
@@ -142,6 +142,9 @@ func _collect_blocked() -> void:
 	_blocked.append(PIER)
 	_blocked.append(TOWN_SQUARE.grow(0.5))
 	_blocked.append(COAST_SQUARE)
+	var reservoir := get_parent().get_node_or_null("Reservoir")
+	if reservoir and reservoir.get("footprint") != null:
+		_blocked.append((reservoir.get("footprint") as Rect2).grow(1.5))
 
 
 func _is_free(area: Rect2) -> bool:
@@ -191,7 +194,7 @@ func _flat(rect: Rect2, top: float, thickness: float, material: Material) -> voi
 # --- Zemin: yollar, kordon, tarlalar ---
 
 func _build_ground_cover() -> void:
-	_flat(FIELDS, 0.015, 0.03, M_GRASS)
+	_flat(FIELDS, 0.015, 0.03, M_FIELD)
 	for road in ROADS_NS:
 		_flat(road, 0.035, 0.05, M_ASPHALT)
 	for road in ROADS_EW:
@@ -302,7 +305,7 @@ func _build_trees() -> void:
 	while z < ORCHARD.end.y:
 		var x := ORCHARD.position.x + 2.0
 		while x < ORCHARD.end.x:
-			if _rng.randf() < 0.55:
+			if _rng.randf() < 0.55 and _is_free(Rect2(x - 1.0, z - 1.0, 2.0, 2.0)):
 				_olive(x + _rng.randf_range(-1.0, 1.0), z + _rng.randf_range(-1.0, 1.0), _rng.randf_range(0.8, 1.2))
 			x += 4.2
 		z += 4.2

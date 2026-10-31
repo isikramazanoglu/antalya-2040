@@ -1,0 +1,44 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://assets/shaders/water.gdshader" id="1_water"]
+
+[sub_resource type="FastNoiseLite" id="Noise_a"]
+seed = 11
+frequency = 0.012
+
+[sub_resource type="NoiseTexture2D" id="Tex_a"]
+width = 512
+height = 512
+seamless = true
+as_normal_map = true
+bump_strength = 6.0
+noise = SubResource("Noise_a")
+
+[sub_resource type="FastNoiseLite" id="Noise_b"]
+seed = 77
+frequency = 0.02
+
+[sub_resource type="NoiseTexture2D" id="Tex_b"]
+width = 512
+height = 512
+seamless = true
+as_normal_map = true
+bump_strength = 6.0
+noise = SubResource("Noise_b")
+
+[resource]
+resource_name = "reservoir_water"
+render_priority = 0
+shader = ExtResource("1_water")
+shader_parameter/shallow_color = Color(0.3, 0.72, 0.74, 1)
+shader_parameter/deep_color = Color(0.02, 0.33, 0.47, 1)
+shader_parameter/foam_color = Color(0.96, 0.98, 1, 1)
+shader_parameter/depth_fade = 1.2
+shader_parameter/foam_width = 0.25
+shader_parameter/wave_height = 0.02
+shader_parameter/wave_speed = 0.6
+shader_parameter/roughness_value = 0.06
+shader_parameter/normal_scale = 0.05
+shader_parameter/min_alpha = 0.7
+shader_parameter/normal_a = SubResource("Tex_a")
+shader_parameter/normal_b = SubResource("Tex_b")

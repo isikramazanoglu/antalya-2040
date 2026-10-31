@@ -8,8 +8,8 @@ uniform vec4 tint : source_color = vec4(1.0, 0.62, 0.32, 1.0);
 
 void fragment() {
 	vec2 uv = SCREEN_UV;
-	// Pus yere yakın (ekranın alt kısmı) daha güçlü.
-	float mask = smoothstep(0.15, 1.0, uv.y);
+	// Pus uzak bölgelerde (ekranın üst kısmı) belirgin, yakında neredeyse yok; şehir okunur kalır.
+	float mask = 1.0 - smoothstep(0.05, 0.6, uv.y);
 	float wave = sin(uv.y * 140.0 + TIME * 5.0) * cos(uv.x * 90.0 + TIME * 3.5);
 	uv += vec2(wave * 0.0022, wave * 0.0012) * strength * mask;
 	vec3 c = texture(screen_tex, uv).rgb;

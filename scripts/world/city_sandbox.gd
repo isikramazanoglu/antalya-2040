@@ -1,7 +1,9 @@
 extends Node
 ## Sahip: A. CitySandbox (mimari §6): şehri Ekip B'nin kodu olmadan dener; B'nin sinyallerini taklit eder.
-## B = sıradaki binayı kur · N = kalanların hepsini kur · 1 = sıcak hava · 2 = kuraklık · 3 = kıyı taşkını
-## R = krizi bitir · P = fazı build / report arasında değiştir. Seçim sinyalleri konsola yazılır.
+## B = sıradaki binayı kur · N = kalanların hepsini kur · P = fazı build / report arasında değiştir
+## 1 / 2 / 3 = sıcak hava / kuraklık / kıyı taşkını: her basış krizi bir sonraki aşamaya geçirir
+##   (uyarı → hazırlık → kriz → çözüldü → bitti), B'nin TurnManager'ı ile aynı sırada sinyal yayar.
+## R = açık bütün krizleri bitir. Seçim sinyalleri konsola yazılır.
 
 ## Her bina sözleşme §8'de izinli bir arsaya; ilk dördü demo senaryosundaki yerler.
 const BUILD_ORDER: Array = [
@@ -10,16 +12,22 @@ const BUILD_ORDER: Array = [
 	[&"O03", &"urban_farming"], [&"U05", &"food_rescue"], [&"O04", &"recycling_compost"],
 	[&"U06", &"transit_hub"], [&"C02", &"coastal_restoration"],
 ]
+## Sözleşme §5.6 info alanları; değerler data/events/*.tres ile aynı.
 const CRISES := {
-	KEY_1: [&"heatwave", &"heat"],
-	KEY_2: [&"drought", &"drought"],
-	KEY_3: [&"coastal_flood", &"coastal_flood"],
+	KEY_1: {"event_id": &"heatwave", "risk_type": &"heat", "visual_effect_id": &"heat_haze",
+			"affected_area": &"city", "affected_plot_kinds": [&"urban"]},
+	KEY_2: {"event_id": &"drought", "risk_type": &"drought", "visual_effect_id": &"drought_dust",
+			"affected_area": &"farmland", "affected_plot_kinds": [&"open"]},
+	KEY_3: {"event_id": &"coastal_flood", "risk_type": &"coastal_flood", "visual_effect_id": &"storm_surge",
+			"affected_area": &"coast", "affected_plot_kinds": [&"coastal"]},
 }
+const STAGES: Array[StringName] = [&"warning", &"preparation", &"active", &"resolved", &"ended"]
+const PROGRESS := {&"warning": 0.0, &"preparation": 0.25, &"active": 0.5, &"resolved": 0.75, &"ended": 1.0}
 const CRISIS_SEVERITY := 0.8
 
 var _next := 0
 var _phase: StringName = &"build"
-var _crisis_id: StringName = &""
+var _stage_index := {}  # event_id -> son yayılan aşamanın sırası
 
 
 func _ready() -> void:
@@ -37,12 +45,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_N:
 			build_all()
 		KEY_R:
-			resolve_crisis()
+			end_all_crises()
 		KEY_P:
 			set_phase(&"report" if _phase == &"build" else &"build")
 		_:
 			if CRISES.has(key.keycode):
-				start_crisis(CRISES[key.keycode][0], CRISES[key.keycode][1], CRISIS_SEVERITY)
+				advance_crisis(CRISES[key.keycode])
 
 
 func build_next() -> void:
@@ -58,25 +66,46 @@ func build_all() -> void:
 		build_next()
 
 
-func start_crisis(event_id: StringName, risk_type: StringName, severity: float) -> void:
-	_crisis_id = event_id
-	set_phase(&"crisis")
-	EventBus.crisis_started.emit(event_id, risk_type, severity)
+## Krizi bir sonraki aşamaya geçirir; son aşamadan sonra baştan başlar.
+func advance_crisis(crisis: Dictionary) -> void:
+	var index: int = (_stage_index.get(crisis.event_id, -1) + 1) % STAGES.size()
+	set_stage(crisis, STAGES[index])
 
 
-func resolve_crisis() -> void:
-	if _crisis_id == &"":
-		return
-	EventBus.crisis_resolved.emit({
-		"event_id": _crisis_id,
-		"response_id": &"sandbox",
-		"risk_type": &"",
-		"mitigation": 0.0,
-		"damage": {},
-		"summary_text": "CitySandbox",
-	})
-	_crisis_id = &""
-	set_phase(&"build")
+func set_stage(crisis: Dictionary, stage: StringName) -> void:
+	_stage_index[crisis.event_id] = STAGES.find(stage)
+	var info := {
+		"severity": CRISIS_SEVERITY,
+		"due_year": 2043,
+		"visual_effect_id": crisis.visual_effect_id,
+		"affected_area": crisis.affected_area,
+		"affected_plot_kinds": crisis.affected_plot_kinds.duplicate(),
+		"progress": PROGRESS[stage],
+	}
+	print("[city] crisis_stage_changed ", crisis.event_id, " ", stage)
+	# B'nin sırası: active → crisis_started, crisis_resolved → resolved.
+	if stage == &"active":
+		set_phase(&"crisis")
+		EventBus.crisis_stage_changed.emit(crisis.event_id, stage, info)
+		EventBus.crisis_started.emit(crisis.event_id, crisis.risk_type, CRISIS_SEVERITY)
+	elif stage == &"resolved":
+		EventBus.crisis_resolved.emit({
+			"event_id": crisis.event_id, "response_id": &"sandbox", "risk_type": crisis.risk_type,
+			"mitigation": 0.0, "damage": {}, "summary_text": "CitySandbox",
+		})
+		EventBus.crisis_stage_changed.emit(crisis.event_id, stage, info)
+		set_phase(&"build")
+	else:
+		EventBus.crisis_stage_changed.emit(crisis.event_id, stage, info)
+
+
+func end_all_crises() -> void:
+	for crisis in CRISES.values():
+		if _stage_index.has(crisis.event_id):
+			set_stage(crisis, &"ended")
+			_stage_index.erase(crisis.event_id)
+	if _phase != &"build":
+		set_phase(&"build")
 
 
 func set_phase(phase: StringName) -> void:
