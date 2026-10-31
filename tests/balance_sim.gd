@@ -8,7 +8,7 @@ const PLOTS := {&"urban": [&"U01", &"U02", &"U03", &"U04", &"U05", &"U06", &"U07
 var _bus: Node
 var _gs: Node
 var _cat: Node
-var _strategies := ["hiçbir şey", "en ucuz", "koruyucu", "emisyon", "karma"]
+var _strategies := ["hiçbir şey", "en ucuz", "koruyucu", "emisyon", "karma", "büyüme"]
 var _i := 0
 var _frame := 0
 
@@ -66,6 +66,8 @@ func _play(strategy: String) -> void:
 			for def in defs:
 				if def.cost > _gs.stats.credits or _gs.plots.values().has(def.id):
 					continue
+				if strategy == "büyüme" and def.id != &"efficient_housing":
+					continue  # Prompt 10C senaryo B: yalnız büyüme, çevresel yatırım yok
 				for kind in def.allowed_plot_kinds:
 					var free: Array = PLOTS[kind].filter(func(p): return _gs.get_building_on(p) == &"")
 					if free.size() > 0:
@@ -80,5 +82,9 @@ func _play(strategy: String) -> void:
 	print("%-11s puan %3d %-16s | kredi %5d nüfus %4d su %3d enerji %3d yaşam %3d eko %3d emisyon %5.1f | bina %2d | %d kriz, kredi kaybı %d | görev %d/%d" % [
 		strategy, summary.score, summary.grade, s.credits, s.population, s.water_security, s.energy_security,
 		s.quality_of_life, s.ecosystem_health, s.emissions_total, built_count, crisis.count, crisis.credits, _gs.missions.values().count(&"done"), _cat.data.missions.size()])
+	var dims := PackedStringArray()
+	for d in summary.evaluation.dimensions:
+		dims.append("%s %d" % [d.title.substr(0, 4), d.score])
+	print("            alt puanlar: " + " · ".join(dims))
 	_bus.crisis_started.disconnect(on_crisis)
 	_bus.crisis_resolved.disconnect(on_resolved)

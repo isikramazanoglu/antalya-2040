@@ -106,7 +106,7 @@ antalya-2040/
 │   ├── synergies/<id>.tres        SynergyDefinition × 6
 │   └── cards/<id>.tres            InfoCard (bina, olay ve İklim Laboratuvarı kartları)
 │
-├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy, test_crises, test_investments, test_final), pencereli testler (test_menu, test_e2e_game, test_ui, test_integration, test_education), denge simülasyonu (balance_sim)
+├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy, test_crises, test_investments, test_final), pencereli testler (test_menu, test_e2e_game, test_ui, test_integration, test_education, test_playthrough), denge simülasyonu (balance_sim)
 │
 └── assets/
     ├── models/                    A     .glb modeller
@@ -427,7 +427,7 @@ Klasör taramak yerine katalog dizisi seçildi: dışa aktarılmış oyunda `.tr
 
 Windows Desktop preset, Godot 4.7.2 export template'leri ile. `export_presets.cfg` B'nin sahipliğindedir ve repoya eklenir. `scenes/dev/*` ve `tests/*` dışa aktarım filtresiyle hariç tutulur. Çıktı: `export/ANTALYA2040.exe` (PCK gömülü, tek dosya; `export/` git'e girmez).
 
-Komut satırından: `<godot> --headless --path . --export-release "Windows Desktop" export/ANTALYA2040.exe`
+Komut satırından: `<godot> --headless --path . --export-release "Windows Desktop" build/windows/ANTALYA2040.exe`. Teslim paketi: `build/ANTALYA2040_Windows_Demo.zip` (.exe + OKUBENI.txt). `build/` ve `export/` git dışında.
 
 ---
 
