@@ -3,7 +3,8 @@ extends Node
 ## B = sıradaki binayı kur · N = kalanların hepsini kur · P = fazı build / report arasında değiştir
 ## 1 / 2 / 3 = sıcak hava / kuraklık / kıyı taşkını: her basış krizi bir sonraki aşamaya geçirir
 ##   (uyarı → hazırlık → kriz → çözüldü → bitti), B'nin TurnManager'ı ile aynı sırada sinyal yayar.
-## R = açık bütün krizleri bitir. Seçim sinyalleri konsola yazılır.
+## R = açık bütün krizleri bitir · M = koruma oranı 0 / 0.4 / 0.8 (sözleşme v1.6 mitigation, bir sonraki aşamada).
+## Seçim sinyalleri konsola yazılır.
 
 ## Her bina sözleşme §8'de izinli bir arsaya; ilk dördü demo senaryosundaki yerler.
 const BUILD_ORDER: Array = [
@@ -24,10 +25,13 @@ const CRISES := {
 const STAGES: Array[StringName] = [&"warning", &"preparation", &"active", &"resolved", &"ended"]
 const PROGRESS := {&"warning": 0.0, &"preparation": 0.25, &"active": 0.5, &"resolved": 0.75, &"ended": 1.0}
 const CRISIS_SEVERITY := 0.8
+const MITIGATION_STEPS: Array[float] = [0.0, 0.4, 0.8]
 
 var _next := 0
 var _phase: StringName = &"build"
 var _stage_index := {}  # event_id -> son yayılan aşamanın sırası
+## Aşama bilgisine yazılan koruma oranı; gerçek oyunda Ekip B hesaplar.
+var mitigation := 0.0
 
 
 func _ready() -> void:
@@ -48,6 +52,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			end_all_crises()
 		KEY_P:
 			set_phase(&"report" if _phase == &"build" else &"build")
+		KEY_M:
+			mitigation = MITIGATION_STEPS[(MITIGATION_STEPS.find(mitigation) + 1) % MITIGATION_STEPS.size()]
+			print("[city] mitigation ", mitigation)
 		_:
 			if CRISES.has(key.keycode):
 				advance_crisis(CRISES[key.keycode])
@@ -81,6 +88,8 @@ func set_stage(crisis: Dictionary, stage: StringName) -> void:
 		"affected_area": crisis.affected_area,
 		"affected_plot_kinds": crisis.affected_plot_kinds.duplicate(),
 		"progress": PROGRESS[stage],
+		"mitigation": mitigation,
+		"advantages": [],
 	}
 	print("[city] crisis_stage_changed ", crisis.event_id, " ", stage)
 	# B'nin sırası: active → crisis_started, crisis_resolved → resolved.

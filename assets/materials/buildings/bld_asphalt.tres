@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "bld_asphalt"
+albedo_color = Color(0.27, 0.28, 0.3, 1)
+roughness = 0.9

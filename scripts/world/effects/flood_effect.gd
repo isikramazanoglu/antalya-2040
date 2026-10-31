@@ -48,7 +48,7 @@ func contribute(a: Dictionary) -> void:
 
 
 func apply_local() -> void:
-	var rise := level * lerpf(0.5, 1.0, severity)
+	var rise := level * lerpf(0.5, 1.0, severity) * damping()
 	_fx.sea.position.y = _sea_y + max_sea_rise * rise
 	_sea_material.set_shader_parameter("wave_height", _wave_height * (1.0 + 3.0 * level))
 	_flood.visible = rise > 0.01
