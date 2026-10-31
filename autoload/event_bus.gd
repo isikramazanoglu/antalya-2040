@@ -1,6 +1,6 @@
 extends Node
 ## ORTAK dosya. Sözleşme: docs/INTEGRATION_CONTRACT.md
-## Sürüm v1.3. Yalnızca sinyal bildirimleri. Değişken, fonksiyon, mantık eklenmez.
+## Sürüm v1.4 (v1.4 yalnızca ret nedeni ekledi, sinyal değişmedi). Yalnızca sinyal bildirimleri. Değişken, fonksiyon, mantık eklenmez.
 ## Değişiklik yalnızca sözleşme §11 süreciyle, yalnızca ekleme olarak.
 
 # Sinyaller başka script'lerden yayılır; bu dosyada kullanılmamaları normal.

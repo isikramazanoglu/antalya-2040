@@ -137,6 +137,8 @@ func _process(_d: float) -> bool:
 					and _hud_value("Ekosistem sağlığı") == str(roundi(gs.stats.ecosystem_health)) and _hud_value("Yaşam kalitesi") == str(roundi(gs.stats.quality_of_life)),
 					"8) park: ekosistem %d, yaşam %d; HUD aynı değerleri gösteriyor" % [gs.stats.ecosystem_health, gs.stats.quality_of_life])
 			_check(_plot("U01").get_building() != null, "9) park şehirde görünüyor")
+			_panel("CloseButton").pressed.emit()
+			_check(not _ui("BuildPanel").visible and not _plot("U01").get("_selected"), "14/v1.3) × ile kapatınca şehirdeki arsa vurgusu da kalktı (A bağlantısı)")
 			_click_plot("O02")
 		170:
 			_pick_card("Su depolama")
