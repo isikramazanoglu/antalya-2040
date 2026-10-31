@@ -9,7 +9,7 @@
 script = ExtResource("2_pf3u6")
 id = &"water_reuse"
 display_name = "Atık su geri kazanım tesisi"
-short_description = "Arıtılmış atık suyu park sulamasında ve sanayide yeniden kullanır."
+short_description = "Arıtılmış atık suyu sulama ve temizlik gibi içme dışı işlerde yeniden kullanır."
 category = &"water"
 cost = 350
 upkeep_per_year = 20
@@ -23,5 +23,5 @@ on_build_effects = {
 risk_reduction = {
 &"drought": 0.25
 }
-water_production = 15.0
+recycled_water_production = 15.0
 info_card = ExtResource("1_6heiu")

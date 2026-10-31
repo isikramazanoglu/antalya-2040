@@ -28,6 +28,8 @@ extends Resource
 @export var water_per_capita: float = 0.1
 ## Binalardan bağımsız mevcut su arzı (baraj, kuyu).
 @export var base_water_supply: float = 55.0
+## Su talebinin içme dışı (sulama, temizlik) kısmı: geri kazanılmış su en fazla bu kadarını karşılar.
+@export var non_potable_water_share: float = 0.3
 
 @export_group("İklim")
 ## 500 nüfus için sektör taban emisyonu (oyun birimi).

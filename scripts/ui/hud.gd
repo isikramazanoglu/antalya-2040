@@ -146,7 +146,9 @@ func _on_stats_changed(stats: Dictionary) -> void:
 			detail = "Üretim %d / tüketim %d · denge %+d · yenilenebilir %%%d" % [roundi(stats.renewable_energy), roundi(stats.energy_demand),
 					roundi(stats.renewable_energy - stats.energy_demand), roundi(stats.renewable_share * 100)]
 		elif r[0] == "water_security":
-			detail = "Su arzı %d / talep %d · denge %+d" % [roundi(stats.water_supply), roundi(stats.water_demand), roundi(stats.water_supply - stats.water_demand)]
+			detail = "Su arzı %d%s / talep %d · denge %+d" % [roundi(stats.water_supply),
+					" + %d geri kazanılmış" % roundi(stats.recycled_water_used) if stats.recycled_water_used > 0.0 else "", roundi(stats.water_demand),
+					roundi(stats.water_supply + stats.recycled_water_used - stats.water_demand)]
 		_set_card(r[0], stats[r[0]], str(roundi(stats[r[0]])), detail)
 
 	# Ekonomik durum: kasanın en ucuz yatırıma yetmesi ve son yılın net bakiyesi.

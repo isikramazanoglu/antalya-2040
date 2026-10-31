@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SynergyDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/synergy_definition.gd" id="1_q6tlw"]
+
+[resource]
+script = ExtResource("1_q6tlw")
+requires = Array[StringName]([&"food_rescue", &"recycling_compost"])
+id = &"syn_zero_food_waste"
+display_name = "Kombinasyon: Gıda kurtarma + kompost"
+short_description = "Yenilebilir gıda dağıtılır, kalanı kompostlanır; çöpe giden gıda azalır."
+category = &"synergy"
+emission_multipliers = {
+"waste": -0.1
+}

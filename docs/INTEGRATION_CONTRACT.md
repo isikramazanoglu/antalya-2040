@@ -4,7 +4,7 @@ Bu belge Ekip A (şehir ve 3D) ile Ekip B (simülasyon ve arayüz) arasındaki t
 İki taraf birbirinin koduna yalnızca burada yazan sinyaller, fonksiyonlar ve veri şekilleri üzerinden dokunur.
 Burada yazmayan bir şeye güvenen kod, sözleşme dışıdır.
 
-Sürüm: **v1.7** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
+Sürüm: **v1.8** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
 
 ---
 
@@ -128,7 +128,9 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
   "renewable_energy": float,
   "renewable_share": float,       # 0..1
   "water_demand": float,
-  "water_supply": float
+  "water_supply": float,          # içme suyu kalitesinde arz
+  "recycled_water": float,        # v1.8: geri kazanılmış su üretimi (içme suyu sayılmaz)
+  "recycled_water_used": float    # v1.8: bunun içme dışı talebi karşılayan kısmı
 }
 ```
 
@@ -325,6 +327,7 @@ MVP üçlüsü: `solar_plant`, `water_storage`, `green_park`.
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
 | v1.0 | 2026-10-30 | İlk sürüm. |
+| v1.8 | 2026-10-31 | Ekleme: `stats.recycled_water`, `stats.recycled_water_used`. A etkilenmez. Not: `GameState.built_definitions()` artık etkin kombinasyonları (`SynergyDefinition`) da döndürür; `advantages` listesinde yalnızca bina kimlikleri kalır. |
 | v1.7 | 2026-10-31 | Ekleme: `summary.start_stats` (final ekranında başlangıç ↔ final). Yalnızca B'nin YearReport'u kullanır. |
 | v1.6 | 2026-10-31 | Ekleme: `crisis_stage_changed` info'suna `mitigation` ve `advantages`. Ekip A talebi. |
 | v1.5 | 2026-10-31 | Ekleme: `crisis_stage_changed` sinyali (§5.6), `result` içine `severity` ve `assessment`. Mevcut kriz sinyalleri değişmedi; A etkilenmez. |

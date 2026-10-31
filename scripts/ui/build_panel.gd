@@ -101,6 +101,7 @@ func _refresh() -> void:
 		_selected = options[0]
 	for def in options:
 		%Cards.add_child(_make_card(def))
+	_fit_cards()
 	_show_detail(_selected)
 	_update_build_button(built_id)
 
@@ -145,8 +146,8 @@ func _make_card(def: BuildingDefinition) -> Button:
 	for k in def.allowed_plot_kinds:
 		kinds.append(UiText.PLOT_KIND_SHORT.get(k, str(k)))
 	var affordable: bool = GameState.stats.credits >= def.cost
-	var price := _label("%s kredi · gider %d/yıl · %s" % [UiText.thousands(def.cost), def.upkeep_per_year, ", ".join(kinds)], 14,
-			Color.WHITE if affordable else UiText.C_CRIT)
+	var price := _label("%s kredi · gider %d/yıl · %s · %s" % [UiText.thousands(def.cost), def.upkeep_per_year, ", ".join(kinds), UiText.CATEGORY_THEME.get(def.category, "")], 14,
+			Color.WHITE if affordable else UiText.C_CRIT, true)
 	text.add_child(price)
 	var chips := PackedStringArray()
 	for e in effects(def):
@@ -156,6 +157,14 @@ func _make_card(def: BuildingDefinition) -> Button:
 		card.tooltip_text = "Bütçe yetmiyor"
 		card.modulate.a = 0.6
 	return card
+
+
+## Kartlar Button olduğu için içeriğe göre büyümez; yerleşim bitince (genişlik belliyken) kaydırılmış metne göre boylanır.
+func _fit_cards() -> void:
+	await get_tree().process_frame
+	for card in %Cards.get_children():
+		if card is Button and card.get_child_count() > 0:
+			card.custom_minimum_size.y = maxf(112.0, card.get_child(0).get_combined_minimum_size().y + 16.0)
 
 
 func _label(text: String, size: int, color: Color, wrap := false) -> Label:
@@ -179,6 +188,8 @@ static func effects(def: BuildingDefinition) -> Array:
 		out.append(["Enerji talebi %+d" % def.energy_consumption, def.energy_consumption < 0.0])
 	if def.water_production > 0.0:
 		out.append(["Su arzı +%d" % def.water_production, true])
+	if def.recycled_water_production > 0.0:
+		out.append(["Geri kazanılmış su +%d (içme dışı)" % def.recycled_water_production, true])
 	if def.water_consumption != 0.0:
 		out.append(["Su talebi %+d" % def.water_consumption, def.water_consumption < 0.0])
 	for key in def.on_build_effects:
@@ -187,6 +198,9 @@ static func effects(def: BuildingDefinition) -> Array:
 	for sector in def.emission_multipliers:
 		var m: float = def.emission_multipliers[sector]
 		out.append(["%s emisyonu %+d%%" % [UiText.SECTOR_NAMES.get(sector, sector), roundi(m * 100)], m < 0.0])
+	for key in def.yearly_effects:
+		var y: float = def.yearly_effects[key]
+		out.append(["%s %s/yıl" % [UiText.STAT_NAMES.get(key, key), UiText.format_delta(y)], y > 0.0])
 	for risk in def.risk_reduction:
 		out.append(["%s hasarı -%d%%" % [UiText.RISK_NAMES.get(risk, risk), roundi(def.risk_reduction[risk] * 100)], true])
 	return out
@@ -209,6 +223,18 @@ func _show_detail(def: BuildingDefinition) -> void:
 	t += "\n"
 	for e in effects(def):
 		t += "[color=%s]%s %s[/color]\n" % [("#6bd185" if e[1] else "#ff8c73"), "+" if e[1] else "−", e[0]]
+	for part in def.components:
+		t += "[color=#4dd9d1]%s:[/color] %s\n" % [part, def.components[part]]
+	var built := GameState.plots.values()
+	for syn in Catalog.data.synergies:
+		if not syn.requires.has(def.id):
+			continue
+		var partners := syn.requires.filter(func(id): return id != def.id).map(func(id): return Catalog.get_building(id).display_name)
+		var active := syn.requires.all(func(id): return built.has(id))
+		var bonus := PackedStringArray()
+		for e in effects(syn):
+			bonus.append(e[0])
+		t += "[color=#%s]%s[/color] %s ile: %s\n" % [("6bd185" if active else "fad159"), "Kombinasyon etkin ·" if active else "Kombinasyon ·", " + ".join(partners), ", ".join(bonus)]
 	t += "[font_size=13][color=#b8c4c2]Değerler oyun dengeleme parametresidir, gerçek ölçüm değildir.[/color][/font_size]"
 	%DetailSummary.text = t
 	var body := card.body if card else ""

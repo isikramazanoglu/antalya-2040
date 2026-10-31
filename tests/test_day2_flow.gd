@@ -103,7 +103,11 @@ func _run() -> void:
 	var base := {"year": 2044, "water_security": 80.0, "quality_of_life": 50.0, "emissions_total": 84.0, "ecosystem_health": 60.0}
 	var r := MissionTracker.evaluate(missions, base, {})
 	_check(r.completed.has(&"water_75") and r.completed.has(&"emissions_85"), "su 80 ve emisyon 84 görevleri tamam")
-	_check(r.reward == 250, "ödül 100 + 150 = 250")
+	var expected_reward := 0
+	for m in missions:
+		if m.id in [&"water_75", &"emissions_85"]:
+			expected_reward += m.reward_credits
+	_check(r.reward == expected_reward, "ödül iki görevin ödüllerinin toplamı (%d)" % expected_reward)
 	_check(not r.completed.has(&"quality_70") and r.failed.is_empty(), "yaşam görevi sürüyor, kaçan yok")
 	base.year = 2045
 	base.water_security = 70.0

@@ -22,4 +22,8 @@ on_build_effects = {
 risk_reduction = {
 &"coastal_flood": 0.45
 }
+components = {
+"Erken uyarı ve koordinasyon": "Taşkın hasarı −%15; \"Erken uyarı ve koordinasyon merkezini çalıştır\" müdahalesini açar.",
+"Kıyı restorasyonu": "Ekosistem +12, taşkın hasarı −%30; \"Restore edilmiş kıyı ekosistemine güven\" müdahalesini açar."
+}
 info_card = ExtResource("1_uen2i")

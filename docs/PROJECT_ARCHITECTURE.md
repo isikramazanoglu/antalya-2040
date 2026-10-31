@@ -39,6 +39,7 @@ antalya-2040/
 │   │   ├── co2_scenario.gd
 │   │   ├── mission_definition.gd    (+ category, kind, required_buildings, info_card)
 │   │   ├── glossary_term.gd         Sözlük kavramı
+│   │   ├── synergy_definition.gd    Yatırım kombinasyonu (BuildingDefinition'dan türer)
 │   │   └── game_catalog.gd
 │   ├── sim/                       B
 │   │   ├── game_controller.gd     Oyuncu taleplerini karşılar, GameState'e tek yazan
@@ -100,9 +101,10 @@ antalya-2040/
 │   ├── events/<id>.tres           EventDefinition × 3+
 │   ├── missions/<id>.tres         MissionDefinition × 9 (4 hedef + 5 öğrenme)
 │   ├── glossary/<id>.tres         GlossaryTerm × 17
+│   ├── synergies/<id>.tres        SynergyDefinition × 6
 │   └── cards/<id>.tres            InfoCard (bina, olay ve İklim Laboratuvarı kartları)
 │
-├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy, test_crises), pencereli testler (test_menu, test_e2e_game, test_ui, test_integration, test_education), denge simülasyonu (balance_sim)
+├── tests/                         B     Headless testler (test_day1_flow, test_day2_flow, test_economy, test_crises, test_investments), pencereli testler (test_menu, test_e2e_game, test_ui, test_integration, test_education), denge simülasyonu (balance_sim)
 │
 └── assets/
     ├── models/                    A     .glb modeller
@@ -339,6 +341,8 @@ Hepsi `scripts/data/` altında, `class_name` ile, `extends Resource`. Alanlar `@
 | `emission_multipliers` | Dictionary | Sektör çarpanı: `{"energy": -0.30}` = enerji emisyonu %30 az |
 | `risk_reduction` | Dictionary | Kriz hasarını azaltma: `{&"drought": 0.30}`. Anahtar `StringName` (risk_type ile aynı tip) |
 | `energy_production`, `energy_consumption`, `water_production`, `water_consumption` | float | İsteğe bağlı kaynak akışları (oyun birimi/yıl); üretim yenilenebilir, negatif tüketim tasarruf |
+| `recycled_water_production` | float | Geri kazanılmış su (içme suyu sayılmaz) |
+| `components` | Dictionary | Tek yatırımdaki ayrı mekanikler, kartta gösterilir |
 | `info_card` | InfoCard | |
 
 ### EventDefinition
@@ -358,6 +362,8 @@ Hepsi `scripts/data/` altında, `class_name` ile, `extends Resource`. Alanlar `@
 | `vulnerability_stats` | Dictionary | Hassasiyet ağırlıkları `{"water_security": 1.0}` |
 | `visual_effect_id`, `affected_area`, `affected_plot_kinds` | StringName / Array | A'nın görselleri için (sözleşme v1.5) |
 | `energy_production`, `energy_consumption`, `water_production`, `water_consumption` | float | İsteğe bağlı kaynak akışları (oyun birimi/yıl); üretim yenilenebilir, negatif tüketim tasarruf |
+| `recycled_water_production` | float | Geri kazanılmış su (içme suyu sayılmaz) |
+| `components` | Dictionary | Tek yatırımdaki ayrı mekanikler, kartta gösterilir |
 | `info_card` | InfoCard | |
 
 ### CrisisResponse
@@ -383,6 +389,10 @@ Başlangıç değerleri (kredi, nüfus, göstergeler), `start_year`, `end_year`,
 ### GameCatalog
 
 `buildings: Array[BuildingDefinition]`, `events: Array[EventDefinition]`, `lab_cards: Array[InfoCard]`, `missions: Array[MissionDefinition]`, `balance: BalanceConfig`, `co2: Co2Scenario`.
+
+**Kombinasyon eklemek:** `data/synergies/<id>.tres` (SynergyDefinition: `requires` + etkiler) oluştur, `catalog.tres` → `synergies` dizisine ekle. `GameState.built_definitions()` onu otomatik dahil eder.
+
+**Veri doğrulaması:** `Catalog.validate()` eksik maliyet, sahne, arsa türü, bilgi kartı ve yinelenen kimliği listeler; oyun açılırken uyarı olarak yazılır.
 
 **Yeni bina eklemek:** `data/buildings/<id>.tres` oluştur, `catalog.tres` → `buildings` dizisine ekle, A `b_<id>.tscn` hazırlar ve `scene` alanına sürükler. Kod değişmez. Sözleşme §8'e satır eklenir.
 **Yeni kriz eklemek:** `data/events/<id>.tres` oluştur, `catalog.tres` → `events` dizisine ekle. Yeni `risk_type` gerekiyorsa sözleşme değişikliğidir (A'nın efekt yazması gerekir).

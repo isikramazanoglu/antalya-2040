@@ -32,18 +32,23 @@ static func compute_resources(population: int, buildings: Array[BuildingDefiniti
 	var water_demand := population * b.water_per_capita
 	var renewable := 0.0
 	var water_supply := b.base_water_supply
+	var recycled := 0.0
 	for def in buildings:
 		renewable += def.energy_production
 		energy_demand += def.energy_consumption
 		water_supply += def.water_production
 		water_demand += def.water_consumption
+		recycled += def.recycled_water_production
 	energy_demand = maxf(energy_demand, 0.0)
 	return {
 		"energy_demand": energy_demand,
 		"renewable_energy": renewable,
 		"renewable_share": clampf(renewable / energy_demand, 0.0, 1.0) if energy_demand > 0.0 else 0.0,
 		"water_demand": maxf(water_demand, 0.0),
-		"water_supply": water_supply,
+		"water_supply": water_supply,  # içme suyu kalitesinde arz
+		# v1.8: geri kazanılmış su ayrı; yalnızca içme dışı talebi (en çok non_potable_water_share) karşılar.
+		"recycled_water": recycled,
+		"recycled_water_used": minf(recycled, maxf(water_demand, 0.0) * b.non_potable_water_share),
 	}
 
 

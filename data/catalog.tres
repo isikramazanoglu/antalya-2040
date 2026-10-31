@@ -50,6 +50,13 @@
 [ext_resource type="Resource" path="res://data/missions/learn_cooler_city.tres" id="47_0rtos"]
 [ext_resource type="Resource" path="res://data/missions/learn_zero_waste.tres" id="48_ca5rl"]
 [ext_resource type="Resource" path="res://data/missions/learn_prepared.tres" id="49_2f5p7"]
+[ext_resource type="Script" path="res://scripts/data/synergy_definition.gd" id="51_li7eu"]
+[ext_resource type="Resource" path="res://data/synergies/syn_smart_energy.tres" id="52_6lk3i"]
+[ext_resource type="Resource" path="res://data/synergies/syn_water_loop.tres" id="53_r6own"]
+[ext_resource type="Resource" path="res://data/synergies/syn_cool_city.tres" id="54_xkmi7"]
+[ext_resource type="Resource" path="res://data/synergies/syn_soil_loop.tres" id="55_b8vgd"]
+[ext_resource type="Resource" path="res://data/synergies/syn_zero_food_waste.tres" id="56_dxta2"]
+[ext_resource type="Resource" path="res://data/synergies/syn_low_carbon_growth.tres" id="57_v70pv"]
 
 [resource]
 script = ExtResource("1_catalog")
@@ -58,5 +65,6 @@ events = Array[ExtResource("6_g3anq")]([ExtResource("17_7671r"), ExtResource("18
 lab_cards = Array[ExtResource("7_885by")]([ExtResource("21_vx4vr")])
 missions = Array[ExtResource("22_wvss8")]([ExtResource("23_0uqn3"), ExtResource("24_5q4dk"), ExtResource("25_l2ssu"), ExtResource("26_kruv5"), ExtResource("45_fmj7f"), ExtResource("46_hvkc2"), ExtResource("47_0rtos"), ExtResource("48_ca5rl"), ExtResource("49_2f5p7")])
 glossary = Array[ExtResource("20_hop4q")]([ExtResource("21_mh6wi"), ExtResource("22_t4alv"), ExtResource("23_nr6ma"), ExtResource("24_fm0ko"), ExtResource("25_jw1ee"), ExtResource("26_7lq7g"), ExtResource("27_li7eu"), ExtResource("28_6lk3i"), ExtResource("29_r6own"), ExtResource("30_xkmi7"), ExtResource("31_b8vgd"), ExtResource("32_dxta2"), ExtResource("33_v70pv"), ExtResource("34_ulwcb"), ExtResource("35_ok07u"), ExtResource("36_j7fk3"), ExtResource("37_kkrt3")])
+synergies = Array[ExtResource("51_li7eu")]([ExtResource("52_6lk3i"), ExtResource("53_r6own"), ExtResource("54_xkmi7"), ExtResource("55_b8vgd"), ExtResource("56_dxta2"), ExtResource("57_v70pv")])
 balance = ExtResource("2_balance")
 co2 = ExtResource("15_kruv5")

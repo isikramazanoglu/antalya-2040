@@ -50,7 +50,7 @@ const C_MUTED := Color(0.85, 0.88, 0.87, 0.7)
 const PLOT_KIND_SHORT := {&"urban": "kent", &"open": "açık alan", &"coastal": "kıyı"}
 const CATEGORY_THEME := {
 	&"energy": "Temiz enerji", &"water": "Su güvenliği", &"heat": "Aşırı sıcağa uyum", &"food": "Gıda ve döngüsel ekonomi",
-	&"waste": "Atık ve döngüsel ekonomi", &"transport": "Sürdürülebilir ulaşım", &"coast": "Kıyı ekosistemi ve uyum",
+	&"waste": "Atık ve döngüsel ekonomi", &"transport": "Sürdürülebilir ulaşım", &"coast": "Kıyı ekosistemi ve uyum", &"synergy": "Kombinasyon",
 }
 const SECTOR_NAMES := {"energy": "Enerji", "transport": "Ulaşım", "buildings": "Binalar", "waste": "Atık"}
 const RISK_NAMES := {"drought": "Kuraklık", "heat": "Aşırı sıcak", "coastal_flood": "Kıyı taşkını"}
