@@ -152,7 +152,8 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 ### Bilgi kartı kaynakları (B, 2026-10-31)
 - 16 kartın 14'üne kaynak eklendi: IEA (güneş, binalar, ulaşım), US EPA (ısı adası, su geri kazanımı, kompost/gıda atığı), WHO (sıcak ve sağlık), UNCCD (kuraklık), FAO (tarım suyu), NOAA GML (CO2). Her adres 2026-10-31'de açıldı; başlık ve içerik kartın konusuyla karşılaştırıldı.
 - Sıcak hava kartındaki "Akdeniz havzası en çok etkilenen bölgeler arasında" cümlesi çıkarıldı: WHO sayfasında yok, IPCC sayfaları otomatik erişime kapalı olduğu için doğrulanamadı.
-- Kaynaksız kalan 2 kart: `card_coastal_restoration`, `card_event_coastal_flood`. Önerilen kaynak IPCC SROCC (https://www.ipcc.ch/srocc/) ve Akdeniz için IPCC AR6 WGII CCP4; bir kişi tarayıcıda açıp doğrularsa eklenebilir. Kartlarda sayı yok.
+- İki kıyı kartına (`card_coastal_restoration`, `card_event_coastal_flood`) IPCC SROCC (2019) eklendi; sayfa otomatik erişime kapalı olduğu için B geliştiricisi tarayıcıda açıp başlığı doğruladı. Artık 16 kartın hepsi kaynaklı; kartlarda sayı yok.
+- Akdeniz cümlesi çıkarılmış durumda; geri eklemek için IPCC AR6 WGII CCP4 (https://www.ipcc.ch/report/ar6/wg2/chapter/ccp4/) tarayıcıda doğrulanmalı.
 
 ## Sözleşme değişiklik talepleri
 
