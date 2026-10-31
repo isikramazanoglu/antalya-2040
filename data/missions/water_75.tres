@@ -9,4 +9,4 @@ title = "Su güvenliğini 75'e çıkar"
 description = "Kurak yıllar gelmeden şehrin suyunu güvenceye al."
 stat = "water_security"
 target = 75.0
-reward_credits = 100
+reward_credits = 50

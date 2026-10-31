@@ -11,4 +11,4 @@ stat = "emissions_total"
 target = 85.0
 at_most = true
 deadline_year = 2048
-reward_credits = 150
+reward_credits = 50

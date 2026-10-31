@@ -10,4 +10,4 @@ description = "Gölge, yeşil alan ve iyi hizmetler şehri yaşanabilir kılar."
 stat = "quality_of_life"
 target = 70.0
 deadline_year = 2047
-reward_credits = 100
+reward_credits = 50

@@ -98,6 +98,23 @@ Hepsi `max_count = 1`. MVP üçlüsü: güneş (enerji/emisyon), su depolama (su
 
 Bütçe kontrolü: 13 yılda yaklaşık 2000–2800 kredi birikir; oyuncu 12 yatırımın hepsini alamaz, seçim yapmak zorunda kalır.
 
+## 5b. Yatırım kombinasyonları (Prompt 9A)
+
+İki yatırım birlikte kurulunca ek etki gelir. Kombinasyonlar `SynergyDefinition` (BuildingDefinition'dan türer) olarak `data/synergies/` altında tanımlıdır; `GameState.built_definitions()` etkin olanları binalarla aynı listede döndürür, böylece bonus tek yoldan bir kez uygulanır. Gideri ve maliyeti yoktur.
+
+| Kombinasyon | Gereken | Ek etki |
+|---|---|---|
+| Akıllı enerji | Güneş + kamu verimliliği | Enerji talebi −4 |
+| Su döngüsü | Su depolama + atık su geri kazanımı | Geri kazanılmış su +5, kuraklık hasarı −%10 |
+| Serin şehir | Yeşil park + serinleme merkezi | Sıcak hasarı −%10 |
+| Toprak döngüsü | Kent tarımı + kompost | Ekosistem +1/yıl, atık emisyonu −%5 |
+| Gıda israfı yok | Gıda kurtarma + kompost | Atık emisyonu −%10 |
+| Düşük karbonlu büyüme | Toplu taşıma + kamu verimliliği | Ulaşım −%5, binalar −%5 emisyon |
+
+**Geri kazanılmış su:** atık su geri kazanım tesisi 15 birim geri kazanılmış su üretir; içme suyu arzına eklenmez, yalnızca su talebinin içme dışı kısmını (en çok %30) karşılar.
+
+**Diğer 9A değişiklikleri:** kamu binalarında verimlilik sıcak hava hasarını %10 azaltır. Kıyı yatırımının iki bileşeni kartta ayrı gösterilir: restorasyon (ekosistem +12, taşkın −%30, "kıyı ekosistemine güven" müdahalesi) ve erken uyarı (taşkın −%15, "erken uyarı" müdahalesi).
+
 ## 6. Krizler
 
 | id | risk_type | En erken | Demo yılı (`scripted_year`) | Taban hasar |
@@ -163,10 +180,12 @@ Veri kuralı:
 
 | id | Görev | Son yıl | Ödül |
 |---|---|---|---|
-| `water_75` | Su güvenliğini 75'e çıkar | 2045 | 100 |
-| `quality_70` | Yaşam kalitesini 70'e çıkar | 2047 | 100 |
-| `emissions_85` | Yerel emisyonu 85'in altına indir | 2048 | 150 |
-| `ecosystem_65` | Ekosistem sağlığını 65'te tut | 2050 | 120 |
+| `water_75` | Su güvenliğini 75'e çıkar | 2045 | 50 |
+| `quality_70` | Yaşam kalitesini 70'e çıkar | 2047 | 50 |
+| `emissions_85` | Yerel emisyonu 85'in altına indir | 2048 | 50 |
+| `ecosystem_65` | Ekosistem sağlığını 65'te tut | 2050 | 50 |
+
+Hedef ödülleri Prompt 9A'da 100–150'den 50'ye indirildi: kombinasyonlarla birlikte yüksek ödüller ucuz binalardan başlayan stratejiyi "İklim Lideri"ne taşıyordu.
 - **İklim Laboratuvarı:** dört sekme (yerel emisyonlar, küresel CO2, yerel riskler, bilgi kartları).
 - **Grafikler:** yıllık geçmişten çizgi grafikler.
 
@@ -194,11 +213,13 @@ Kaynak kuralları:
 
 | Strateji | Puan | Not | Görev | Kriz kredi kaybı |
 |---|---|---|---|---|
-| Hiçbir şey yapma | 40 | Risk Altında | 0/4 | −500 |
-| En ucuzdan başla | 75 | Dayanıklı Şehir | 2/4 | −499 |
-| Önce koruma | 74 | Dayanıklı Şehir | 2/4 | −435 |
-| Yalnız emisyon | 66 | Gelişen Şehir | 1/4 | −475 |
-| Karma | 79 | Dayanıklı Şehir | 2/4 | −299 |
+| Hiçbir şey yapma | 38 | Risk Altında | 0/4 | −472 |
+| En ucuzdan başla | 78 | Dayanıklı Şehir | – | – |
+| Önce koruma | 78 | Dayanıklı Şehir | – | – |
+| Yalnız emisyon | 69 | Gelişen Şehir | – | – |
+| Karma | 79 | Dayanıklı Şehir | – | – |
+
+(Prompt 9A sonrası; görev sütunu artık 9 görev içerdiği için ayrıntı `tests/balance_sim.gd` çıktısındadır.)
 
 "İklim Lideri" (85+) hiçbir otomatik stratejiyle gelmiyor; bilinçli, dengeli oyun ister. Sayılar değişince simülasyon yeniden çalıştırılır.
 

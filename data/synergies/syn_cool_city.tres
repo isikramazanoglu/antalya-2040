@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SynergyDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/synergy_definition.gd" id="1_depew"]
+
+[resource]
+script = ExtResource("1_depew")
+requires = Array[StringName]([&"green_park", &"cooling_center"])
+id = &"syn_cool_city"
+display_name = "Kombinasyon: Park + serinleme merkezi"
+short_description = "Gölgeli parklar ve serinleme merkezi birlikte sıcakta halkı daha iyi korur."
+category = &"synergy"
+risk_reduction = {
+&"heat": 0.1
+}

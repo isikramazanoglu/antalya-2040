@@ -3,20 +3,20 @@
 Her ekip yalnızca kendi bölümündeki kutuları işaretler. Ortak bölümlere satır **eklenir**, var olan satır silinmez.
 İşaret: `[ ]` yapılmadı, `[~]` sürüyor, `[x]` bitti ve kendi dalında çalışıyor, `[D]` develop'a birleşti.
 
-Son güncelleme: 2026-10-30 · Aşama: **Gün 3, Ekip B işleri bitti; entegrasyon için Ekip A bekleniyor**
+Son güncelleme: 2026-10-31 · Aşama: **Gün 0–3 ve Prompt 2–9A tamam; kalan ortak işler: demo provası, orta seviye PC'de FPS, main + v1.0, .exe yayını**
 Repo: https://github.com/isikramazanoglu/antalya-2040 (gizli)
 
 ---
 
 ## Gün 0 · Kurulum (ikisi birlikte, 1–2 saat)
 
-- [~] İki bilgisayarda Godot 4.7.2 Stable Standard kurulu (Mac: 4.7.2.stable.official doğrulandı; ikinci bilgisayar bekliyor)
-- [~] GitHub reposu açıldı (gizli); ikinci kişi Collaborators'a eklenecek
+- [x] İki bilgisayarda Godot 4.7.2 Stable Standard kurulu (Mac ve Windows: 4.7.2.stable.official)
+- [x] GitHub reposu açıldı (gizli); iki kişi de yazıyor (A PR #2, #4, #7, #9, #12 açtı)
 - [x] `main`, `develop`, `feature/city-world`, `feature/simulation-ui` dalları açıldı ve gönderildi
 - [x] B: iskelet commit'i `develop`'a: `project.godot` (Forward+, autoload'lar, Input Map, fizik katman adları), `.gitignore`, `.gitattributes`, `event_bus.gd`, `scripts/data/*.gd` boş Resource sınıfları, boş `catalog.tres`, `Game.tscn`, `MainMenu.tscn`
 - [x] A: `CityWorld.tscn` kök node'u (boş zemin + kamera) iskelete eklendi, Game.tscn içinde açılıyor
-- [ ] İki bilgisayarda da `develop` çekildi, oyun açıldı, hata yok
-- [x] Windows export: Mac'te `export/ANTALYA2040.exe` üretildi (PCK gömülü, Game sahnesi ve 12 bina paketten yüklendi, dev/test hariç). Windows'ta çalıştırılması bekliyor.
+- [x] İki bilgisayarda da `develop` çekildi, oyun açıldı, hata yok (A, B'nin testlerini Windows'ta da çalıştırdı)
+- [x] Windows export: Mac'te `export/ANTALYA2040.exe` üretildi (PCK gömülü, Game sahnesi ve 12 bina paketten yüklendi, dev/test hariç). A Windows'ta da üretip çalıştırdı (entegrasyon günlüğü).
 
 ## Gün 1 · Oynanabilir prototip (3 yatırım)
 
@@ -162,12 +162,21 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - Öğrenme görevleri kredi vermez (denge: 10 kredi bile basit stratejileri 85 puana taşıdı). Krizler GameState.crisis_log'a kaydediliyor (Laboratuvar D ve Şehir bilgileri okur).
 - `tests/test_education.gd`: Prompt 8'in 20 testi (23 kontrol) 1280×720 ve 1920×1080'de TAMAM.
 
+### Prompt 9A notları (B, 2026-10-31) · 12 yatırım ve kombinasyonlar
+- 12 yatırımın hepsi zaten veri, sahne, küçük resim, bilgi kartı ve kaynakla çalışıyordu; ilk üçü dokunulmadan korundu.
+- Eklenen: 6 kombinasyon (SynergyDefinition, tek hesap yolu), geri kazanılmış suyun içme suyundan ayrılması (sözleşme v1.8), `Catalog.validate()`, kamu verimliliğine sıcak koruması, kıyı yatırımının iki bileşeni, BuildPanel kartında tema + kombinasyon durumu, Laboratuvar C'de kombinasyon listesi ve geri kazanılmış su.
+- Denge: kombinasyonlar ucuz-önce stratejisini 87'ye çıkardı; hedef ödülleri 50'ye indirildi → hiçbir otomatik strateji "İklim Lideri"ne ulaşmıyor (38/78/78/69/79), en fazla 10 bina.
+- Bilerek değişmeyen: arsa türleri urban/open/coastal (A'nın haritası, sözleşme §7), inşaat anlık (`construction_turns` yok), mevcut dosya adları.
+- Ekip A için yeni model gerekmiyor: 12 bina sahnesi mevcut (`scenes/buildings/b_<id>.tscn`); kombinasyonların görseli yok.
+- `tests/test_investments.gd`: 18 test sorusu (25 kontrol) TAMAM.
+
 ## Sözleşme değişiklik talepleri
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |
 |---|---|---|---|---|
 | 2026-10-31 | B | v1.5: `crisis_stage_changed` + `result.severity/assessment` (ekleme) | A'nın kullanması isteğe bağlı | Yapıldı |
 | 2026-10-31 | B | v1.4: ret nedenleri `scene_unavailable`, `unknown_plot` (ekleme) | B içi, A ret nedenlerini kullanmaz | Yapıldı |
+| 2026-10-31 | B | v1.8: `stats.recycled_water`, `recycled_water_used` (ekleme) | B içi | Yapıldı |
 | 2026-10-31 | B | v1.7: `summary.start_stats` (ekleme) | B içi | Yapıldı |
 | 2026-10-31 | A | v1.6: `crisis_stage_changed` info'suna `mitigation` (0..0.8, o risk için yatırımların koruma oranı) ve `advantages` (koruma sağlayan bina kimlikleri). Neden: Prompt 7B koruma düzeyini görselde B'nin değerinden almayı istiyor; şu an yalnızca `crisis_resolved` sonucunda var. | B onayladı | B ekledi (2026-10-31) |
 | 2026-10-31 | B (öneri) | v1.3: `plot_deselect_requested` (parametresiz). Yayan: B · BuildPanel (kapat düğmesi, Esc). Dinleyen: A · CityWorld → seçimi bırakır ve `plot_deselected` yayar. Neden: panel kapanınca arsa vurgusu kalıyor. | A onayladı (2026-10-31) | B ekledi (2026-10-31); A'nın CityWorld'de dinlemesi bekleniyor |

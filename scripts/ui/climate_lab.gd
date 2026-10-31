@@ -267,8 +267,9 @@ func _build_resources(page: VBoxContainer) -> void:
 			{"name": "Şebeke (fosil)", "color": Color(0.7, 0.7, 0.75), "values": e_grid}], years)
 	_chart_card(page, "Enerji üretimi ve tüketimi", "oyun birimi/yıl · %s · %s" % [range_text, TAG_SIM], ec,
 			"Şebeke, yenilenebilir üretimin karşılamadığı talebi kapatır.", "ResourceChart")
-	_card(page, _rich("[b]Su[/b]  %s\nSu arzı %d · su talebi %d · denge %s · su güvenliği %d/100\nKuraklık hazırlığı: yatırımlar kuraklık hasarını %%%d azaltır.\n[color=#b8c4c2]Su rezervi miktarı ve su verimliliği simülasyonda ayrı tutulmuyor; su güvenliği endeksi bunların yerine kullanılır.[/color]" % [
-			TAG_SIM, roundi(now.water_supply), roundi(now.water_demand), _delta_text(now.water_supply - now.water_demand, true), roundi(now.water_security),
+	_card(page, _rich("[b]Su[/b]  %s\nSu arzı %d · su talebi %d · denge %s · su güvenliği %d/100\nGeri kazanılmış su: %d üretim, %d kullanılıyor (yalnızca içme dışı talep; içme suyu sayılmaz)\nKuraklık hazırlığı: yatırımlar kuraklık hasarını %%%d azaltır.\n[color=#b8c4c2]Su rezervi miktarı ve su verimliliği simülasyonda ayrı tutulmuyor; su güvenliği endeksi bunların yerine kullanılır.[/color]" % [
+			TAG_SIM, roundi(now.water_supply), roundi(now.water_demand), _delta_text(now.water_supply + now.recycled_water_used - now.water_demand, true), roundi(now.water_security),
+			roundi(now.recycled_water), roundi(now.recycled_water_used),
 			roundi(ClimateSimulator.mitigation(GameState.built_definitions(), &"drought", Catalog.data.balance) * 100)]))
 	var wc := LineChart.new()
 	wc.set_data([{"name": "Su arzı", "color": Color(0.3, 0.85, 0.82), "values": w_sup}, {"name": "Su talebi", "color": Color(0.45, 0.72, 1.0), "values": w_dem}], years)
@@ -289,6 +290,14 @@ func _build_resources(page: VBoxContainer) -> void:
 	var start_waste: float = Catalog.data.balance.base_emissions.waste
 	_card(page, _rich("[b]Atık[/b]  %s\nAtık kaynaklı emisyon: %d (başlangıç %d)\nAtık azaltma oranı: %%%d (yatırımların atık sektörü çarpanı)\nKompost / geri dönüşüm / gıda kurtarma: %s\n[color=#b8c4c2]Toplam atık miktarı (ton) simülasyonda yok; yalnızca atık sektörünün emisyonu hesaplanır.[/color]" % [
 			TAG_SIM, roundi(now.emissions_by_sector.waste), roundi(start_waste), roundi(minf(waste_cut, 1.0) * 100), ", ".join(waste_built) if waste_built.size() > 0 else "henüz yok"]))
+
+	var syn_text := "[b]Yatırım kombinasyonları[/b]  %s\n" % TAG_SIM
+	var built_ids := GameState.plots.values()
+	for syn in Catalog.data.synergies:
+		var active := syn.requires.all(func(id): return built_ids.has(id))
+		var names := syn.requires.map(func(id): return Catalog.get_building(id).display_name)
+		syn_text += "[color=#%s]%s[/color] %s — %s\n" % [("6bd185" if active else "b8c4c2"), "Etkin" if active else "Etkin değil", " + ".join(names), syn.short_description]
+	_card(page, _rich(syn_text))
 
 	var built := GameState.built_definitions()
 	var green := built.filter(func(d): return d.id in [&"green_park", &"urban_farming"]).map(func(d): return d.display_name)

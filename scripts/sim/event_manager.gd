@@ -49,7 +49,8 @@ static func assess(def: EventDefinition, severity_value: float, stats: Dictionar
 		vulnerability += def.vulnerability_stats[key] * (50.0 - float(stats.get(key, 50.0))) / 100.0
 	var advantages := []
 	for building in buildings:
-		if building.risk_reduction.get(def.risk_type, 0.0) > 0.0:
+		# Sözleşme v1.6: advantages bina kimlikleridir; kombinasyonlar korumaya katılır ama listede yer almaz.
+		if building.risk_reduction.get(def.risk_type, 0.0) > 0.0 and not building is SynergyDefinition:
 			advantages.append(building.id)
 	return {
 		"hazard": 0.5 + severity_value,

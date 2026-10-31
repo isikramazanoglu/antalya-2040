@@ -10,4 +10,4 @@ description = "Kıyıyı ve yeşil alanları koru."
 stat = "ecosystem_health"
 target = 65.0
 deadline_year = 2050
-reward_credits = 120
+reward_credits = 50

@@ -8,5 +8,6 @@ extends Resource
 @export var lab_cards: Array[InfoCard] = []
 @export var missions: Array[MissionDefinition] = []
 @export var glossary: Array[GlossaryTerm] = []
+@export var synergies: Array[SynergyDefinition] = []
 @export var balance: BalanceConfig
 @export var co2: Co2Scenario

@@ -36,6 +36,8 @@ func reset() -> void:
 		"renewable_share": 0.0,
 		"water_demand": 0.0,
 		"water_supply": 0.0,
+		"recycled_water": 0.0,
+		"recycled_water_used": 0.0,
 	}
 	var total := 0.0
 	for value in b.base_emissions.values():
@@ -130,10 +132,15 @@ func remove_pending(warning: Dictionary) -> void:
 
 # --- Salt okunur yardımcılar ---
 
+## Kurulu binalar + etkin kombinasyonlar (SynergyDefinition). Simülatörler bu tek listeyi kullanır.
 func built_definitions() -> Array[BuildingDefinition]:
 	var result: Array[BuildingDefinition] = []
-	for building_id in plots.values():
+	var ids := plots.values()
+	for building_id in ids:
 		var def := Catalog.get_building(building_id)
 		if def:
 			result.append(def)
+	for syn in Catalog.data.synergies:
+		if syn.requires.all(func(id): return ids.has(id)):
+			result.append(syn)
 	return result

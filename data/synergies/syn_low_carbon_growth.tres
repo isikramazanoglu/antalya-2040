@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SynergyDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/synergy_definition.gd" id="1_2op1y"]
+
+[resource]
+script = ExtResource("1_2op1y")
+requires = Array[StringName]([&"transit_hub", &"public_efficiency"])
+id = &"syn_low_carbon_growth"
+display_name = "Kombinasyon: Toplu taşıma + kamu verimliliği"
+short_description = "Şehir büyürken ulaşım ve bina emisyonu birlikte frenlenir."
+category = &"synergy"
+emission_multipliers = {
+"buildings": -0.05,
+"transport": -0.05
+}
