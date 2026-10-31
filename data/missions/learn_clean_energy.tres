@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MissionDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_solar_plant.tres" id="1_gxwhn"]
+[ext_resource type="Script" path="res://scripts/data/mission_definition.gd" id="2_kkcb4"]
+
+[resource]
+script = ExtResource("2_kkcb4")
+id = &"learn_clean_energy"
+title = "Temiz enerjiye geçiş"
+description = "Bir güneş enerjisi tesisi kur. Öğrenme: yenilenebilir enerji ve elektrik üretimi."
+deadline_year = 2052
+category = &"learning"
+kind = &"build"
+required_buildings = Array[StringName]([&"solar_plant"])
+info_card = ExtResource("1_gxwhn")

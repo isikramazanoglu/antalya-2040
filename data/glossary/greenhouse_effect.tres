@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_hyplm"]
+
+[resource]
+script = ExtResource("1_hyplm")
+id = &"greenhouse_effect"
+title = "Sera etkisi"
+definition = "Sera gazlarının Dünya'dan yayılan ısının bir kısmını tutarak atmosferi ısıtması. İnsan faaliyetleri bu etkiyi güçlendirmektedir."
+example = "Güneşte bırakılan kapalı arabanın içinin ısınmasına benzetilir."
+game_link = "İklim Laboratuvarı'nın Küresel CO₂ bölümünde anlatılır."
+sources = Array[String](["NASA Science, Causes of climate change (web sayfası), https://science.nasa.gov/climate-change/causes/, erişim 2026-10-31"])

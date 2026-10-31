@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_87j6y"]
+
+[resource]
+script = ExtResource("1_87j6y")
+id = &"greenhouse_gases"
+title = "Sera gazları"
+definition = "Atmosferde ısıyı tutan gazlar. Karbondioksit, metan ve diazot monoksit başlıcalarıdır."
+example = "Çöplükte çürüyen gıda atığı metan çıkarır."
+game_link = "Yerel emisyon endeksi şehrin sera gazı salımını göreli olarak gösterir."
+sources = Array[String](["US EPA, Overview of Greenhouse Gases (web sayfası), https://www.epa.gov/ghgemissions/overview-greenhouse-gases, erişim 2026-10-31"])

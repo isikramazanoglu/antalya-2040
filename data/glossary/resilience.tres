@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_w8niv"]
+
+[resource]
+script = ExtResource("1_w8niv")
+id = &"resilience"
+title = "İklim dayanıklılığı"
+definition = "Bir şehrin iklim kaynaklı şoklara hazırlanma, onları atlatma ve toparlanma kapasitesi."
+example = "Önceden kurulmuş su deposu sayesinde kuraklığı az kayıpla geçirmek."
+game_link = "D bölümünde her risk için hazırlık kapasitesi gösterilir."
+sources = Array[String](["NASA Science, Mitigation and Adaptation (web sayfası), https://science.nasa.gov/climate-change/adaptation-mitigation/, erişim 2026-10-31"])

@@ -92,6 +92,10 @@ func set_mission_state(mission_id: StringName, state: StringName) -> void:
 	GameState.set_mission_state(mission_id, state)
 
 
+func log_crisis(result: Dictionary) -> void:
+	GameState.log_crisis(result)
+
+
 func add_pending(warning: Dictionary) -> void:
 	GameState.add_pending(warning)
 

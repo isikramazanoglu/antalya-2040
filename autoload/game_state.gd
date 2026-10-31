@@ -7,6 +7,7 @@ var plots: Dictionary = {}  # plot_id (StringName) -> building_id (StringName)
 var pending_crises: Array = []  # sözleşme §5.2 warning sözlükleri
 var history: Array = []  # her yıl sonunun stats kopyası
 var missions: Dictionary = {}  # mission id -> &"active" | &"done" | &"failed"
+var crisis_log: Array = []  # yaşanan krizlerin sonuçları (+ "year"), İklim Laboratuvarı ve şehir bilgileri için
 var phase: StringName = &"build"
 var rng_seed: int = 0
 
@@ -44,6 +45,7 @@ func reset() -> void:
 	pending_crises.clear()
 	history.clear()
 	missions.clear()
+	crisis_log.clear()
 	phase = &"build"
 	rng_seed = randi()
 	EventBus.stats_changed.emit(get_stats())
@@ -112,6 +114,10 @@ func set_resources(resources: Dictionary) -> void:
 
 func set_mission_state(mission_id: StringName, state: StringName) -> void:
 	missions[mission_id] = state
+
+
+func log_crisis(result: Dictionary) -> void:
+	crisis_log.append(result)
 
 
 func add_pending(warning: Dictionary) -> void:

@@ -12,3 +12,10 @@ extends Resource
 @export var at_most := false
 @export var deadline_year: int = 2045
 @export var reward_credits: int = 0
+## Prompt 8: &"goal" (HUD'da görünen gösterge hedefi) veya &"learning" (öğrenme görevi, İklim Laboratuvarı'nda).
+@export var category: StringName = &"goal"
+## &"stat" (gösterge hedefi), &"build" (required_buildings'ten biri kurulsun), &"prepared" (bir kriz koruma varken karşılansın).
+@export var kind: StringName = &"stat"
+@export var required_buildings: Array[StringName] = []
+## Görevin öğrettiği konunun bilgi kartı.
+@export var info_card: InfoCard

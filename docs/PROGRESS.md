@@ -155,12 +155,20 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - İki kıyı kartına (`card_coastal_restoration`, `card_event_coastal_flood`) IPCC SROCC (2019) eklendi; sayfa otomatik erişime kapalı olduğu için B geliştiricisi tarayıcıda açıp başlığı doğruladı. Artık 16 kartın hepsi kaynaklı; kartlarda sayı yok.
 - Akdeniz cümlesi çıkarılmış durumda; geri eklemek için IPCC AR6 WGII CCP4 (https://www.ipcc.ch/report/ar6/wg2/chapter/ccp4/) tarayıcıda doğrulanmalı.
 
+### Prompt 8 notları (B, 2026-10-31) · İklim Laboratuvarı ve eğitim
+- Laboratuvar 6 sekme: A Emisyonlar (endeks, son yıl ve başlangıca göre değişim, yenilenebilir pay, birikimli göreli azaltım, sektör çizgi + dağılım sütun grafiği, "neden değişti"), B Küresel CO₂ (NOAA 1959–2025, BİLİMSEL ÖLÇÜM etiketi, gelecek senaryosu yok notu, ölçek farkı, 7 kavram), C Kaynaklar (enerji, su, atık, ekosistem), D Riskler ve dayanıklılık (EventManager/ClimateSimulator değerleri, ilgili yatırımlar, açılan müdahaleler, uyarı, son kriz, öneri), Sözlük (17 kavram), Öğrenme (5 görev + ilerleme). Her grafikte başlık, birim, dönem, veri türü etiketi.
+- Simülasyonda olmayan veriler uydurulmadı ve açıkça yazıldı: toplam atık miktarı (ton), su rezervi ve su verimliliği, "diğer şehir faaliyetleri" sektörü, 2040–2052 CO₂ senaryosu.
+- Eğitim kartı: yatırım ilk kez yapıldığında küçük, kapatılabilir kart; aynı kart bir oyunda bir kez. HUD'a "Bilgi arşivi" düğmesi. Final ekranında başlangıç ↔ final tablosu (sözleşme v1.7) ve öğrenme özeti.
+- Öğrenme görevleri kredi vermez (denge: 10 kredi bile basit stratejileri 85 puana taşıdı). Krizler GameState.crisis_log'a kaydediliyor (Laboratuvar D ve Şehir bilgileri okur).
+- `tests/test_education.gd`: Prompt 8'in 20 testi (23 kontrol) 1280×720 ve 1920×1080'de TAMAM.
+
 ## Sözleşme değişiklik talepleri
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |
 |---|---|---|---|---|
 | 2026-10-31 | B | v1.5: `crisis_stage_changed` + `result.severity/assessment` (ekleme) | A'nın kullanması isteğe bağlı | Yapıldı |
 | 2026-10-31 | B | v1.4: ret nedenleri `scene_unavailable`, `unknown_plot` (ekleme) | B içi, A ret nedenlerini kullanmaz | Yapıldı |
+| 2026-10-31 | B | v1.7: `summary.start_stats` (ekleme) | B içi | Yapıldı |
 | 2026-10-31 | A | v1.6: `crisis_stage_changed` info'suna `mitigation` (0..0.8, o risk için yatırımların koruma oranı) ve `advantages` (koruma sağlayan bina kimlikleri). Neden: Prompt 7B koruma düzeyini görselde B'nin değerinden almayı istiyor; şu an yalnızca `crisis_resolved` sonucunda var. | B onayladı | B ekledi (2026-10-31) |
 | 2026-10-31 | B (öneri) | v1.3: `plot_deselect_requested` (parametresiz). Yayan: B · BuildPanel (kapat düğmesi, Esc). Dinleyen: A · CityWorld → seçimi bırakır ve `plot_deselected` yayar. Neden: panel kapanınca arsa vurgusu kalıyor. | A onayladı (2026-10-31) | B ekledi (2026-10-31); A'nın CityWorld'de dinlemesi bekleniyor |
 | 2026-10-31 | B | v1.2: `stats` enerji/su akışları (ekleme) | B içi, A etkilenmez | Yapıldı |

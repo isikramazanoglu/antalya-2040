@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_8p08t"]
+
+[resource]
+script = ExtResource("1_8p08t")
+id = &"climate_change"
+title = "İklim değişikliği"
+definition = "Sıcaklık ve hava düzenlerinde uzun dönemli değişim. Günümüzdeki ısınma büyük ölçüde insan faaliyetlerinden, özellikle fosil yakıt kullanımından kaynaklanır."
+example = "Sıcak hava dalgalarının ve kuraklıkların daha sık görülmesi."
+game_link = "Oyundaki riskler her yıl biraz artar; krizler bu eğilimi temsil eder."
+sources = Array[String](["NASA Science, What Is Climate Change? (web sayfası), https://science.nasa.gov/climate-change/what-is-climate-change/, erişim 2026-10-31"])

@@ -176,6 +176,18 @@ Kaynak kuralları:
 - Aday kurumlar: IPCC AR6 raporları (https://www.ipcc.ch/report/ar6/syr/), NOAA GML, Meteoroloji Genel Müdürlüğü, T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı. Her URL eklenmeden önce açılıp kontrol edilir.
 - Oyun değerleri ile gerçek veriler arayüzde karıştırılmaz: oyun değerleri "oyun ölçeği" etiketi taşır.
 
+**Öğrenme görevleri (Prompt 8):** İklim Laboratuvarı'nın "Öğrenme" sekmesinde, yıl sonunda değerlendirilir, kaçmaz ve **kredi vermez** (10 kredilik ödül bile basit stratejileri "İklim Lideri"ne taşıyıp dengeyi bozdu).
+
+| id | Görev | Koşul |
+|---|---|---|
+| `learn_clean_energy` | Temiz enerjiye geçiş | Güneş enerjisi tesisi kur |
+| `learn_save_water` | Suyunu koru | Su depolama kur |
+| `learn_cooler_city` | Daha serin bir şehir | Yeşil park kur |
+| `learn_zero_waste` | Atıksız şehre doğru | Geri dönüşüm ve kompost tesisi kur |
+| `learn_prepared` | Krize hazırlık | Bir krizi koruyucu yatırım varken karşıla |
+
+**İklim sözlüğü:** 17 kavram (`data/glossary/`), her birinde tanım, örnek, oyundaki bağlantısı ve doğrulanmış kaynak (NASA, US EPA, NOAA, IEA, FAO, UNCCD, The Nature Conservancy, Ellen MacArthur Foundation, IPCC SROCC).
+
 ## 9. Denge ölçümü (Gün 3)
 
 `tests/balance_sim.gd` beş stratejiyi otomatik oynatır (yılda en çok bir yatırım, krizde en iyi karşılanabilir müdahale):
