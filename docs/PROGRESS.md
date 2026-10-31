@@ -92,7 +92,7 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
   - Sunum B'nin arayüzünün üstündeki kendi katmanında (CanvasLayer 50) tam ekran, aynı 3D dünyayı gösteren SubViewport'ta çizilir; bu sürede ana görünümün 3D çizimi kapalıdır (şehir iki kez çizilmez), arkadaki arayüze tıklanamaz. B'nin node'larına dokunulmadı. Ekrandaki sayılar `summary`'den okunur (yatırım sayısı, `emission_reduction_pct`, `score`/`grade`); hesap yok.
   - `CityWorld.show_city_state(plots, animate)` (sözleşmede önerilen ad) + `show_plot_state`, `restore_city_state`: yalnızca görsel; gerçek binalar gizlenir/gösterilir, yerleşimde olup şehirde olmayan (ya da farklı) bina geçici kopyayla çizilir, sonra silinir. `GameState`'e yazmaz, `place_building` çağırmaz. Bilinmeyen kimlik → arsa boş + uyarı; `summary.city_2052` yoksa sunum atlanır ve hemen bitiş yayılır.
   - `CameraRig`: `cinematic` (oyuncu girdisi kapalı), `get_view`/`set_view`, `glide_to`, `play_tour` (sözleşme §D). Sunum bitince kamera oyuncunun son görünümüne döner.
-  - Test: `scripts/world/dev/test_final_presentation.gd` (gerçek Game.tscn 2052'ye kadar; kabul ölçütleri 1–6, Esc, geçici kopya, bilinmeyen kimlik, eksik summary, yatırımsız oyun; 29 kontrol) 1280×720 ve 1920×1080'de TAMAM. B'nin 11 testi + A'nın diğer 4 testi TAMAM. Windows export (geçici klasöre) hatasız, exe açılıyor.
+  - Test: `scripts/world/dev/test_final_presentation.gd` (gerçek Game.tscn 2052'ye kadar; kabul ölçütleri 1–6, Esc, geçici kopya, bilinmeyen kimlik, eksik summary, yatırımsız oyun; 28 kontrol) 1280×720 ve 1920×1080'de TAMAM. B'nin 11 testi + A'nın diğer 4 testi TAMAM. Windows export (geçici klasöre) hatasız, exe açılıyor.
   - Performans (RTX 5060 Laptop, 1080p, vsync kapalı): normal 481 FPS, sunum boyunca ortalama 427 FPS.
   - Bilinen sınır: ısı pusu (ekran efekti) ana görünümde çizildiği için sunumdaki sıcak hava tekrarında görünmez; sıcak ton, sis ve koruma hareleri görünür. Rezervuarın su seviyesi sunumda 2052 değerinde kalır.
 - 10C sonrası kontrol (A, 2026-10-31): develop 1b255c9 alındı; B'nin 12 testi (`test_playthrough` 1280×720 ve 1920×1080 dahil) + A'nın 5 testi TAMAM. `test_final_presentation.gd` titrekliği giderildi: [6]'daki sabit 5,5 sn bekleme ve 0,6 sn'lik bitiş beklemeleri koşul beklemesine çevrildi (yavaş makinede ilk sahne 5,5 sn'yi aşabiliyordu); FPS 20'ye kısılarak da TAMAM. Kontrol mesajı düşerse sunumun durumunu yazar. Kodda: art arda iki sunumda kararma tween'leri çakışmasın diye önceki durdurulur. Windows: güncel develop'tan export alındı, `ANTALYA2040.exe` pencereli açılıyor, hata yok (release şablonu dış test script'i çalıştırmadığı için exe içinde otomatik sunum testi yapılamadı; elle oynanabilir).
@@ -106,6 +106,11 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
   | RTX 5060 Laptop · 1920×1080 | 231 / 218 | 225 / 218 | 223 / 220 | 211 / 179 |
 
   Ölçüm sırasında bulunan ve düzeltilen: final sunumunun ayrı görünümü pencere ne olursa olsun 1920×1080 tabanda çiziliyordu (720p'de 2,25 kat piksel); artık pencerenin gerçek boyutunda çizer. Intel UHD 720p'de final sunumu 68 → 113 FPS.
+- **Prova tamam** (A, 2026-11-01, Windows, develop 3e8ad68):
+  - Tam test turu: B'nin 6 headless testi + 6 pencereli testi (`test_playthrough` dahil) 1280×720 ve 1920×1080'de, A'nın 5 testi iki çözünürlükte (`test_final_presentation` 28 kontrol), derleme kontrolü hatasız; hepsi TAMAM. `balance_sim` B'nin sonuçlarıyla aynı (74 / 67 / 41 / 37).
+  - Windows export: `build/windows/ANTALYA2040.exe` (110 MB) pencereli açılıyor, hata yok.
+  - Demo provası export edilmiş exe ile, jüri akışına göre elle yapıldı (menü → yatırım → İklim Laboratuvarı → kriz → 2052 → "Şehrin dönüşümünü izle", Esc ile atlama, rapora ve ana menüye dönüş): sorun yok.
+  - FPS: yukarıdaki tablo (orta seviye PC yerine Intel UHD).
 
 ### Ekip B
 - [x] 12 `BuildingDefinition` + bilgi kartları
