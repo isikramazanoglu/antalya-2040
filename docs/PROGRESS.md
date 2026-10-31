@@ -95,6 +95,7 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
   - Test: `scripts/world/dev/test_final_presentation.gd` (gerçek Game.tscn 2052'ye kadar; kabul ölçütleri 1–6, Esc, geçici kopya, bilinmeyen kimlik, eksik summary, yatırımsız oyun; 29 kontrol) 1280×720 ve 1920×1080'de TAMAM. B'nin 11 testi + A'nın diğer 4 testi TAMAM. Windows export (geçici klasöre) hatasız, exe açılıyor.
   - Performans (RTX 5060 Laptop, 1080p, vsync kapalı): normal 481 FPS, sunum boyunca ortalama 427 FPS.
   - Bilinen sınır: ısı pusu (ekran efekti) ana görünümde çizildiği için sunumdaki sıcak hava tekrarında görünmez; sıcak ton, sis ve koruma hareleri görünür. Rezervuarın su seviyesi sunumda 2052 değerinde kalır.
+- 10C sonrası kontrol (A, 2026-10-31): develop 1b255c9 alındı; B'nin 12 testi (`test_playthrough` 1280×720 ve 1920×1080 dahil) + A'nın 5 testi TAMAM. `test_final_presentation.gd` titrekliği giderildi: [6]'daki sabit 5,5 sn bekleme ve 0,6 sn'lik bitiş beklemeleri koşul beklemesine çevrildi (yavaş makinede ilk sahne 5,5 sn'yi aşabiliyordu); FPS 20'ye kısılarak da TAMAM. Kontrol mesajı düşerse sunumun durumunu yazar. Kodda: art arda iki sunumda kararma tween'leri çakışmasın diye önceki durdurulur. Windows: güncel develop'tan export alındı, `ANTALYA2040.exe` pencereli açılıyor, hata yok (release şablonu dış test script'i çalıştırmadığı için exe içinde otomatik sunum testi yapılamadı; elle oynanabilir).
 
 ### Ekip B
 - [x] 12 `BuildingDefinition` + bilgi kartları
