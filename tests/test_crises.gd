@@ -94,6 +94,7 @@ func _run() -> void:
 	bus.report_closed.emit()
 	var prep := stages.filter(func(s): return s[0] == &"heatwave" and s[1] == &"preparation")
 	_check(prep.size() == 1 and prep[0][3] == 2043, "2) 2043 başında hazırlık aşaması bildirildi")
+	_check(is_equal_approx(prep[0][2].mitigation, 0.25) and prep[0][2].advantages == [&"green_park"], "v1.6) aşama bilgisi koruma oranını (%25) ve parkı taşıyor")
 	var energy_before: float = gs.stats.energy_security
 	bus.end_turn_requested.emit()  # 2043 sonu: kriz
 	_check(gs.phase == &"crisis" and stages[-1][1] == &"active", "kriz başladı, aşama active")
