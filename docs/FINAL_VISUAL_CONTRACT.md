@@ -3,6 +3,8 @@
 Sürüm: **v1.0** (2026-10-31) · Ana sözleşmenin **v1.9** eklemesine dayanır (`docs/INTEGRATION_CONTRACT.md`).
 Hazırlayan: Ekip B. Kullanan: Ekip A (2040 ↔ 2052 şehir sunumu, final kamera geçişleri, görsel dönüşüm).
 
+**Durum (2026-10-31, Prompt 10C):** B tarafı tamam ve test edildi (`tests/test_final.gd`). A tarafı (10B) henüz develop'ta değil; FinalReport'taki "Şehrin dönüşümünü izle" düğmesi A dinlemeye başlayınca kendiliğinden görünecek.
+
 Bu belgede "mevcut" diye geçen her sinyal, fonksiyon ve veri projede **bugün vardır** ve test edilmiştir (`tests/test_final.gd`). Henüz olmayanlar açıkça **"Ekip A tarafından geliştirilecek"** diye işaretlidir. Ekip A simülasyon koduna dokunmadan çalışabilir.
 
 ---
