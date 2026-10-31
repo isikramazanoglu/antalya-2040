@@ -7,3 +7,4 @@ script = ExtResource("1_ruue7")
 id = &"card_event_drought"
 title = "Kuraklık"
 body = "Kuraklık, yağışın uzun süre normalin altında kalmasıdır. Sıcaklık arttıkça topraktan ve barajlardan buharlaşan su da artar; bu yüzden aynı yağış daha az kullanılabilir suya dönüşür."
+sources = Array[String](["UNCCD, Drought (web sayfası), https://www.unccd.int/land-and-life/drought/overview, erişim 2026-10-31"])

@@ -10,3 +10,4 @@ body = "Fotovoltaik paneller güneş ışığını doğrudan elektriğe çevirir
 benefit = "Yenilenebilir enerji üretimini artırır."
 climate_link = "Elektrik sistemindeki fosil yakıt bağımlılığını azaltmaya yardımcı olur."
 strategic = "Şehrin enerji dengesini ve yerel emisyon performansını iyileştirir."
+sources = Array[String](["IEA, Solar PV (web sayfası), https://www.iea.org/energy-system/renewables/solar-pv, erişim 2026-10-31"])

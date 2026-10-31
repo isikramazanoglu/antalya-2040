@@ -4,7 +4,7 @@ Bu belge Ekip A (şehir ve 3D) ile Ekip B (simülasyon ve arayüz) arasındaki t
 İki taraf birbirinin koduna yalnızca burada yazan sinyaller, fonksiyonlar ve veri şekilleri üzerinden dokunur.
 Burada yazmayan bir şeye güvenen kod, sözleşme dışıdır.
 
-Sürüm: **v1.5** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
+Sürüm: **v1.6** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
 
 ---
 
@@ -162,10 +162,12 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
   "visual_effect_id": StringName, # heat_haze, drought_dust, storm_surge
   "affected_area": StringName,    # city, farmland, coast
   "affected_plot_kinds": Array,   # ör. [&"coastal"]; A bunu arsa kimliklerine çevirebilir
-  "progress": float               # warning 0.0, preparation 0.25, active 0.5, resolved 0.75, ended 1.0
+  "progress": float,              # warning 0.0, preparation 0.25, active 0.5, resolved 0.75, ended 1.0
+  "mitigation": float,            # v1.6: o risk için yatırımların koruma oranı 0..0.8 (aşama anındaki binalardan)
+  "advantages": Array             # v1.6: koruma sağlayan building_id listesi (StringName)
 }
 ```
-`ended` aşamasında yalnızca `severity`, `due_year`, `visual_effect_id`, `affected_area`, `affected_plot_kinds`, `progress` garanti edilir.
+Bütün aşamalarda bu sekiz anahtarın hepsi vardır. `mitigation` ve `advantages` aşama anındaki binalardan hesaplanır; örneğin uyarı ile kriz arasında park yapılırsa `active` aşamasında artar.
 
 ### 5.4 `report` (yıl sonu)
 
@@ -323,6 +325,7 @@ MVP üçlüsü: `solar_plant`, `water_storage`, `green_park`.
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
 | v1.0 | 2026-10-30 | İlk sürüm. |
+| v1.6 | 2026-10-31 | Ekleme: `crisis_stage_changed` info'suna `mitigation` ve `advantages`. Ekip A talebi. |
 | v1.5 | 2026-10-31 | Ekleme: `crisis_stage_changed` sinyali (§5.6), `result` içine `severity` ve `assessment`. Mevcut kriz sinyalleri değişmedi; A etkilenmez. |
 | v1.4 | 2026-10-31 | Ekleme: iki ret nedeni (`scene_unavailable`, `unknown_plot`). Sinyal değişikliği yok; A ret nedenlerini kullanmaz. |
 | v1.3 | 2026-10-31 | Ekleme: `plot_deselect_requested` sinyali. Neden: panel kapanınca arsa vurgusu kalıyordu. A onayladı. |

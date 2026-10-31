@@ -10,3 +10,4 @@ body = "İyi yalıtılmış bir bina yazın içeriyi serin, kışın sıcak tuta
 benefit = "Şehre yeni ve konforlu konut alanı kazandırır."
 climate_link = "Yalıtımlı binalar ısıtma ve soğutma için daha az enerji harcar."
 strategic = "Nüfusu büyütürken binaların emisyonunu düşük tutar; sıcak dalgalarında içerisi daha serin kalır."
+sources = Array[String](["IEA, Buildings: Energy consumption and efficiency (web sayfası), https://www.iea.org/energy-system/buildings, erişim 2026-10-31"])

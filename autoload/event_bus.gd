@@ -1,6 +1,6 @@
 extends Node
 ## ORTAK dosya. Sözleşme: docs/INTEGRATION_CONTRACT.md
-## Sürüm v1.5. Yalnızca sinyal bildirimleri. Değişken, fonksiyon, mantık eklenmez.
+## Sürüm v1.6. Yalnızca sinyal bildirimleri. Değişken, fonksiyon, mantık eklenmez.
 ## Değişiklik yalnızca sözleşme §11 süreciyle, yalnızca ekleme olarak.
 
 # Sinyaller başka script'lerden yayılır; bu dosyada kullanılmamaları normal.
@@ -28,5 +28,5 @@ signal crisis_warned(warning: Dictionary)  # B: TurnManager
 signal crisis_started(event_id: StringName, risk_type: StringName, severity: float)  # B: TurnManager
 signal crisis_response_chosen(event_id: StringName, response_id: StringName)  # B: EventPanel
 signal crisis_resolved(result: Dictionary)  # B: TurnManager
-## v1.5: krizin yaşam döngüsü (görseller için). stage: warning, preparation, active, resolved, ended. info: sözleşme §5.6
+## v1.5: krizin yaşam döngüsü (görseller için). stage: warning, preparation, active, resolved, ended. info: sözleşme §5.6 (v1.6: mitigation, advantages)
 signal crisis_stage_changed(event_id: StringName, stage: StringName, info: Dictionary)  # B: TurnManager

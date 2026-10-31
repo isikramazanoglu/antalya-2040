@@ -7,3 +7,4 @@ script = ExtResource("1_0hovq")
 id = &"card_event_coastal_flood"
 title = "Deniz seviyesi ve fırtınalar"
 body = "Okyanuslar ısındıkça genleşir ve buzullar eridikçe deniz seviyesi yükselir. Daha yüksek bir deniz seviyesinde aynı fırtına kıyıda daha büyük taşkınlara yol açar."
+sources = Array[String](["IPCC, Special Report on the Ocean and Cryosphere in a Changing Climate (SROCC), 2019, https://www.ipcc.ch/srocc/, erişim 2026-10-31"])

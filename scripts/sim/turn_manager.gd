@@ -19,12 +19,13 @@ func _ready() -> void:
 	EventBus.build_approved.connect(func(_plot_id, building_id): _built_this_year.append(building_id))
 
 
-## Sözleşme v1.5: aşama bilgisini görsel sisteme bildirir.
+## Sözleşme v1.5/v1.6: aşama bilgisini görsel sisteme bildirir. Koruma o anki binalardan EventManager ile hesaplanır.
 const STAGE_PROGRESS := {&"warning": 0.0, &"preparation": 0.25, &"active": 0.5, &"resolved": 0.75, &"ended": 1.0}
 
 
 func _emit_stage(warning: Dictionary, stage: StringName) -> void:
 	var def := Catalog.get_event(warning.event_id)
+	var a := EventManager.assess(def, warning.severity, GameState.get_stats(), GameState.built_definitions(), Catalog.data.balance)
 	EventBus.crisis_stage_changed.emit(warning.event_id, stage, {
 		"severity": warning.severity,
 		"due_year": warning.due_year,
@@ -32,6 +33,8 @@ func _emit_stage(warning: Dictionary, stage: StringName) -> void:
 		"affected_area": def.affected_area,
 		"affected_plot_kinds": def.affected_plot_kinds.duplicate(),
 		"progress": STAGE_PROGRESS[stage],
+		"mitigation": a.mitigation,  # v1.6
+		"advantages": a.advantages,  # v1.6
 	})
 
 

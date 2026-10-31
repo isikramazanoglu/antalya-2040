@@ -10,3 +10,4 @@ body = "Şehir şebekelerinde suyun bir bölümü eskimiş borulardan kaçarak k
 benefit = "Su rezervlerini ve hazırlık kapasitesini artırır."
 climate_link = "Kuraklık dönemlerinde şehirdeki su güvenliğini destekler."
 strategic = "Kuraklık krizinde kayıpları azaltır."
+sources = Array[String](["UNCCD, Drought (web sayfası), https://www.unccd.int/land-and-life/drought/overview, erişim 2026-10-31"])

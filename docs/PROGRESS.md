@@ -149,13 +149,19 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - `tests/test_crises.gd`: 12 test sorusu (22 kontrol) TAMAM. Diğer 7 test TAMAM. Denge: hiçbir şey 38, koruyucu 77, karma 81; hazırlıklı şehrin kriz kaybı 145, hazırlıksızın 472.
 - Kriz yılları sabit (2043, 2046, 2049): sonuç tekrarlanabilir, oyuncu sürekli felaketle cezalandırılmaz.
 
+### Bilgi kartı kaynakları (B, 2026-10-31)
+- 16 kartın 14'üne kaynak eklendi: IEA (güneş, binalar, ulaşım), US EPA (ısı adası, su geri kazanımı, kompost/gıda atığı), WHO (sıcak ve sağlık), UNCCD (kuraklık), FAO (tarım suyu), NOAA GML (CO2). Her adres 2026-10-31'de açıldı; başlık ve içerik kartın konusuyla karşılaştırıldı.
+- Sıcak hava kartındaki "Akdeniz havzası en çok etkilenen bölgeler arasında" cümlesi çıkarıldı: WHO sayfasında yok, IPCC sayfaları otomatik erişime kapalı olduğu için doğrulanamadı.
+- İki kıyı kartına (`card_coastal_restoration`, `card_event_coastal_flood`) IPCC SROCC (2019) eklendi; sayfa otomatik erişime kapalı olduğu için B geliştiricisi tarayıcıda açıp başlığı doğruladı. Artık 16 kartın hepsi kaynaklı; kartlarda sayı yok.
+- Akdeniz cümlesi çıkarılmış durumda; geri eklemek için IPCC AR6 WGII CCP4 (https://www.ipcc.ch/report/ar6/wg2/chapter/ccp4/) tarayıcıda doğrulanmalı.
+
 ## Sözleşme değişiklik talepleri
 
 | Tarih | İsteyen | Değişiklik | Onay | Durum |
 |---|---|---|---|---|
 | 2026-10-31 | B | v1.5: `crisis_stage_changed` + `result.severity/assessment` (ekleme) | A'nın kullanması isteğe bağlı | Yapıldı |
 | 2026-10-31 | B | v1.4: ret nedenleri `scene_unavailable`, `unknown_plot` (ekleme) | B içi, A ret nedenlerini kullanmaz | Yapıldı |
-| 2026-10-31 | A | v1.6: `crisis_stage_changed` info'suna `mitigation` (0..0.8, o risk için yatırımların koruma oranı) ve `advantages` (koruma sağlayan bina kimlikleri). Neden: Prompt 7B koruma düzeyini görselde B'nin değerinden almayı istiyor; şu an yalnızca `crisis_resolved` sonucunda var. | B onayı bekleniyor | Bekliyor |
+| 2026-10-31 | A | v1.6: `crisis_stage_changed` info'suna `mitigation` (0..0.8, o risk için yatırımların koruma oranı) ve `advantages` (koruma sağlayan bina kimlikleri). Neden: Prompt 7B koruma düzeyini görselde B'nin değerinden almayı istiyor; şu an yalnızca `crisis_resolved` sonucunda var. | B onayladı | B ekledi (2026-10-31) |
 | 2026-10-31 | B (öneri) | v1.3: `plot_deselect_requested` (parametresiz). Yayan: B · BuildPanel (kapat düğmesi, Esc). Dinleyen: A · CityWorld → seçimi bırakır ve `plot_deselected` yayar. Neden: panel kapanınca arsa vurgusu kalıyor. | A onayladı (2026-10-31) | B ekledi (2026-10-31); A'nın CityWorld'de dinlemesi bekleniyor |
 | 2026-10-31 | B | v1.2: `stats` enerji/su akışları (ekleme) | B içi, A etkilenmez | Yapıldı |
 | 2026-10-30 | B | v1.1: `report.missions`, `summary.emission_reduction_pct` (ekleme) | B içi, A etkilenmez | Yapıldı |

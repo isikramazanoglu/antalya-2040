@@ -10,3 +10,4 @@ body = "Harcanmayan enerji, üretilmesi gerekmeyen enerjidir. Verimli aydınlatm
 benefit = "Okul, hastane ve belediye binalarının enerji tüketimini düşürür."
 climate_link = "Harcanmayan enerji üretilmesi gerekmeyen enerjidir; emisyon kaynağında azalır."
 strategic = "Ucuz bir yatırımla enerji güvenliğini ve bina emisyonlarını birlikte iyileştirir."
+sources = Array[String](["IEA, Buildings: Energy consumption and efficiency (web sayfası), https://www.iea.org/energy-system/buildings, erişim 2026-10-31"])

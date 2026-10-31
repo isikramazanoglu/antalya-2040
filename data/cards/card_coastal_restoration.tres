@@ -10,3 +10,4 @@ body = "Kumullar ve kıyı bitkileri dalgaların enerjisini emer ve kıyı erozy
 benefit = "Kumulları ve kıyı bitki örtüsünü onarır, erken uyarı sistemi kurar."
 climate_link = "Yükselen deniz ve fırtınalara karşı doğal bir tampon oluşturur."
 strategic = "Kıyı taşkını hasarını en çok azaltan yatırımdır; ekosistemi güçlendirir."
+sources = Array[String](["IPCC, Special Report on the Ocean and Cryosphere in a Changing Climate (SROCC), 2019, https://www.ipcc.ch/srocc/, erişim 2026-10-31"])
