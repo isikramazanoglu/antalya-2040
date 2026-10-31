@@ -40,6 +40,16 @@ func wait_step(presentation, step: String, limit := 90.0) -> bool:
 	return false
 
 
+## Koşul sağlanana kadar bekler (sabit süre yerine; yavaş makinede titreklik olmasın).
+func wait_until(cond: Callable, limit: float) -> bool:
+	var t0 := Time.get_ticks_msec()
+	while not cond.call():
+		if Time.get_ticks_msec() - t0 > limit * 1000.0:
+			return false
+		await wait(0.1)
+	return true
+
+
 func wait_finished(count: int, limit: float) -> float:
 	var t0 := Time.get_ticks_msec()
 	while _finished < count and Time.get_ticks_msec() - t0 < limit * 1000.0:
@@ -183,18 +193,18 @@ func _run() -> void:
 		"şehirde olmayan yatırım geçici kopyayla gösterildi, arsaya kalıcı bina eklenmedi")
 	check(visible_building(city, city.find_plot(&"O05")) == null, "bilinmeyen yatırım kimliği boş arsa olarak geçildi (uyarı)")
 	presentation.skip()
-	await wait_finished(3, 3.0)
-	await wait(0.6)
+	await wait_until(func(): return _finished >= 3 and not presentation._layer.visible, 5.0)
 	check(city._stand_ins.is_empty() and u08.is_empty() and gs.get_building_on(&"U08") == &"", "geçici kopya silindi, U08 boş kaldı")
 	presentation.play({})
 	await wait_finished(4, 2.0)
 	check(_finished == 4 and not presentation.is_playing(), "summary eksikse sunum atlanıp hemen bitiş yayıldı")
 	presentation.play({"city_2040": {"plots": {}}, "city_2052": {"year": 2052, "plots": {}, "builds": []}})
-	await wait(5.5)
-	check(presentation.is_playing() and presentation._caption.text.contains("yatırım yapılmadı"), "hiç yatırım yoksa sunum çökmeden \"yatırım yapılmadı\" diyor")
+	var reached: bool = await wait_step(presentation, "Dönüşüm", 20.0)
+	check(reached and presentation._caption.text.contains("yatırım yapılmadı"),
+		"hiç yatırım yoksa sunum çökmeden \"yatırım yapılmadı\" diyor (sahneye ulaştı: %s, oynuyor: %s, bitiş: %d, yazı: %s)" % [
+		reached, presentation.is_playing(), _finished, presentation._caption.text])
 	presentation.skip()
-	await wait_finished(5, 3.0)
-	await wait(0.6)
+	await wait_until(func(): return _finished >= 5 and not presentation._layer.visible, 5.0)
 	check(_finished == 5 and snapshot(gs) == before, "yatırımsız sunum da temiz bitti, GameState değişmedi")
 
 	print("\nSONUÇ: %s" % ("TAMAM" if _fails == 0 else "%d HATA" % _fails))

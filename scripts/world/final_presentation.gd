@@ -52,6 +52,7 @@ var _saved_view: Dictionary
 var _saved_fades := Vector2.ZERO
 var _replayed: Array[CrisisEffect] = []
 var _image_2040: ImageTexture
+var _fade_tween: Tween
 
 var _layer: CanvasLayer
 var _view: SubViewportContainer
@@ -333,8 +334,12 @@ func _hold(seconds: float, token: int) -> bool:
 	return _alive(token)
 
 
+## Kararma; önceki kararma sürüyorsa durdurulur (biten sunumun açılışı yeni sunumla çakışmasın).
 func _tween_fade(alpha: float, time: float) -> void:
-	create_tween().tween_property(_fade, "color:a", alpha, time)
+	if _fade_tween:
+		_fade_tween.kill()
+	_fade_tween = create_tween()
+	_fade_tween.tween_property(_fade, "color:a", alpha, time)
 
 
 func _sync_camera() -> void:
