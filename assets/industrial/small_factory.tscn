@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/industrial/small_factory_body.tres" id="1_6w07i"]
+[ext_resource type="ArrayMesh" path="res://assets/industrial/small_factory_windows.tres" id="2_jdoiu"]
+[ext_resource type="ArrayMesh" path="res://assets/industrial/small_factory_upgrade_clean_energy.tres" id="3_ghwhd"]
+[ext_resource type="ArrayMesh" path="res://assets/industrial/small_factory_upgrade_treatment.tres" id="4_0t34o"]
+
+[node name="SmallFactory" type="Node3D" unique_id=1065953059]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=1959722271]
+mesh = ExtResource("1_6w07i")
+
+[node name="Windows" type="MeshInstance3D" parent="." unique_id=1543030606]
+mesh = ExtResource("2_jdoiu")
+
+[node name="Upgrade_clean_energy" type="MeshInstance3D" parent="." unique_id=725130924]
+visible = false
+mesh = ExtResource("3_ghwhd")
+
+[node name="Upgrade_treatment" type="MeshInstance3D" parent="." unique_id=784692222]
+visible = false
+mesh = ExtResource("4_0t34o")
+
+[node name="Smoke_0" type="Marker3D" parent="." unique_id=1075535410]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.55, 3.06, -1.75)

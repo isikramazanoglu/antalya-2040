@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/industrial/heavy_factory_body.tres" id="1_5psid"]
+[ext_resource type="ArrayMesh" path="res://assets/industrial/heavy_factory_windows.tres" id="2_22t7f"]
+[ext_resource type="ArrayMesh" path="res://assets/industrial/heavy_factory_upgrade_clean_energy.tres" id="3_sryy8"]
+[ext_resource type="ArrayMesh" path="res://assets/industrial/heavy_factory_upgrade_treatment.tres" id="4_287tt"]
+
+[node name="HeavyFactory" type="Node3D" unique_id=1315206653]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=440326044]
+mesh = ExtResource("1_5psid")
+
+[node name="Windows" type="MeshInstance3D" parent="." unique_id=879596132]
+mesh = ExtResource("2_22t7f")
+
+[node name="Upgrade_clean_energy" type="MeshInstance3D" parent="." unique_id=1109492875]
+visible = false
+mesh = ExtResource("3_sryy8")
+
+[node name="Upgrade_treatment" type="MeshInstance3D" parent="." unique_id=1218393176]
+visible = false
+mesh = ExtResource("4_287tt")
+
+[node name="Smoke_0" type="Marker3D" parent="." unique_id=938084078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 5.76, -1.5)
+
+[node name="Smoke_1" type="Marker3D" parent="." unique_id=424430595]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 5.16, -1.5)

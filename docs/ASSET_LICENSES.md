@@ -40,6 +40,18 @@ Modeller **yatırım değildir**: BuildingDefinition'a, yatırım kimliğine ya 
 | `assets/buildings/public/public_building_b.tres` / `.tscn` | Sosyal tesis / okul | Proje içinde üretildi | Ekip A | Proje lisansı |
 | `assets/materials/architecture/arch_*.tres` | Mimari palet (24 StandardMaterial3D) | Proje içinde üretildi | Ekip A | Proje lisansı |
 
+## Sanayi modelleri (Prompt A14, proje içinde üretildi)
+
+Üretici: `scripts/world/dev/gen_industrial_library.gd` (Godot `--script`; harici model yok). Duman `scripts/world/industry.gd`'de
+kodla kurulur (parçacık dokusu çalışma anında GradientTexture2D). Marka / logo / yazı yok.
+
+| Dosya | Tür | Kaynak | Yazar | Lisans |
+|---|---|---|---|---|
+| `assets/industrial/small_factory.tscn` (+ `*_body/_windows/_upgrade_*.tres`) | Küçük üretim fabrikası | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/industrial/heavy_factory.tscn` | Ağır sanayi tesisi | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/industrial/logistics_warehouse.tscn` | Lojistik deposu | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/industrial/materials/ind_*.tres` | Sanayi paleti | Proje içinde üretildi | Ekip A | Proje lisansı |
+
 ## Araç kütüphanesi (görsel revizyon 9, proje içinde üretildi)
 
 Üretici: `scripts/world/dev/gen_vehicle_library.gd` (Godot `--script`; Blender ya da harici model yok). Yeniden üretmek için:
