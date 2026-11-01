@@ -24,10 +24,11 @@ Oyundaki sayılar oyun dengeleme değerleridir; gerçek Antalya ölçümleri de�
 |---|---|
 | Sol tık | Arsa seç |
 | Sağ tık / Esc | Seçimi bırak, paneli kapat |
-| W A S D | Kamerayı kaydır |
-| Q / E | Kamerayı döndür (±30°) |
+| W A S D / ok tuşları | Kamerayı kaydır (ekran yönünde) |
 | Tekerlek | Yakınlaş / uzaklaş |
-| Orta tuş sürükle | Kamerayı kaydır |
+| Orta tuş sürükle | Zemini tutup kamerayı kaydır |
+
+Kamera açısı sabittir (izometrik görünüm); final sunumunda kamera kendiliğinden döner.
 
 ## Ana sistemler
 | Sistem | Dosya | Ekip |
