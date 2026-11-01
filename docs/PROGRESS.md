@@ -383,6 +383,10 @@ Emre'nin kredisi bittiği için kullanıcı kararıyla B yaptı. Ayrı dalda ve 
 - 10 soruluk banka (soru, 4 seçenek, doğru indeks, açıklama ayrı alanlar); sıra rng_seed + sayaçla döner. Bir ayda çözülen soru o ay yeniden sorulmaz. `GameState.quiz_count / quiz_done_key` kayda girer.
 - Test (bir kez, gerçek Game.tscn): açılıyor, yanlışta ay geçmiyor, Esc/panel atlatmıyor, doğruda ay 1 → 2, sonraki ayda yeni soru. `--script` testlerinde quiz kapalı; test_months, test_businesses, test_day1 TAMAM.
 
+### Teslim hotfix (B, 2026-11-01 23:17) · Araç egzozu
+- `scripts/world/traffic.gd` (Ekip A dosyası; Emre devre dışıyken kullanıcı kararıyla en küçük değişiklik): hareket eden her araca arka uçta (stop lambası tarafı) küçük `GPUParticles3D` egzoz; dünya koordinatında kısa iz, 0,9 sn'de dağılır, araç başına 10 parçacık, yoğunluk hıza bağlı (durunca rölantide az). 17 araçta çalışıyor; A'nın `test_traffic` TAMAM; görüntüyle doğrulandı.
+- **Yapılmadı (süre):** araç seçme, araç emisyon verisi, araç denetimi ve cezası. Denetim/ceza yalnızca işletmeler için var ("Sanayi" paneli).
+
 ### Jüri demo akışı (5–7 dk, sabit kriz yılları, ek demo modu gerekmez)
 1. Giriş (30 sn): ana menü, arkada canlı şehir; "Oyun hakkında".
 2. 2040 şehri (45 sn): HUD; kaynak paneli, enerji üretim/tüketim, yerel emisyon.
