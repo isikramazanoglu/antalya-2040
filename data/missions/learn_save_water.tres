@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MissionDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_water_storage.tres" id="1_0ml3u"]
+[ext_resource type="Script" path="res://scripts/data/mission_definition.gd" id="2_eo4g2"]
+
+[resource]
+script = ExtResource("2_eo4g2")
+id = &"learn_save_water"
+title = "Suyunu koru"
+description = "Su depolama altyapısı kur. Öğrenme: kuraklık, su güvenliği ve uyum."
+deadline_year = 2052
+category = &"learning"
+kind = &"build"
+required_buildings = Array[StringName]([&"water_storage"])
+info_card = ExtResource("1_0ml3u")

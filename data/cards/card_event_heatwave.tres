@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_ln6o5"]
+
+[resource]
+script = ExtResource("1_ln6o5")
+id = &"card_event_heatwave"
+title = "Sıcak hava dalgaları"
+body = "Bilim insanları, iklim ısındıkça aşırı sıcak günlerin daha sık ve daha şiddetli yaşanacağını öngörüyor. Sıcak hava dalgaları özellikle yaşlıların, küçük çocukların ve kronik hastalığı olanların sağlığını tehdit eder."
+sources = Array[String](["WHO, Heat and health (bilgi notu), https://www.who.int/news-room/fact-sheets/detail/climate-change-heat-and-health, erişim 2026-10-31"])

@@ -1,0 +1,84 @@
+[gd_resource type="Resource" script_class="EventDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_event_heatwave.tres" id="1_0fyod"]
+[ext_resource type="Script" path="res://scripts/data/crisis_response.gd" id="2_b6ikl"]
+[ext_resource type="Script" path="res://scripts/data/event_definition.gd" id="3_xj6rt"]
+
+[sub_resource type="Resource" id="Resource_0fyod"]
+script = ExtResource("2_b6ikl")
+id = &"emergency_power"
+label = "Acil enerji desteği"
+description = "Şebekeye ek kapasite kiralanır; kesintiler önlenir."
+cost = 90
+damage_multiplier = 0.65
+extra_effects = {
+"energy_security": 5.0
+}
+
+[sub_resource type="Resource" id="Resource_b6ikl"]
+script = ExtResource("2_b6ikl")
+id = &"use_cooling_centers"
+label = "Serinleme merkezlerini devreye al"
+description = "İklim serinleme merkezi gün boyu açılır, risk altındakilere ulaşılır."
+cost = 20
+damage_multiplier = 0.4
+required_building = &"cooling_center"
+
+[sub_resource type="Resource" id="Resource_xj6rt"]
+script = ExtResource("2_b6ikl")
+id = &"use_parks"
+label = "Park ve gölgelendirme altyapısını kullan"
+description = "Parklar gölge ve su noktalarıyla serinleme alanına dönüşür."
+cost = 10
+damage_multiplier = 0.6
+required_building = &"green_park"
+
+[sub_resource type="Resource" id="Resource_2ueqx"]
+script = ExtResource("2_b6ikl")
+id = &"shift_hours"
+label = "Enerji talebini azaltma programı"
+description = "Öğle saatlerinde açık hava çalışması durur, klima kullanımı kademelendirilir."
+cost = 20
+damage_multiplier = 0.8
+extra_effects = {
+"energy_security": 3.0
+}
+
+[sub_resource type="Resource" id="Resource_v1lmy"]
+script = ExtResource("2_b6ikl")
+id = &"open_cooling"
+label = "Kamu binalarını serinleme alanı yap"
+description = "Okul ve belediye binaları gün boyu açık tutulur, yaşlılara ulaşılır."
+cost = 60
+damage_multiplier = 0.6
+
+[sub_resource type="Resource" id="Resource_27xy8"]
+script = ExtResource("2_b6ikl")
+id = &"do_nothing"
+label = "Müdahale etme"
+description = "Kaynaklar başka işlere ayrılır."
+
+[resource]
+script = ExtResource("3_xj6rt")
+id = &"heatwave"
+display_name = "Sıcak hava dalgası"
+description = "Günlerce süren aşırı sıcak, şehirde sağlık sorunlarına ve iş kaybına yol açıyor."
+risk_type = &"heat"
+earliest_year = 2042
+scripted_year = 2043
+base_damage = {
+"credits": -100,
+"energy_security": -8.0,
+"population": -10,
+"quality_of_life": -10.0
+}
+responses = Array[ExtResource("2_b6ikl")]([SubResource("Resource_0fyod"), SubResource("Resource_b6ikl"), SubResource("Resource_xj6rt"), SubResource("Resource_2ueqx"), SubResource("Resource_v1lmy"), SubResource("Resource_27xy8")])
+warning_text = "Şehirde aşırı sıcak riski artıyor. Enerji talebi ve halkın sıcaklığa maruz kalma düzeyi yükseliyor."
+vulnerability_stats = {
+"ecosystem_health": 0.5,
+"quality_of_life": 0.5
+}
+visual_effect_id = &"heat_haze"
+affected_area = &"city"
+affected_plot_kinds = Array[StringName]([&"urban"])
+info_card = ExtResource("1_0fyod")

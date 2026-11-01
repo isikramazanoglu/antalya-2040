@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SynergyDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/synergy_definition.gd" id="1_pdoba"]
+
+[resource]
+script = ExtResource("1_pdoba")
+requires = Array[StringName]([&"water_storage", &"water_reuse"])
+id = &"syn_water_loop"
+display_name = "Kombinasyon: Su depolama + geri kazanım"
+short_description = "Geri kazanılan su depolanır; kurak dönemde kullanılabilir su artar."
+category = &"synergy"
+risk_reduction = {
+&"drought": 0.1
+}
+recycled_water_production = 5.0

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="MissionDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/mission_definition.gd" id="1_emh0l"]
+
+[resource]
+script = ExtResource("1_emh0l")
+id = &"emissions_85"
+title = "Yerel emisyonu 85'in altına indir"
+description = "Enerji, ulaşım ve atıktan gelen emisyonu azalt."
+stat = "emissions_total"
+target = 85.0
+at_most = true
+deadline_year = 2048
+reward_credits = 50

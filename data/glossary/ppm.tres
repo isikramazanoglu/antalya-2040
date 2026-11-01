@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_ypwmr"]
+
+[resource]
+script = ExtResource("1_ypwmr")
+id = &"ppm"
+title = "PPM (milyonda bir)"
+definition = "Atmosferdeki CO₂ miktarını anlatan birim. NOAA'ya göre 0.000400 oranı 400 ppm olarak yazılır."
+example = "Grafikteki her değer o yılın ortalama CO₂ yoğunluğudur."
+game_link = "Küresel CO₂ grafiğinin birimi ppm'dir; şehrin emisyon endeksiyle aynı ölçek değildir."
+sources = Array[String](["NOAA Global Monitoring Laboratory, Trends in Atmospheric Carbon Dioxide (web sayfası), https://gml.noaa.gov/ccgg/trends/, erişim 2026-10-31"])

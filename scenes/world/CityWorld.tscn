@@ -1,65 +1,209 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/world/city_world.gd" id="1_city"]
+[ext_resource type="Script" path="res://scripts/world/city_world.gd" id="1_city_world"]
+[ext_resource type="PackedScene" path="res://scenes/world/CameraRig.tscn" id="2_CameraRig"]
+[ext_resource type="PackedScene" path="res://scenes/world/BuildPlot.tscn" id="3_BuildPlot"]
+[ext_resource type="PackedScene" path="res://scenes/world/DisasterFX.tscn" id="4_DisasterFX"]
+[ext_resource type="Script" path="res://scripts/world/city_decor.gd" id="5_city_decor"]
+[ext_resource type="ShaderMaterial" path="res://assets/materials/sea.tres" id="6_sea"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/ground.tres" id="7_ground"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/sand.tres" id="8_sand"]
+[ext_resource type="PackedScene" path="res://scenes/world/Reservoir.tscn" id="9_Reservoir"]
 
-[sub_resource type="ProceduralSkyMaterial" id="Sky_mat"]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
+sky_top_color = Color(0.4745, 0.7255, 0.8471, 1)
+sky_horizon_color = Color(0.851, 0.9098, 0.9137, 1)
+ground_bottom_color = Color(0.42, 0.52, 0.56, 1)
+ground_horizon_color = Color(0.851, 0.9098, 0.9137, 1)
+sun_angle_max = 20.0
 
-[sub_resource type="Sky" id="Sky_1"]
-sky_material = SubResource("Sky_mat")
+[sub_resource type="Sky" id="Sky_2"]
+sky_material = SubResource("ProceduralSkyMaterial_1")
 
-[sub_resource type="Environment" id="Env_1"]
+[sub_resource type="Environment" id="Environment_3"]
 background_mode = 2
-sky = SubResource("Sky_1")
-tonemap_mode = 2
+sky = SubResource("Sky_2")
+ambient_light_source = 2
+ambient_light_color = Color(0.6588, 0.8314, 0.8784, 1)
+ambient_light_energy = 0.45
+reflected_light_source = 2
+tonemap_mode = 3
+tonemap_exposure = 0.95
+tonemap_white = 6.0
 ssao_enabled = true
+ssao_radius = 1.2
+ssao_intensity = 1.5
+ssao_power = 1.2
+ssao_detail = 0.5
+ssao_light_affect = 0.0
+glow_enabled = true
+glow_intensity = 0.3
+glow_bloom = 0.0
+fog_enabled = true
+fog_light_color = Color(0.851, 0.9098, 0.9137, 1)
+fog_density = 0.0006
+fog_sky_affect = 0.3
+adjustment_enabled = true
+adjustment_contrast = 1.14
+adjustment_saturation = 1.08
 
-[sub_resource type="PlaneMesh" id="Ground_mesh"]
-size = Vector2(60, 40)
+[sub_resource type="BoxMesh" id="BoxMesh_4"]
+size = Vector3(220, 2, 104)
 
-[sub_resource type="StandardMaterial3D" id="Ground_mat"]
-albedo_color = Color(0.82, 0.74, 0.58, 1)
+[sub_resource type="BoxShape3D" id="BoxShape3D_5"]
+size = Vector3(220, 2, 104)
 
-[sub_resource type="BoxShape3D" id="Ground_shape"]
-size = Vector3(60, 0.2, 40)
+[sub_resource type="BoxMesh" id="BoxMesh_6"]
+size = Vector3(220, 0.4, 40)
 
-[sub_resource type="PlaneMesh" id="Sea_mesh"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_7"]
 size = Vector2(600, 600)
+subdivide_width = 240
+subdivide_depth = 240
 
-[sub_resource type="StandardMaterial3D" id="Sea_mat"]
-albedo_color = Color(0.12, 0.71, 0.69, 1)
-roughness = 0.15
+[node name="CityWorld" type="Node3D"]
+script = ExtResource("1_city_world")
 
-[node name="CityWorld" type="Node3D" unique_id=1482166477]
-script = ExtResource("1_city")
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_3")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1615779557]
-environment = SubResource("Env_1")
-
-[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1976666731]
-transform = Transform3D(0.8682431, -0.38624364, 0.31139958, 0, 0.62764585, 0.77849895, -0.49613893, -0.6759263, 0.54494923, 0, 20, 0)
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.766044, -0.477684, 0.430109, 0, 0.669131, 0.743145, -0.642788, -0.569282, 0.512584, 0, 30, 0)
+light_color = Color(1, 0.9412, 0.8627, 1)
+light_energy = 1.75
+light_angular_distance = 0.35
 shadow_enabled = true
+shadow_opacity = 1.0
+shadow_blur = 1.2
+directional_shadow_mode = 2
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 120.0
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=569881340]
-transform = Transform3D(0.67349, -0.41977388, 0.60844153, 0, 0.8231122, 0.5678787, -0.73919636, -0.38246062, 0.5543578, 45, 42, 45)
-current = true
-fov = 35.0
-far = 1000.0
+[node name="CameraRig" parent="." instance=ExtResource("2_CameraRig")]
+transform = Transform3D(0.819152, 0, 0.573576, 0, 1, 0, -0.573576, 0, 0.819152, -6.9, 0, -2.6)
 
-[node name="Terrain" type="StaticBody3D" parent="." unique_id=1369139612]
+[node name="Terrain" type="StaticBody3D" parent="."]
+collision_mask = 0
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain" unique_id=2104781630]
-mesh = SubResource("Ground_mesh")
-surface_material_override/0 = SubResource("Ground_mat")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, -38)
+mesh = SubResource("BoxMesh_4")
+surface_material_override/0 = ExtResource("7_ground")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain" unique_id=1842116583]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
-shape = SubResource("Ground_shape")
+[node name="Beach" type="MeshInstance3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 0.989728, -0.142961, 0, 0.142961, 0.989728, 0, -3.057161, 33.765975)
+mesh = SubResource("BoxMesh_6")
+surface_material_override/0 = ExtResource("8_sand")
 
-[node name="Sea" type="MeshInstance3D" parent="." unique_id=1600350638]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
-mesh = SubResource("Sea_mesh")
-surface_material_override/0 = SubResource("Sea_mat")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, -38)
+shape = SubResource("BoxShape3D_5")
 
-[node name="Plots" type="Node3D" parent="." unique_id=1537552113]
+[node name="Sea" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.45, 316)
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_7")
+material_override = ExtResource("6_sea")
 
-[node name="Decor" type="Node3D" parent="." unique_id=1755084831]
+[node name="Plots" type="Node3D" parent="."]
+
+[node name="U01" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, -10)
+plot_id = &"U01"
+plot_kind = &"urban"
+size = 6.0
+
+[node name="U02" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -10)
+plot_id = &"U02"
+plot_kind = &"urban"
+size = 6.0
+
+[node name="U03" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -10)
+plot_id = &"U03"
+plot_kind = &"urban"
+size = 6.0
+
+[node name="U04" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -10)
+plot_id = &"U04"
+plot_kind = &"urban"
+size = 6.0
+
+[node name="U05" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 2)
+plot_id = &"U05"
+plot_kind = &"urban"
+size = 6.0
+
+[node name="U06" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 2)
+plot_id = &"U06"
+plot_kind = &"urban"
+size = 6.0
+
+[node name="U07" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 2)
+plot_id = &"U07"
+plot_kind = &"urban"
+size = 6.0
+
+[node name="U08" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 2)
+plot_id = &"U08"
+plot_kind = &"urban"
+size = 6.0
+
+[node name="O01" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, -24)
+plot_id = &"O01"
+plot_kind = &"open"
+size = 8.0
+
+[node name="O02" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -24)
+plot_id = &"O02"
+plot_kind = &"open"
+size = 8.0
+
+[node name="O03" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -24)
+plot_id = &"O03"
+plot_kind = &"open"
+size = 8.0
+
+[node name="O04" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -24)
+plot_id = &"O04"
+plot_kind = &"open"
+size = 8.0
+
+[node name="O05" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, -24)
+plot_id = &"O05"
+plot_kind = &"open"
+size = 8.0
+
+[node name="C01" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 11.3)
+plot_id = &"C01"
+plot_kind = &"coastal"
+size = 6.0
+
+[node name="C02" parent="Plots" instance=ExtResource("3_BuildPlot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 11.3)
+plot_id = &"C02"
+plot_kind = &"coastal"
+size = 6.0
+
+[node name="Reservoir" parent="." instance=ExtResource("9_Reservoir")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -40)
+
+[node name="Decor" type="Node3D" parent="."]
+script = ExtResource("5_city_decor")
+
+[node name="DisasterFX" parent="." node_paths=PackedStringArray("world_environment", "sun", "sea") instance=ExtResource("4_DisasterFX")]
+world_environment = NodePath("../WorldEnvironment")
+sun = NodePath("../Sun")
+sea = NodePath("../Sea")

@@ -1,0 +1,242 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/buildings/Building.tscn" id="1_Building"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_lawn.tres" id="2_bld_lawn"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_metal.tres" id="3_bld_metal"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_stone.tres" id="4_bld_stone"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_turquoise.tres" id="5_bld_turquoise"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_solar.tres" id="6_bld_solar"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_glass.tres" id="7_bld_glass"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_wood.tres" id="8_bld_wood"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_metal_dark.tres" id="9_bld_metal_dark"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_glow_cool.tres" id="10_bld_glow_cool"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_asphalt.tres" id="11_bld_asphalt"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_cream.tres" id="12_bld_cream"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_window.tres" id="13_bld_window"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(5.6, 0.04, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(5.6, 0.05, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3"]
+size = Vector3(5.4, 0.25, 1.9)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4"]
+top_radius = 0.1
+bottom_radius = 0.1
+height = 2.4
+radial_segments = 8
+rings = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_5"]
+size = Vector3(5.6, 0.1, 1.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6"]
+size = Vector3(2.4, 0.04, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7"]
+size = Vector3(4.6, 1.3, 0.04)
+
+[sub_resource type="BoxMesh" id="BoxMesh_8"]
+size = Vector3(1.2, 0.1, 0.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_9"]
+size = Vector3(1, 0.36, 0.3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_10"]
+size = Vector3(0.3, 1.8, 0.25)
+
+[sub_resource type="BoxMesh" id="BoxMesh_11"]
+size = Vector3(0.24, 0.6, 0.02)
+
+[sub_resource type="BoxMesh" id="BoxMesh_12"]
+size = Vector3(5.6, 0.03, 1.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_13"]
+size = Vector3(5.4, 0.02, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_14"]
+size = Vector3(4.2, 1.25, 1.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_15"]
+size = Vector3(4.22, 0.42, 1.17)
+
+[sub_resource type="BoxMesh" id="BoxMesh_16"]
+size = Vector3(4.22, 0.14, 1.17)
+
+[sub_resource type="BoxMesh" id="BoxMesh_17"]
+size = Vector3(1.6, 0.16, 0.8)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_18"]
+top_radius = 0.24
+bottom_radius = 0.24
+height = 1.2
+radial_segments = 10
+rings = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_19"]
+size = Vector3(0.16, 3, 0.16)
+
+[sub_resource type="BoxMesh" id="BoxMesh_20"]
+size = Vector3(0.12, 0.12, 0.95)
+
+[sub_resource type="BoxMesh" id="BoxMesh_21"]
+size = Vector3(0.7, 0.06, 0.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_22"]
+size = Vector3(0.5, 1, 0.35)
+
+[node name="b_transit_hub" instance=ExtResource("1_Building")]
+building_id = &"transit_hub"
+footprint = 6.0
+height_class = &"public"
+
+[node name="TramBed" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -2.1)
+mesh = SubResource("BoxMesh_1")
+surface_material_override/0 = ExtResource("2_bld_lawn")
+cast_shadow = 0
+
+[node name="Rail" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.065, -2.4)
+mesh = SubResource("BoxMesh_2")
+surface_material_override/0 = ExtResource("3_bld_metal")
+
+[node name="Rail2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.065, -1.8)
+mesh = SubResource("BoxMesh_2")
+surface_material_override/0 = ExtResource("3_bld_metal")
+
+[node name="Platform" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, -0.3)
+mesh = SubResource("BoxMesh_3")
+surface_material_override/0 = ExtResource("4_bld_stone")
+
+[node name="Column" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 1.45, -0.3)
+mesh = SubResource("CylinderMesh_4")
+surface_material_override/0 = ExtResource("3_bld_metal")
+
+[node name="Column2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 1.45, -0.3)
+mesh = SubResource("CylinderMesh_4")
+surface_material_override/0 = ExtResource("3_bld_metal")
+
+[node name="WingN" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0.987688, 0.156434, 0, -0.156434, 0.987688, 0, 2.68, -0.82)
+mesh = SubResource("BoxMesh_5")
+surface_material_override/0 = ExtResource("5_bld_turquoise")
+
+[node name="WingS" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0.987688, -0.156434, 0, 0.156434, 0.987688, 0, 2.68, 0.22)
+mesh = SubResource("BoxMesh_5")
+surface_material_override/0 = ExtResource("5_bld_turquoise")
+
+[node name="RoofSolar" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0.987688, 0.156434, 0, -0.156434, 0.987688, -1.3, 2.81, -0.82)
+mesh = SubResource("BoxMesh_6")
+surface_material_override/0 = ExtResource("6_bld_solar")
+
+[node name="RoofSolar2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0.987688, 0.156434, 0, -0.156434, 0.987688, 1.3, 2.81, -0.82)
+mesh = SubResource("BoxMesh_6")
+surface_material_override/0 = ExtResource("6_bld_solar")
+
+[node name="WindScreen" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, -1.15)
+mesh = SubResource("BoxMesh_7")
+surface_material_override/0 = ExtResource("7_bld_glass")
+
+[node name="BenchSeat" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.42, -0.75)
+mesh = SubResource("BoxMesh_8")
+surface_material_override/0 = ExtResource("8_bld_wood")
+
+[node name="BenchBase" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.19, -0.75)
+mesh = SubResource("BoxMesh_9")
+surface_material_override/0 = ExtResource("4_bld_stone")
+
+[node name="BenchSeat2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.42, -0.75)
+mesh = SubResource("BoxMesh_8")
+surface_material_override/0 = ExtResource("8_bld_wood")
+
+[node name="BenchBase2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.19, -0.75)
+mesh = SubResource("BoxMesh_9")
+surface_material_override/0 = ExtResource("4_bld_stone")
+
+[node name="InfoPylon" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45, 1.15, 0.2)
+mesh = SubResource("BoxMesh_10")
+surface_material_override/0 = ExtResource("9_bld_metal_dark")
+
+[node name="InfoScreen" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45, 1.5, 0.33)
+mesh = SubResource("BoxMesh_11")
+surface_material_override/0 = ExtResource("10_bld_glow_cool")
+
+[node name="BusLane" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 1.75)
+mesh = SubResource("BoxMesh_12")
+surface_material_override/0 = ExtResource("11_bld_asphalt")
+cast_shadow = 0
+
+[node name="LaneMark" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 2.6)
+mesh = SubResource("BoxMesh_13")
+surface_material_override/0 = ExtResource("12_bld_cream")
+cast_shadow = 0
+
+[node name="Bus" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.82, 1.7)
+mesh = SubResource("BoxMesh_14")
+surface_material_override/0 = ExtResource("12_bld_cream")
+
+[node name="BusWindows" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 1.08, 1.7)
+mesh = SubResource("BoxMesh_15")
+surface_material_override/0 = ExtResource("13_bld_window")
+
+[node name="BusStripe" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.55, 1.7)
+mesh = SubResource("BoxMesh_16")
+surface_material_override/0 = ExtResource("5_bld_turquoise")
+
+[node name="BusRoofPack" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 1.52, 1.7)
+mesh = SubResource("BoxMesh_17")
+surface_material_override/0 = ExtResource("3_bld_metal")
+
+[node name="Wheel" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, -1.9, 0.24, 1.7)
+mesh = SubResource("CylinderMesh_18")
+surface_material_override/0 = ExtResource("11_bld_asphalt")
+
+[node name="Wheel2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 1, 0.24, 1.7)
+mesh = SubResource("CylinderMesh_18")
+surface_material_override/0 = ExtResource("11_bld_asphalt")
+
+[node name="ChargerMast" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 1.5, 2.55)
+mesh = SubResource("BoxMesh_19")
+surface_material_override/0 = ExtResource("3_bld_metal")
+
+[node name="ChargerArm" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.95, 2.1)
+mesh = SubResource("BoxMesh_20")
+surface_material_override/0 = ExtResource("3_bld_metal")
+
+[node name="Pantograph" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.85, 1.7)
+mesh = SubResource("BoxMesh_21")
+surface_material_override/0 = ExtResource("9_bld_metal_dark")
+
+[node name="ChargerCabinet" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.5, 2.25)
+mesh = SubResource("BoxMesh_22")
+surface_material_override/0 = ExtResource("3_bld_metal")

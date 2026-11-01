@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ui/thumbnails/recycling_compost.png" id="1_2ukyx"]
+[ext_resource type="Resource" path="res://data/cards/card_recycling_compost.tres" id="1_n08yj"]
+[ext_resource type="PackedScene" path="res://scenes/buildings/b_recycling_compost.tscn" id="2_2ukyx"]
+[ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_8f3dc"]
+
+[resource]
+script = ExtResource("2_8f3dc")
+id = &"recycling_compost"
+display_name = "Geri dönüşüm ve kompost tesisi"
+short_description = "Ambalajı geri kazanır, organik atığı toprağa döndürür."
+category = &"waste"
+cost = 250
+upkeep_per_year = 10
+allowed_plot_kinds = Array[StringName]([&"open"])
+scene = ExtResource("2_2ukyx")
+icon = ExtResource("1_2ukyx")
+on_build_effects = {
+"ecosystem_health": 3.0
+}
+emission_multipliers = {
+"waste": -0.35
+}
+info_card = ExtResource("1_n08yj")

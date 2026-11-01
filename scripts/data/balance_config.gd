@@ -22,6 +22,15 @@ extends Resource
 @export var population_growth_min: float = -0.03
 @export var population_growth_max: float = 0.04
 
+@export_group("Kaynak akışları")
+## Kişi başı yıllık enerji ve su talebi (oyun birimi). Talebin yenilenebilirle karşılanmayan kısmı şebekeden (fosil) gelir.
+@export var energy_per_capita: float = 0.1
+@export var water_per_capita: float = 0.1
+## Binalardan bağımsız mevcut su arzı (baraj, kuyu).
+@export var base_water_supply: float = 55.0
+## Su talebinin içme dışı (sulama, temizlik) kısmı: geri kazanılmış su en fazla bu kadarını karşılar.
+@export var non_potable_water_share: float = 0.3
+
 @export_group("İklim")
 ## 500 nüfus için sektör taban emisyonu (oyun birimi).
 @export var base_emissions: Dictionary = {"energy": 40.0, "transport": 25.0, "buildings": 20.0, "waste": 15.0}

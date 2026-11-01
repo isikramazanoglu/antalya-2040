@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/disaster_fx.gd" id="1_disaster_fx"]
+[ext_resource type="PackedScene" path="res://scenes/world/effects/HeatEffect.tscn" id="2_HeatEffect"]
+[ext_resource type="PackedScene" path="res://scenes/world/effects/DroughtEffect.tscn" id="3_DroughtEffec"]
+[ext_resource type="PackedScene" path="res://scenes/world/effects/FloodEffect.tscn" id="4_FloodEffect"]
+
+[node name="DisasterFX" type="Node3D"]
+script = ExtResource("1_disaster_fx")
+
+[node name="HeatEffect" parent="." instance=ExtResource("2_HeatEffect")]
+
+[node name="DroughtEffect" parent="." instance=ExtResource("3_DroughtEffec")]
+
+[node name="FloodEffect" parent="." instance=ExtResource("4_FloodEffect")]

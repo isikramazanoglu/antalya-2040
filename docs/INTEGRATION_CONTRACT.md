@@ -4,7 +4,7 @@ Bu belge Ekip A (şehir ve 3D) ile Ekip B (simülasyon ve arayüz) arasındaki t
 İki taraf birbirinin koduna yalnızca burada yazan sinyaller, fonksiyonlar ve veri şekilleri üzerinden dokunur.
 Burada yazmayan bir şeye güvenen kod, sözleşme dışıdır.
 
-Sürüm: **v1.0** (2026-10-30). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
+Sürüm: **v1.9** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
 
 ---
 
@@ -44,8 +44,9 @@ Sürüm: **v1.0** (2026-10-30). Her değişiklikte sürümü artırın ve en alt
 | `build_requested` | `plot_id: StringName, building_id: StringName` | B · `BuildPanel` | B · `GameController` |
 | `build_approved` | `plot_id: StringName, building_id: StringName` | B · `GameController` | A · `CityWorld`, B · `BuildPanel`, `HUD` |
 | `build_rejected` | `plot_id: StringName, building_id: StringName, reason: StringName` | B · `GameController` | B · `BuildPanel` |
+| `plot_deselect_requested` (v1.3) | yok | B · `BuildPanel` (kapat düğmesi, Esc) | A · `CityWorld` → seçimi bırakır ve `plot_deselected` yayar |
 
-`reason` değerleri: `&"not_enough_credits"`, `&"plot_occupied"`, `&"wrong_plot_kind"`, `&"max_count_reached"`, `&"wrong_phase"`, `&"unknown_building"`.
+`reason` değerleri: `&"not_enough_credits"`, `&"plot_occupied"`, `&"wrong_plot_kind"`, `&"max_count_reached"`, `&"wrong_phase"`, `&"unknown_building"`, v1.4: `&"scene_unavailable"` (bina sahnesi yüklenemiyor), `&"unknown_plot"` (bu oturumda `plot_selected` ile bildirilmemiş arsa).
 
 ### 3.2 Durum ve tur
 
@@ -78,6 +79,9 @@ Ekip A, `phase_changed` ile gelen değer `&"build"` değilse arsa seçimini kapa
 | `crisis_started` | `event_id: StringName, risk_type: StringName, severity: float` | B · `TurnManager` | A · `CityWorld` (görsel efekt), B · `EventPanel` |
 | `crisis_response_chosen` | `event_id: StringName, response_id: StringName` | B · `EventPanel` | B · `GameController` |
 | `crisis_resolved` | `result: Dictionary` (şekil §5.3) | B · `TurnManager` | A · `CityWorld` (efekti bitir), B · `EventPanel` |
+| `crisis_stage_changed` (v1.5) | `event_id: StringName, stage: StringName, info: Dictionary` (şekil §5.6) | B · `TurnManager` | A · `CityWorld` (isteğe bağlı: aşamaya göre görsel) |
+
+`stage` değerleri (v1.5), sırayla: `&"warning"` (yıl N sonu, `crisis_warned` ile aynı an) → `&"preparation"` (yıl N+1 başı) → `&"active"` (yıl N+1 sonu, `crisis_started`'dan hemen önce) → `&"resolved"` (`crisis_resolved`'dan hemen sonra) → `&"ended"` (rapor kapanınca). Mevcut `crisis_started` / `crisis_resolved` aynen yayılmaya devam eder; A yeni sinyali kullanmak zorunda değildir.
 
 `risk_type` değerleri: `&"drought"` (kuraklık), `&"heat"` (aşırı sıcak), `&"coastal_flood"` (kıyı taşkını).
 `severity`: 0.0 ile 1.0 arası. Ekip A bunu efekt şiddeti için kullanır (ör. su seviyesi yüksekliği).
@@ -118,7 +122,17 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
   "emissions_total": float,       # oyun birimi, yıllık
   "emissions_by_sector": { "energy": float, "transport": float, "buildings": float, "waste": float },
   "risks": { "drought": float, "heat": float, "coastal_flood": float },   # 0..100
-  "global_co2_ppm": float         # kaynak tablodan; veri yoksa -1.0
+  "global_co2_ppm": float,        # kaynak tablodan; veri yoksa -1.0
+  # v1.2 kaynak akışları (oyun birimi, bilgi amaçlı; endekslerden ayrı)
+  "energy_demand": float,
+  "renewable_energy": float,
+  "renewable_share": float,       # 0..1
+  "water_demand": float,
+  "water_supply": float,          # içme suyu kalitesinde arz
+  "recycled_water": float,        # v1.8: geri kazanılmış su üretimi (içme suyu sayılmaz)
+  "recycled_water_used": float,   # v1.8: bunun içme dışı talebi karşılayan kısmı
+  "waste_recovery": float,        # v1.9: atık azaltma oranı 0..1
+  "climate_resilience": float     # v1.9: üç risk için ortalama yatırım koruması 0..0.8
 }
 ```
 
@@ -137,9 +151,36 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
   "risk_type": StringName,
   "mitigation": float,            # 0..0.8, yatırımlardan gelen koruma oranı
   "damage": { "<stat_adı>": float },   # uygulanan değişimler, ör. {"credits": -120, "water_security": -8}
-  "summary_text": String          # rapora yazılacak tek cümle
+  "summary_text": String,         # rapora yazılacak tek cümle
+  "severity": float,              # v1.5: tehlike şiddeti 0.2..1 (yatırımdan bağımsız ham risk)
+  "assessment": Dictionary        # v1.5: {"hazard", "exposure", "vulnerability", "mitigation": float, "advantages": Array[StringName]}
 }
 ```
+
+### 3.4 Final sunumu (v1.9)
+
+| Sinyal | Parametreler | Yayan | Dinleyen |
+|---|---|---|---|
+| `final_presentation_requested` | `summary: Dictionary` (§5.5) | B · FinalReport ("Şehrin dönüşümünü izle") | A · CityWorld (geliştirilecek) |
+| `final_presentation_finished` | yok | A (geliştirilecek) | B · FinalReport |
+
+Ayrıntı ve kabul ölçütleri: `docs/FINAL_VISUAL_CONTRACT.md`.
+
+### 5.6 `info` (crisis_stage_changed, v1.5)
+
+```
+{
+  "severity": float,              # 0.2..1
+  "due_year": int,
+  "visual_effect_id": StringName, # heat_haze, drought_dust, storm_surge
+  "affected_area": StringName,    # city, farmland, coast
+  "affected_plot_kinds": Array,   # ör. [&"coastal"]; A bunu arsa kimliklerine çevirebilir
+  "progress": float,              # warning 0.0, preparation 0.25, active 0.5, resolved 0.75, ended 1.0
+  "mitigation": float,            # v1.6: o risk için yatırımların koruma oranı 0..0.8 (aşama anındaki binalardan)
+  "advantages": Array             # v1.6: koruma sağlayan building_id listesi (StringName)
+}
+```
+Bütün aşamalarda bu sekiz anahtarın hepsi vardır. `mitigation` ve `advantages` aşama anındaki binalardan hesaplanır; örneğin uyarı ile kriz arasında park yapılırsa `active` aşamasında artar.
 
 ### 5.4 `report` (yıl sonu)
 
@@ -152,14 +193,17 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
   "upkeep": int,
   "built_this_year": Array,       # building_id listesi
   "crisis_results": Array,        # §5.3 listesi
-  "new_warnings": Array           # §5.2 listesi
+  "new_warnings": Array,          # §5.2 listesi
+  "missions": { "completed": Array, "failed": Array, "reward": int },  # v1.1
+  "investment_cost": int          # v1.9: o yıl onaylanan yatırımların maliyet toplamı
 }
 ```
 
 ### 5.5 `summary` (oyun sonu)
 
 ```
-{ "final_stats": Dictionary, "history": Array, "score": int, "grade": String }
+{ "final_stats": Dictionary, "history": Array, "score": int, "grade": String, "emission_reduction_pct": int, "start_stats": Dictionary,
+  "evaluation": Dictionary, "city_2040": Dictionary, "city_2052": Dictionary }   # v1.1, v1.7, v1.9 (evaluation, city_2040, city_2052: FINAL_VISUAL_CONTRACT.md)
 ```
 
 `history`: her yıl sonunun `stats` kopyası (ClimateLab grafikleri de bunu kullanır).
@@ -187,6 +231,8 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
 
 1. `phase == &"build"` mi? Değilse `wrong_phase`.
 2. Tanım var mı? Yoksa `unknown_building`.
+2a. (v1.4) Tanımın `scene` alanı yüklenebilir mi? Değilse `scene_unavailable`.
+2b. (v1.4) Arsa `plot_selected` ile bildirilmiş mi? Değilse `unknown_plot`.
 3. Arsa boş mu (`GameState.get_building_on`)? Değilse `plot_occupied`.
 4. `plot_kind` izinli mi? Değilse `wrong_plot_kind`. (Plot türünü `plot_selected` anında `GameController` de dinleyip saklar.)
 5. Bu binadan `max_count` kadar var mı? Varsa `max_count_reached`.
@@ -294,3 +340,12 @@ MVP üçlüsü: `solar_plant`, `water_storage`, `green_park`.
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
 | v1.0 | 2026-10-30 | İlk sürüm. |
+| v1.9 | 2026-10-31 | Ekleme: §3.4 final sunum sinyalleri, `summary.evaluation/city_2040/city_2052`, `report.investment_cost`, `stats.waste_recovery/climate_resilience`. `docs/FINAL_VISUAL_CONTRACT.md`. A'nın kullanması isteğe bağlı. |
+| v1.8 | 2026-10-31 | Ekleme: `stats.recycled_water`, `stats.recycled_water_used`. A etkilenmez. Not: `GameState.built_definitions()` artık etkin kombinasyonları (`SynergyDefinition`) da döndürür; `advantages` listesinde yalnızca bina kimlikleri kalır. |
+| v1.7 | 2026-10-31 | Ekleme: `summary.start_stats` (final ekranında başlangıç ↔ final). Yalnızca B'nin YearReport'u kullanır. |
+| v1.6 | 2026-10-31 | Ekleme: `crisis_stage_changed` info'suna `mitigation` ve `advantages`. Ekip A talebi. |
+| v1.5 | 2026-10-31 | Ekleme: `crisis_stage_changed` sinyali (§5.6), `result` içine `severity` ve `assessment`. Mevcut kriz sinyalleri değişmedi; A etkilenmez. |
+| v1.4 | 2026-10-31 | Ekleme: iki ret nedeni (`scene_unavailable`, `unknown_plot`). Sinyal değişikliği yok; A ret nedenlerini kullanmaz. |
+| v1.3 | 2026-10-31 | Ekleme: `plot_deselect_requested` sinyali. Neden: panel kapanınca arsa vurgusu kalıyordu. A onayladı. |
+| v1.2 | 2026-10-31 | Ekleme: `stats` içine enerji ve su akışları (5 anahtar). Sinyal değişikliği yok, A etkilenmez. |
+| v1.1 | 2026-10-30 | Ekleme: `report.missions`, `summary.emission_reduction_pct`. Yalnızca B'nin YearReport'u kullanır; sinyal değişikliği yok, A etkilenmez. |

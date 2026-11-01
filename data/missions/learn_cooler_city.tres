@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MissionDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_green_park.tres" id="1_gxb0m"]
+[ext_resource type="Script" path="res://scripts/data/mission_definition.gd" id="2_2qfqw"]
+
+[resource]
+script = ExtResource("2_2qfqw")
+id = &"learn_cooler_city"
+title = "Daha serin bir şehir"
+description = "Yeşil park yatırımı yap. Öğrenme: kentsel ısı adası ve yeşil altyapı."
+deadline_year = 2052
+category = &"learning"
+kind = &"build"
+required_buildings = Array[StringName]([&"green_park"])
+info_card = ExtResource("1_gxb0m")

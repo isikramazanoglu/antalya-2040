@@ -22,4 +22,13 @@ extends Resource
 @export var emission_multipliers: Dictionary = {}
 ## Kriz hasarını azaltma, ör. {"drought": 0.30}
 @export var risk_reduction: Dictionary = {}
+## Kaynak akışları (oyun birimi/yıl, isteğe bağlı). Üretim yenilenebilirdir; tüketim negatifse tasarruftur.
+@export var energy_production: float = 0.0
+@export var energy_consumption: float = 0.0
+@export var water_production: float = 0.0
+@export var water_consumption: float = 0.0
+## Geri kazanılmış su (Prompt 9A): içme suyu sayılmaz, yalnızca içme dışı talebin bir kısmını karşılar.
+@export var recycled_water_production: float = 0.0
+## Tek yatırımda birden fazla mekanik varsa ayrı ayrı gösterilir: {"Bileşen adı": "etkisi"}.
+@export var components: Dictionary = {}
 @export var info_card: InfoCard

@@ -49,6 +49,11 @@ Hepsi `BalanceConfig` içinde katsayı olarak durur, kodda sabit sayı yazılmaz
 - Yıllık değişim oranı = (yaşam kalitesi − 45) / 1000, −%3 ile +%4 arasında sınırlı.
 - Su güvenliği 30'un altındaysa oran ayrıca −%2.
 
+**Enerji ve su akışları (bilgi amaçlı)**
+- Enerji talebi = nüfus × 0.1 + binaların `energy_consumption` toplamı. Yenilenebilir üretim = binaların `energy_production` toplamı (güneş 20). Yenilenebilir payı = üretim / talep (0–1); kalanı şebekeden, fosil kaynaklı kabul edilir.
+- Su talebi = nüfus × 0.1 + binaların `water_consumption` toplamı (park 1, kent tarımı 2). Su arzı = 55 + binaların `water_production` toplamı (su depolama 10, geri kazanım 15).
+- Bu akışlar İklim Laboratuvarı'nda ve yıl sonu raporunda gösterilir; puanı ve endeksleri doğrudan değiştirmez. Değerler oyun birimidir.
+
 **Emisyon (yerel)**
 - Sektör taban değerleri (500 nüfus için): enerji 40, ulaşım 25, binalar 20, atık 15.
 - Sektör emisyonu = taban × (nüfus / 500) × (1 + o sektördeki `emission_multipliers` toplamı), en düşük %20'ye kadar iner.
@@ -56,6 +61,7 @@ Hepsi `BalanceConfig` içinde katsayı olarak durur, kodda sabit sayı yazılmaz
 **Riskler (0–100)**
 - Başlangıç: kuraklık 40, sıcak 45, kıyı taşkını 30.
 - Her yıl artış: kuraklık +2, sıcak +2, taşkın +1.5. Bu artış oyun içi bir eğilimdir, bilimsel tahmin değildir.
+- Yıl sonunda hesaplanan risk **gelecek yılın** riskidir (uyarılar da gelecek yıl için planlanır).
 - Gösterilen risk = ham risk × (1 − koruma oranı).
 - Koruma oranı = o `risk_type` için tüm binaların `risk_reduction` toplamı, en çok 0.8.
 
@@ -65,11 +71,21 @@ Hepsi `BalanceConfig` içinde katsayı olarak durur, kodda sabit sayı yazılmaz
 
 **Kriz hasarı**
 - Uygulanan hasar = `base_damage` × (1 − koruma oranı) × seçilen müdahalenin `damage_multiplier` değeri.
-- Kriz olasılığı (scripted değilse) = `base_probability` × (gösterilen risk / 50).
+- `scripted_year` dolu olan kriz yalnızca o yıl gelir (demo garantisi). Boşsa her yıl olasılık = `base_probability` × (gösterilen risk / 50).
 
-**Final puanı**
-- Puan = (su + enerji + yaşam kalitesi + ekosistem) / 4 + emisyon azaltma yüzdesi × 0.3 (en çok 30). 
-- Not: 85+ "İklim Lideri", 70+ "Dayanıklı Şehir", 50+ "Gelişen Şehir", altı "Risk Altında".
+**Final değerlendirmesi (Prompt 10A, `FinalEvaluator`)** — oyun içi değerlendirmedir, bilimsel ölçüm değildir. Yedi alt puan (0–100):
+
+| Alt puan | Ağırlık | Nasıl |
+|---|---|---|
+| Ekonomik sürdürülebilirlik | 15 | borçsuz yıl oranı ×60 + final kasa (500 kredi = tam) ×40 |
+| Su yönetimi | 15 | su güvenliği ×0.7 + arzın talebi karşılama oranı ×30 (geri kazanılmış su yalnızca içme dışı) |
+| Enerji yönetimi | 15 | enerji güvenliği ×0.4 + yenilenebilir payı ×30 + kişi başı emisyon azalması (%50 = tam) ×30 |
+| İklim değişikliğine uyum | 15 | üç risk için ortalama koruma / %80 |
+| Ekosistem koruma | 15 | final ekosistem sağlığı |
+| Yaşam kalitesi | 15 | final yaşam kalitesi |
+| Afetlere hazırlık | 10 | krizler anındaki ortalama koruma / %80 (kriz yoksa uyum puanı) |
+
+Genel puan ağırlıklı ortalamadır. Not: 80+ İklim Lideri, 65+ Dayanıklı Şehir, 50+ Gelişen Şehir, altı Risk Altında; her not için ayrı sonuç metni, ayrıca en başarılı ve en zayıf alan önerisiyle gösterilir. 2040 ↔ 2052 karşılaştırmasında bütçe ve nüfus "nötr" (tek başına başarı değil), emisyonda düşüş olumludur; başlangıcı 0 olan göstergede yüzde hesaplanmaz.
 
 ## 5. On iki yatırım (taslak sayılar)
 
@@ -92,11 +108,28 @@ Hepsi `max_count = 1`. MVP üçlüsü: güneş (enerji/emisyon), su depolama (su
 
 Bütçe kontrolü: 13 yılda yaklaşık 2000–2800 kredi birikir; oyuncu 12 yatırımın hepsini alamaz, seçim yapmak zorunda kalır.
 
+## 5b. Yatırım kombinasyonları (Prompt 9A)
+
+İki yatırım birlikte kurulunca ek etki gelir. Kombinasyonlar `SynergyDefinition` (BuildingDefinition'dan türer) olarak `data/synergies/` altında tanımlıdır; `GameState.built_definitions()` etkin olanları binalarla aynı listede döndürür, böylece bonus tek yoldan bir kez uygulanır. Gideri ve maliyeti yoktur.
+
+| Kombinasyon | Gereken | Ek etki |
+|---|---|---|
+| Akıllı enerji | Güneş + kamu verimliliği | Enerji talebi −4 |
+| Su döngüsü | Su depolama + atık su geri kazanımı | Geri kazanılmış su +5, kuraklık hasarı −%10 |
+| Serin şehir | Yeşil park + serinleme merkezi | Sıcak hasarı −%10 |
+| Toprak döngüsü | Kent tarımı + kompost | Ekosistem +1/yıl, atık emisyonu −%5 |
+| Gıda israfı yok | Gıda kurtarma + kompost | Atık emisyonu −%10 |
+| Düşük karbonlu büyüme | Toplu taşıma + kamu verimliliği | Ulaşım −%5, binalar −%5 emisyon |
+
+**Geri kazanılmış su:** atık su geri kazanım tesisi 15 birim geri kazanılmış su üretir; içme suyu arzına eklenmez, yalnızca su talebinin içme dışı kısmını (en çok %30) karşılar.
+
+**Diğer 9A değişiklikleri:** kamu binalarında verimlilik sıcak hava hasarını %10 azaltır. Kıyı yatırımının iki bileşeni kartta ayrı gösterilir: restorasyon (ekosistem +12, taşkın −%30, "kıyı ekosistemine güven" müdahalesi) ve erken uyarı (taşkın −%15, "erken uyarı" müdahalesi).
+
 ## 6. Krizler
 
 | id | risk_type | En erken | Demo yılı (`scripted_year`) | Taban hasar |
 |---|---|---|---|---|
-| `heatwave` | heat | 2042 | 2043 | yaşam −10, nüfus −%2, kredi −100 |
+| `heatwave` | heat | 2042 | 2043 | yaşam −10, nüfus −10 kişi, kredi −100, enerji −8 |
 | `drought` | drought | 2044 | 2046 | su −20, ekosistem −5, kredi −150 |
 | `coastal_flood` | coastal_flood | 2046 | 2049 | kredi −250, ekosistem −8, yaşam −5 |
 
@@ -108,6 +141,33 @@ Her krizin üç müdahale seçeneği olur. Örnek, sıcak hava dalgası:
 | `shift_hours` | Açık hava çalışma saatlerini değiştir | 20 | 0.8 |
 | `do_nothing` | Müdahale etme | 0 | 1.0 |
 
+**Hasar hesabı (Prompt 7A):** taban × tehlike × maruziyet × hassasiyet × (1 − uyum) × müdahale çarpanı; müdahale maliyeti ve ek etkileri ayrıca eklenir.
+- Tehlike = 0.5 + şiddet; şiddet = o yılın yatırımdan bağımsız ham riski / 100 (0.2–1).
+- Maruziyet = nüfus / 500 (0.8–1.5).
+- Hassasiyet = 1 + Σ ağırlık × (50 − gösterge) / 100 (0.6–1.5): kuraklıkta su güvenliği, sıcakta yaşam kalitesi + ekosistem, taşkında ekosistem.
+- Uyum = binaların koruma oranı (en çok %80).
+- Sıcak hava enerji güvenliğini de düşürür (klima talebi).
+
+**Müdahaleler** (altyapı şartlı olanlar yalnızca o bina kuruluysa görünür; bütçe yetmeyen seçilemez):
+
+| Kriz | Seçenek | Maliyet | Çarpan | Şart |
+|---|---|---|---|---|
+| Kuraklık | Su tasarrufu programı (yaşam −3) | 0 | 0.7 | – |
+| | Acil su tedariki | 120 | 0.5 | – |
+| | Su depolama altyapısını devreye al | 20 | 0.35 | Su depolama |
+| | Verimli sulama ve tarım planı (ekosistem +2) | 30 | 0.5 | Kent tarımı |
+| Sıcak hava | Acil enerji desteği (enerji +5) | 90 | 0.65 | – |
+| | Serinleme merkezlerini devreye al | 20 | 0.4 | Serinleme merkezi |
+| | Park ve gölgelendirme altyapısını kullan | 10 | 0.6 | Yeşil park |
+| | Enerji talebini azaltma programı (enerji +3) | 20 | 0.8 | – |
+| | Kamu binalarını serinleme alanı yap | 60 | 0.6 | – |
+| Kıyı taşkını | Acil kıyı koruma önlemleri | 150 | 0.4 | – |
+| | Riskli bölgelerde geçici tahliye (yaşam −2) | 80 | 0.6 | – |
+| | Restore edilmiş kıyı ekosistemine güven | 0 | 0.5 | Kıyı restorasyonu |
+| | Erken uyarı ve koordinasyon merkezini çalıştır | 30 | 0.35 | Kıyı restorasyonu |
+
+Her krizde "Müdahale etme" (0 kredi, ×1.0) de vardır; böylece bütçesi biten oyuncu takılmaz.
+
 Kriz aşamaları: risk uyarısı (yıl N sonu) → hazırlık (yıl N+1) → kriz (yıl N+1 sonu) → müdahale → sonuç ve hasar → yıl sonu raporu. Ayrıntı: `INTEGRATION_CONTRACT.md` §6.6.
 
 ## 7. İklim katmanları
@@ -117,8 +177,8 @@ Kriz aşamaları: risk uyarısı (yıl N sonu) → hazırlık (yıl N+1) → kri
 **B. Küresel atmosferik CO2 (ppm).** Yalnızca bilgi katmanıdır. Oyuncunun yatırımı bu sayıyı değiştirmez. İklim Laboratuvarı'nda şu mesaj verilir: tek bir şehrin emisyonu küresel yoğunluğa çok küçük katkı yapar; etki, dünyadaki bütün şehirlerin toplamıyla oluşur.
 
 Veri kuralı:
-- Geçmiş yıllar NOAA Global Monitoring Laboratory ölçümlerinden alınır (https://gml.noaa.gov/ccgg/trends/).
-- 2040–2052 değerleri ölçüm değil, senaryodur. Bir IPCC AR6 senaryosundan (ör. SSP2-4.5) alınır ve arayüzde senaryo adıyla gösterilir.
+- Geçmiş yıllar NOAA Global Monitoring Laboratory ölçümlerinden alınır (https://gml.noaa.gov/ccgg/trends/). `data/co2_scenario.tres` şu an 1959–2025 Mauna Loa yıllık ortalamalarını içerir (dosya tarihi 2026-10-09).
+- 2040–2052 değerleri ölçüm değil, senaryodur. Henüz eklenmedi; oyun bu yıllar için "veri yok" gösterir. Bir IPCC AR6 senaryosundan (ör. SSP2-4.5) alınır ve arayüzde senaryo adıyla gösterilir.
 - Kaynağı kontrol edilmemiş hiçbir sayı `co2_scenario.tres` dosyasına girmez. Değer yoksa oyun "veri yok" yazar.
 
 **C. Yerel iklim riskleri.** Kuraklık, aşırı sıcak, kıyı taşkını. 0–100 oyun ölçeği. Yatırımlar riski değil hasarı azaltır; arayüzde ham risk ve korunmuş risk ayrı gösterilir.
@@ -126,7 +186,16 @@ Veri kuralı:
 ## 8. Eğitim sistemi
 
 - **Bilgi kartları:** her yatırım ve her kriz için bir `InfoCard`. Yapıda "Nedir? Neden önemli? Antalya'yla bağı" ve kaynak satırı.
-- **Görevler (MVP sonrası):** basit hedefler, ör. "2045'e kadar su güvenliğini 75'e çıkar", "Ulaşım emisyonunu %30 azalt". Yıl sonu raporunda kontrol edilir. Kod yapısı: `GameCatalog` içine `missions` dizisi eklenir (sözleşme değişikliği gerekmez, B içi iş).
+- **Görevler:** yıl sonunda kontrol edilir, tamamlanınca ödül kredisi verilir, son yıl geçerse kaçar. HUD'da sol altta, raporda sonuçlarıyla görünür.
+
+| id | Görev | Son yıl | Ödül |
+|---|---|---|---|
+| `water_75` | Su güvenliğini 75'e çıkar | 2045 | 50 |
+| `quality_70` | Yaşam kalitesini 70'e çıkar | 2047 | 50 |
+| `emissions_85` | Yerel emisyonu 85'in altına indir | 2048 | 50 |
+| `ecosystem_65` | Ekosistem sağlığını 65'te tut | 2050 | 50 |
+
+Hedef ödülleri Prompt 9A'da 100–150'den 50'ye indirildi: kombinasyonlarla birlikte yüksek ödüller ucuz binalardan başlayan stratejiyi "İklim Lideri"ne taşıyordu.
 - **İklim Laboratuvarı:** dört sekme (yerel emisyonlar, küresel CO2, yerel riskler, bilgi kartları).
 - **Grafikler:** yıllık geçmişten çizgi grafikler.
 
@@ -136,10 +205,38 @@ Kaynak kuralları:
 - Aday kurumlar: IPCC AR6 raporları (https://www.ipcc.ch/report/ar6/syr/), NOAA GML, Meteoroloji Genel Müdürlüğü, T.C. Çevre, Şehircilik ve İklim Değişikliği Bakanlığı. Her URL eklenmeden önce açılıp kontrol edilir.
 - Oyun değerleri ile gerçek veriler arayüzde karıştırılmaz: oyun değerleri "oyun ölçeği" etiketi taşır.
 
-## 9. Görsel ve kamera
+**Öğrenme görevleri (Prompt 8):** İklim Laboratuvarı'nın "Öğrenme" sekmesinde, yıl sonunda değerlendirilir, kaçmaz ve **kredi vermez** (10 kredilik ödül bile basit stratejileri "İklim Lideri"ne taşıyıp dengeyi bozdu).
+
+| id | Görev | Koşul |
+|---|---|---|
+| `learn_clean_energy` | Temiz enerjiye geçiş | Güneş enerjisi tesisi kur |
+| `learn_save_water` | Suyunu koru | Su depolama kur |
+| `learn_cooler_city` | Daha serin bir şehir | Yeşil park kur |
+| `learn_zero_waste` | Atıksız şehre doğru | Geri dönüşüm ve kompost tesisi kur |
+| `learn_prepared` | Krize hazırlık | Bir krizi koruyucu yatırım varken karşıla |
+
+**İklim sözlüğü:** 17 kavram (`data/glossary/`), her birinde tanım, örnek, oyundaki bağlantısı ve doğrulanmış kaynak (NASA, US EPA, NOAA, IEA, FAO, UNCCD, The Nature Conservancy, Ellen MacArthur Foundation, IPCC SROCC).
+
+## 9. Denge ölçümü (Gün 3)
+
+`tests/balance_sim.gd` beş stratejiyi otomatik oynatır (yılda en çok bir yatırım, krizde en iyi karşılanabilir müdahale):
+
+| Strateji | Puan | Not | Görev | Kriz kredi kaybı |
+|---|---|---|---|---|
+| Hiçbir şey yapma | 37 | Risk Altında | – | −472 |
+| En ucuzdan başla | 72 | Dayanıklı Şehir | – | – |
+| Önce koruma | 74 | Dayanıklı Şehir | – | – |
+| Yalnız emisyon | 51 | Gelişen Şehir | – | – |
+| Karma | 67 | Dayanıklı Şehir | – | – |
+
+(Prompt 10A'nın 7 boyutlu final değerlendirmesiyle; tek göstergeyi kovalayan strateji dengesiz kaldığı için geride. Ayrıntı `tests/balance_sim.gd` çıktısında.)
+
+"İklim Lideri" (85+) hiçbir otomatik stratejiyle gelmiyor; bilinçli, dengeli oyun ister. Sayılar değişince simülasyon yeniden çalıştırılır.
+
+## 10. Görsel ve kamera
 
 Low-poly 3D, gerçekçi ışık, yumuşak gölge. Akdeniz mimarisi: beyaz sıva, terracotta çatı, turkuaz deniz, yeşil parklar. İzometrik perspektif kamera; yakınlaştırma, ±30° döndürme, harita sınırında duran kaydırma. Arayüz sade ve modern: yarı saydam koyu paneller, tek vurgu rengi (turkuaz), ikonlu gösterge çubuğu.
 
-## 10. Kapsam dışı (hackathon)
+## 11. Kapsam dışı (hackathon)
 
 Kaydet/yükle, bina yıkma ve yükseltme, çok oyunculu, serbest inşaat, gerçek harita verisi, ses dublajı, yerelleştirme (oyun yalnızca Türkçe).

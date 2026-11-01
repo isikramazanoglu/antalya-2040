@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SynergyDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/synergy_definition.gd" id="1_ltsuk"]
+
+[resource]
+script = ExtResource("1_ltsuk")
+requires = Array[StringName]([&"urban_farming", &"recycling_compost"])
+id = &"syn_soil_loop"
+display_name = "Kombinasyon: Kent tarımı + kompost"
+short_description = "Kompost kent tarımına toprak olur; organik atık döngüye girer."
+category = &"synergy"
+yearly_effects = {
+"ecosystem_health": 1.0
+}
+emission_multipliers = {
+"waste": -0.05
+}

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_ivae8"]
+
+[resource]
+script = ExtResource("1_ivae8")
+id = &"card_urban_farming"
+title = "Az suyla tarım"
+body = "Damla sulama suyu doğrudan bitkinin köküne verir, buharlaşma ile kaybolan su azalır. Bölgenin iklimine uygun bitkiler kurak yıllarda daha az etkilenir."
+benefit = "Şehirde taze gıda üretir ve yeşil alan sağlar."
+climate_link = "Damla sulama ve iklime uygun bitkiler az suyla üretim yapar."
+strategic = "Yaşam kalitesine ve ekosisteme katkı verir; kuraklıkta küçük bir koruma sağlar."
+sources = Array[String](["FAO, Agricultural water management (web sayfası), https://www.fao.org/land-water/water/water-management/en/, erişim 2026-10-31"])

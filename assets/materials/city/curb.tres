@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "curb"
+albedo_color = Color(0.518, 0.498, 0.447, 1)
+roughness = 0.9

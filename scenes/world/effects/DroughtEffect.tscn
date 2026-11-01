@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/effects/drought_effect.gd" id="1_drought_effe"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/field_grass.tres" id="2_field_grass"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/hill_green.tres" id="3_hill_green"]
+[ext_resource type="ShaderMaterial" path="res://assets/materials/foliage_olive.tres" id="4_foliage_oliv"]
+[ext_resource type="ShaderMaterial" path="res://assets/materials/foliage_cypress.tres" id="5_foliage_cypr"]
+[ext_resource type="ShaderMaterial" path="res://assets/materials/foliage_palm.tres" id="6_foliage_palm"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/ground.tres" id="7_ground"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_lawn.tres" id="8_bld_lawn"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_olive.tres" id="9_bld_olive"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_shrub.tres" id="10_bld_shrub"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_crop.tres" id="11_bld_crop"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_dune.tres" id="12_bld_dune"]
+
+[node name="DroughtEffect" type="Node3D"]
+script = ExtResource("1_drought_effe")
+visual_effect_id = &"drought_dust"
+risk_type = &"drought"
+default_plot_kinds = Array[StringName]([&"open"])
+marker_color = Color(0.35, 0.6, 1, 1)
+focus_point = Vector3(0, 0, -32)
+dry_materials = Array[Material]([ExtResource("2_field_grass"), ExtResource("3_hill_green"), ExtResource("4_foliage_oliv"), ExtResource("5_foliage_cypr"), ExtResource("6_foliage_palm")])
+ground_material = ExtResource("7_ground")
+building_materials = Array[Material]([ExtResource("8_bld_lawn"), ExtResource("9_bld_olive"), ExtResource("10_bld_shrub"), ExtResource("11_bld_crop"), ExtResource("12_bld_dune")])

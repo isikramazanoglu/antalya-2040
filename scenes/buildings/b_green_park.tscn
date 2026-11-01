@@ -1,0 +1,387 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/buildings/Building.tscn" id="1_Building"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_lawn.tres" id="2_bld_lawn"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_stone.tres" id="3_bld_stone"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_water.tres" id="4_bld_water"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_wood.tres" id="5_bld_wood"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_olive.tres" id="6_bld_olive"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_cypress.tres" id="7_bld_cypress"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_shrub.tres" id="8_bld_shrub"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_turquoise_light.tres" id="9_bld_turquoise_"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_terracotta.tres" id="10_bld_terracotta"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_fruit.tres" id="11_bld_fruit"]
+[ext_resource type="StandardMaterial3D" path="res://assets/materials/buildings/bld_mist.tres" id="12_bld_mist"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(5.6, 0.04, 5.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(5.6, 0.06, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3"]
+size = Vector3(0.8, 0.06, 5.6)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4"]
+top_radius = 0.95
+bottom_radius = 0.95
+height = 0.35
+radial_segments = 14
+rings = 0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_5"]
+top_radius = 0.8
+bottom_radius = 0.8
+height = 0.04
+radial_segments = 14
+rings = 0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 0.7
+radial_segments = 8
+rings = 0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_7"]
+top_radius = 0.1
+bottom_radius = 0.1
+height = 0.9
+radial_segments = 6
+rings = 0
+
+[sub_resource type="SphereMesh" id="SphereMesh_8"]
+radius = 0.72
+height = 1.1
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_9"]
+top_radius = 0.09
+bottom_radius = 0.09
+height = 0.81
+radial_segments = 6
+rings = 0
+
+[sub_resource type="SphereMesh" id="SphereMesh_10"]
+radius = 0.648
+height = 0.99
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_11"]
+top_radius = 0.105
+bottom_radius = 0.105
+height = 0.945
+radial_segments = 6
+rings = 0
+
+[sub_resource type="SphereMesh" id="SphereMesh_12"]
+radius = 0.756
+height = 1.155
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_13"]
+top_radius = 0.072
+bottom_radius = 0.072
+height = 0.36
+radial_segments = 6
+rings = 0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_14"]
+top_radius = 0.036
+bottom_radius = 0.288
+height = 1.8
+radial_segments = 8
+rings = 0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_15"]
+top_radius = 0.068
+bottom_radius = 0.068
+height = 0.34
+radial_segments = 6
+rings = 0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_16"]
+top_radius = 0.034
+bottom_radius = 0.272
+height = 1.7
+radial_segments = 8
+rings = 0
+
+[sub_resource type="SphereMesh" id="SphereMesh_17"]
+radius = 0.3
+height = 0.39
+radial_segments = 7
+rings = 3
+
+[sub_resource type="SphereMesh" id="SphereMesh_18"]
+radius = 0.28
+height = 0.364
+radial_segments = 7
+rings = 3
+
+[sub_resource type="SphereMesh" id="SphereMesh_19"]
+radius = 0.26
+height = 0.338
+radial_segments = 7
+rings = 3
+
+[sub_resource type="BoxMesh" id="BoxMesh_20"]
+size = Vector3(1.2, 0.1, 0.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_21"]
+size = Vector3(1, 0.36, 0.3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_22"]
+size = Vector3(0.4, 0.1, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_23"]
+size = Vector3(0.3, 0.36, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_24"]
+size = Vector3(0.1, 2.1, 0.1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_25"]
+size = Vector3(1.8, 0.06, 0.1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_26"]
+size = Vector3(1.7, 0.03, 1.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_27"]
+size = Vector3(0.9, 0.25, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_28"]
+size = Vector3(0.8, 0.12, 0.4)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_29"]
+top_radius = 0.08
+bottom_radius = 0.55
+height = 1.4
+radial_segments = 10
+rings = 0
+
+[node name="b_green_park" instance=ExtResource("1_Building")]
+building_id = &"green_park"
+footprint = 6.0
+height_class = &"ground"
+
+[node name="Ground" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("BoxMesh_1")
+surface_material_override/0 = ExtResource("2_bld_lawn")
+cast_shadow = 0
+
+[node name="PathX" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, 0)
+mesh = SubResource("BoxMesh_2")
+surface_material_override/0 = ExtResource("3_bld_stone")
+cast_shadow = 0
+
+[node name="PathZ" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, 0)
+mesh = SubResource("BoxMesh_3")
+surface_material_override/0 = ExtResource("3_bld_stone")
+cast_shadow = 0
+
+[node name="Fountain" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 0)
+mesh = SubResource("CylinderMesh_4")
+surface_material_override/0 = ExtResource("3_bld_stone")
+
+[node name="FountainWater" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.36, 0)
+mesh = SubResource("CylinderMesh_5")
+surface_material_override/0 = ExtResource("4_bld_water")
+
+[node name="Spout" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("CylinderMesh_6")
+surface_material_override/0 = ExtResource("3_bld_stone")
+
+[node name="Trunk" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.45, -1.9)
+mesh = SubResource("CylinderMesh_7")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="Canopy" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 1.3, -1.9)
+mesh = SubResource("SphereMesh_8")
+surface_material_override/0 = ExtResource("6_bld_olive")
+
+[node name="Trunk2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9, 0.405, 1.9)
+mesh = SubResource("CylinderMesh_9")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="Canopy2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9, 1.17, 1.9)
+mesh = SubResource("SphereMesh_10")
+surface_material_override/0 = ExtResource("6_bld_olive")
+
+[node name="Trunk3" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.95, 0.4725, 1.75)
+mesh = SubResource("CylinderMesh_11")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="Canopy3" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.95, 1.365, 1.75)
+mesh = SubResource("SphereMesh_12")
+surface_material_override/0 = ExtResource("6_bld_olive")
+
+[node name="CypressTrunk" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.35, 0.18, -0.9)
+mesh = SubResource("CylinderMesh_13")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="Cypress" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.35, 1.17, -0.9)
+mesh = SubResource("CylinderMesh_14")
+surface_material_override/0 = ExtResource("7_bld_cypress")
+
+[node name="CypressTrunk2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.95, 0.17, -2.35)
+mesh = SubResource("CylinderMesh_15")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="Cypress2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.95, 1.105, -2.35)
+mesh = SubResource("CylinderMesh_16")
+surface_material_override/0 = ExtResource("7_bld_cypress")
+
+[node name="Shrub" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.165, -1)
+mesh = SubResource("SphereMesh_17")
+surface_material_override/0 = ExtResource("8_bld_shrub")
+
+[node name="Shrub2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.154, 1)
+mesh = SubResource("SphereMesh_18")
+surface_material_override/0 = ExtResource("8_bld_shrub")
+
+[node name="Shrub3" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.165, 0.95)
+mesh = SubResource("SphereMesh_17")
+surface_material_override/0 = ExtResource("8_bld_shrub")
+
+[node name="Shrub4" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0.143, 0.9)
+mesh = SubResource("SphereMesh_19")
+surface_material_override/0 = ExtResource("8_bld_shrub")
+
+[node name="BenchSeat" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0.42, 0.75)
+mesh = SubResource("BoxMesh_20")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="BenchBase" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0.19, 0.75)
+mesh = SubResource("BoxMesh_21")
+surface_material_override/0 = ExtResource("3_bld_stone")
+
+[node name="BenchSeat2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.42, 1.3)
+mesh = SubResource("BoxMesh_22")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="BenchBase2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.19, 1.3)
+mesh = SubResource("BoxMesh_23")
+surface_material_override/0 = ExtResource("3_bld_stone")
+
+[node name="PergolaPost" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 1.05, -2.5)
+mesh = SubResource("BoxMesh_24")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="PergolaPost2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 1.05, -1.1)
+mesh = SubResource("BoxMesh_24")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="PergolaPost3" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.05, -2.5)
+mesh = SubResource("BoxMesh_24")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="PergolaPost4" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.05, -1.1)
+mesh = SubResource("BoxMesh_24")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="PergolaSlat" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 2.15, -2.55)
+mesh = SubResource("BoxMesh_25")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="PergolaSlat2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 2.15, -2.26)
+mesh = SubResource("BoxMesh_25")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="PergolaSlat3" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 2.15, -1.97)
+mesh = SubResource("BoxMesh_25")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="PergolaSlat4" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 2.15, -1.68)
+mesh = SubResource("BoxMesh_25")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="PergolaSlat5" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 2.15, -1.39)
+mesh = SubResource("BoxMesh_25")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="PergolaSlat6" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 2.15, -1.1)
+mesh = SubResource("BoxMesh_25")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="ShadeSail" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 2.22, -1.8)
+mesh = SubResource("BoxMesh_26")
+surface_material_override/0 = ExtResource("9_bld_turquoise_")
+
+[node name="BenchSeat3" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.42, -1.8)
+mesh = SubResource("BoxMesh_20")
+surface_material_override/0 = ExtResource("5_bld_wood")
+
+[node name="BenchBase3" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.19, -1.8)
+mesh = SubResource("BoxMesh_21")
+surface_material_override/0 = ExtResource("3_bld_stone")
+
+[node name="FlowerBed" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.125, 2.3)
+mesh = SubResource("BoxMesh_27")
+surface_material_override/0 = ExtResource("10_bld_terracotta")
+
+[node name="Flowers" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.29, 2.3)
+mesh = SubResource("BoxMesh_28")
+surface_material_override/0 = ExtResource("11_bld_fruit")
+
+[node name="FlowerBed2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.25, 0.125, -0.7)
+mesh = SubResource("BoxMesh_27")
+surface_material_override/0 = ExtResource("10_bld_terracotta")
+
+[node name="Flowers2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.25, 0.29, -0.7)
+mesh = SubResource("BoxMesh_28")
+surface_material_override/0 = ExtResource("11_bld_fruit")
+
+[node name="Live" type="Node3D" parent="Model"]
+
+[node name="Crisis_heat" type="Node3D" parent="Model/Live"]
+visible = false
+
+[node name="Spray" type="MeshInstance3D" parent="Model/Live/Crisis_heat"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+mesh = SubResource("CylinderMesh_29")
+surface_material_override/0 = ExtResource("12_bld_mist")
+cast_shadow = 0

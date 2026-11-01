@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_gv80a"]
+
+[resource]
+script = ExtResource("1_gv80a")
+id = &"co2e"
+title = "CO₂ eşdeğeri (CO₂e)"
+definition = "Farklı sera gazlarını tek ölçüde toplamak için kullanılan birim. Her gaz, aynı miktar CO₂'ye göre ne kadar ısınmaya yol açtığına (küresel ısınma potansiyeli) göre çevrilir."
+example = "Metanın etkisi CO₂ cinsinden ifade edilerek toplam hesaplanır."
+game_link = "Oyunun emisyon endeksi CO₂e değildir; gerçek bir envanter olmadığı için göreli oyun birimi kullanılır."
+sources = Array[String](["US EPA, Understanding Global Warming Potentials (web sayfası), https://www.epa.gov/ghgemissions/understanding-global-warming-potentials, erişim 2026-10-31"])

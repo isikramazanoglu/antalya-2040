@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="GlossaryTerm" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/glossary_term.gd" id="1_7ts6m"]
+
+[resource]
+script = ExtResource("1_7ts6m")
+id = &"carbon_dioxide"
+title = "Karbondioksit (CO₂)"
+definition = "Fosil yakıtlar yakıldığında açığa çıkan, atmosferde uzun süre kalan başlıca sera gazı."
+example = "Kömürle elektrik üretmek CO₂ salar; güneş paneli üretim sırasında salmaz."
+game_link = "Küresel CO₂ grafiği NOAA'nın Mauna Loa ölçümlerini gösterir."
+sources = Array[String](["US EPA, Overview of Greenhouse Gases (web sayfası), https://www.epa.gov/ghgemissions/overview-greenhouse-gases, erişim 2026-10-31", "NOAA Global Monitoring Laboratory, Trends in Atmospheric Carbon Dioxide (web sayfası), https://gml.noaa.gov/ccgg/trends/, erişim 2026-10-31"])

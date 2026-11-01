@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_ahypq"]
+
+[resource]
+script = ExtResource("1_ahypq")
+id = &"card_public_efficiency"
+title = "Önce tasarruf"
+body = "Harcanmayan enerji, üretilmesi gerekmeyen enerjidir. Verimli aydınlatma, yalıtım ve doğru ayarlanmış ısıtma-soğutma sistemleri kamu binalarının tüketimini düşürür."
+benefit = "Okul, hastane ve belediye binalarının enerji tüketimini düşürür."
+climate_link = "Harcanmayan enerji üretilmesi gerekmeyen enerjidir; emisyon kaynağında azalır."
+strategic = "Ucuz bir yatırımla enerji güvenliğini ve bina emisyonlarını birlikte iyileştirir."
+sources = Array[String](["IEA, Buildings: Energy consumption and efficiency (web sayfası), https://www.iea.org/energy-system/buildings, erişim 2026-10-31"])

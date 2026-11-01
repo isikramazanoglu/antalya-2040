@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/camera_rig.gd" id="1_camera_rig"]
+
+[node name="CameraRig" type="Node3D"]
+script = ExtResource("1_camera_rig")
+zoom_min = 22.0
+zoom_max = 105.0
+rotate_limit_deg = 0.0
+bounds = Rect2(-30, -28, 62, 41)
+
+[node name="Pitch" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.731354, 0.681998, 0, -0.681998, 0.731354, 0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Pitch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 90)
+current = true
+fov = 38.0
+near = 0.5
+far = 700.0

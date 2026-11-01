@@ -8,3 +8,5 @@ extends Resource
 @export var cost: int = 0
 @export_range(0.0, 1.0) var damage_multiplier: float = 1.0
 @export var extra_effects: Dictionary = {}
+## Boş değilse bu müdahale yalnızca bu bina kuruluysa görünür ve seçilebilir (Prompt 7A).
+@export var required_building: StringName

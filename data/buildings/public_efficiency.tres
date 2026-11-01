@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_public_efficiency.tres" id="1_61fpq"]
+[ext_resource type="Texture2D" path="res://assets/ui/thumbnails/public_efficiency.png" id="1_vxv68"]
+[ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_6l8yw"]
+[ext_resource type="PackedScene" path="res://scenes/buildings/b_public_efficiency.tscn" id="2_vxv68"]
+
+[resource]
+script = ExtResource("2_6l8yw")
+id = &"public_efficiency"
+display_name = "Kamu binalarında enerji verimliliği"
+short_description = "Okul, hastane ve belediye binalarında aydınlatma ve yalıtım yenilenir."
+category = &"energy"
+cost = 200
+upkeep_per_year = 5
+allowed_plot_kinds = Array[StringName]([&"urban"])
+scene = ExtResource("2_vxv68")
+icon = ExtResource("1_vxv68")
+on_build_effects = {
+"energy_security": 8.0
+}
+emission_multipliers = {
+"buildings": -0.15
+}
+risk_reduction = {
+&"heat": 0.1
+}
+energy_consumption = -5.0
+info_card = ExtResource("1_61fpq")

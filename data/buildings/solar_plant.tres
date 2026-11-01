@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ui/thumbnails/solar_plant.png" id="1_6ajbf"]
+[ext_resource type="Resource" path="res://data/cards/card_solar_plant.tres" id="1_v5ht7"]
+[ext_resource type="PackedScene" path="res://scenes/buildings/b_solar_plant.tscn" id="2_6ajbf"]
+[ext_resource type="Script" path="res://scripts/data/building_definition.gd" id="2_dgag5"]
+
+[resource]
+script = ExtResource("2_dgag5")
+id = &"solar_plant"
+display_name = "Güneş enerjisi tesisi"
+short_description = "Şehrin elektriğinin bir kısmını güneşten üretir."
+category = &"energy"
+cost = 400
+upkeep_per_year = 10
+allowed_plot_kinds = Array[StringName]([&"open"])
+scene = ExtResource("2_6ajbf")
+icon = ExtResource("1_6ajbf")
+on_build_effects = {
+"energy_security": 20.0
+}
+emission_multipliers = {
+"energy": -0.3
+}
+energy_production = 20.0
+info_card = ExtResource("1_v5ht7")

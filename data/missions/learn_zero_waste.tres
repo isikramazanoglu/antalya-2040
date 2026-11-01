@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MissionDefinition" format=3]
+
+[ext_resource type="Resource" path="res://data/cards/card_recycling_compost.tres" id="1_ehwxy"]
+[ext_resource type="Script" path="res://scripts/data/mission_definition.gd" id="2_dhqhn"]
+
+[resource]
+script = ExtResource("2_dhqhn")
+id = &"learn_zero_waste"
+title = "Atıksız şehre doğru"
+description = "Geri dönüşüm ve kompost altyapısı kur. Öğrenme: döngüsel ekonomi ve atık yönetimi."
+deadline_year = 2052
+category = &"learning"
+kind = &"build"
+required_buildings = Array[StringName]([&"recycling_compost"])
+info_card = ExtResource("1_ehwxy")

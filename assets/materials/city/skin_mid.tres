@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "skin_mid"
+albedo_color = Color(0.68, 0.5, 0.38, 1)
+roughness = 0.8

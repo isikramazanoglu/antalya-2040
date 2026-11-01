@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_ruue7"]
+
+[resource]
+script = ExtResource("1_ruue7")
+id = &"card_event_drought"
+title = "Kuraklık"
+body = "Kuraklık, yağışın uzun süre normalin altında kalmasıdır. Sıcaklık arttıkça topraktan ve barajlardan buharlaşan su da artar; bu yüzden aynı yağış daha az kullanılabilir suya dönüşür."
+sources = Array[String](["UNCCD, Drought (web sayfası), https://www.unccd.int/land-and-life/drought/overview, erişim 2026-10-31"])

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MissionDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/mission_definition.gd" id="1_brocy"]
+
+[resource]
+script = ExtResource("1_brocy")
+id = &"quality_70"
+title = "Yaşam kalitesini 70'e çıkar"
+description = "Gölge, yeşil alan ve iyi hizmetler şehri yaşanabilir kılar."
+stat = "quality_of_life"
+target = 70.0
+deadline_year = 2047
+reward_credits = 50

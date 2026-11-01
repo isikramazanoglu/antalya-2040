@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="InfoCard" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/info_card.gd" id="1_frdgd"]
+
+[resource]
+script = ExtResource("1_frdgd")
+id = &"card_transit_hub"
+title = "Toplu taşıma"
+body = "Dolu bir otobüs, aynı sayıda insanı taşıyan çok sayıda otomobilden daha az yakıt harcar. Elektrikli araçlar ayrıca şehir içinde egzoz kirliliğini azaltır."
+benefit = "Elektrikli otobüs, tramvay ve bisiklet yollarını birleştirir."
+climate_link = "Kişi başına yakıt tüketimini ve egzoz kirliliğini azaltır."
+strategic = "Ulaşım emisyonunu en çok düşüren yatırımdır; yaşam kalitesini de artırır."
+sources = Array[String](["IEA, Transport: Energy demand and emissions (web sayfası), https://www.iea.org/energy-system/transport, erişim 2026-10-31"])
