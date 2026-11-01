@@ -78,6 +78,8 @@ func _process(delta: float) -> void:
 			var rate := ACCEL if target > v.speed else BRAKE
 			v.speed = move_toward(v.speed, target, rate * delta)
 			follow.progress += v.speed * delta
+			if v.has("exhaust"):  # teslim hotfix: egzoz hızla artar, durunca rölantide az
+				(v.exhaust as GPUParticles3D).amount_ratio = clampf(v.speed / maxf(v.cruise, 0.01), 0.15, 1.0)
 			_spin_wheels(v, v.speed * delta)
 
 
@@ -175,11 +177,62 @@ func _spawn(route: Dictionary, model: StringName, progress: float, look: int) ->
 		if child.name.begins_with("Wheel_"):
 			var w := child as MeshInstance3D
 			wheels.append([w, w.rotation.y, w.mesh.get_aabb().size.y * 0.5])
+	var exhaust := _make_exhaust(body)
 	var cruise := BUS_CRUISE if model == &"city_bus" else _rng.randf_range(CRUISE.x, CRUISE.y)
 	var v := {"follow": follow, "body": body, "model": model, "length": VehicleLibrary.length_of(model), "speed": cruise,
-		"cruise": cruise, "wheels": wheels, "spin": 0.0}
+		"cruise": cruise, "wheels": wheels, "spin": 0.0, "exhaust": exhaust}
 	_vehicles.append(v)
 	return v
+
+
+## Teslim hotfix (B, Emre devre dışıyken): arka uçta (stop lambası tarafı, +z) alçakta küçük egzoz dumanı.
+## Parçacıklar dünya koordinatında kalır: araç ilerledikçe arkasında kısa, hızla dağılan bir iz bırakır.
+static var _exhaust_mat: ParticleProcessMaterial
+static var _exhaust_mesh: QuadMesh
+
+
+func _make_exhaust(body: Node3D) -> GPUParticles3D:
+	if _exhaust_mat == null:
+		_exhaust_mat = ParticleProcessMaterial.new()
+		_exhaust_mat.direction = Vector3(0, 1, 0)
+		_exhaust_mat.spread = 25.0
+		_exhaust_mat.initial_velocity_min = 0.15
+		_exhaust_mat.initial_velocity_max = 0.3
+		_exhaust_mat.gravity = Vector3(0, 0.25, 0)
+		_exhaust_mat.scale_min = 0.6
+		_exhaust_mat.scale_max = 1.0
+		var curve := Curve.new()
+		curve.add_point(Vector2(0, 0.4))
+		curve.add_point(Vector2(1, 1.6))
+		var ct := CurveTexture.new()
+		ct.curve = curve
+		_exhaust_mat.scale_curve = ct
+		var g := Gradient.new()
+		g.set_color(0, Color(0.55, 0.55, 0.55, 0.45))
+		g.set_color(1, Color(0.7, 0.7, 0.7, 0.0))
+		var gt := GradientTexture1D.new()
+		gt.gradient = g
+		_exhaust_mat.color_ramp = gt
+		_exhaust_mesh = QuadMesh.new()
+		_exhaust_mesh.size = Vector2(0.14, 0.14)
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.vertex_color_use_as_albedo = true
+		m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+		_exhaust_mesh.material = m
+	var aabb := (body.get_node("Body") as MeshInstance3D).mesh.get_aabb()
+	var p := GPUParticles3D.new()
+	p.name = "Exhaust"
+	p.amount = 10
+	p.lifetime = 0.9
+	p.local_coords = false
+	p.process_material = _exhaust_mat
+	p.draw_pass_1 = _exhaust_mesh
+	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	p.position = Vector3(aabb.position.x + aabb.size.x * 0.25, 0.12, aabb.end.z + 0.02)
+	body.add_child(p)
+	return p
 
 
 func _bus_stop_target(v: Dictionary, target: float, delta: float, length: float) -> float:
