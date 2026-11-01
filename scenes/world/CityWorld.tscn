@@ -11,10 +11,10 @@
 [ext_resource type="PackedScene" path="res://scenes/world/Reservoir.tscn" id="9_Reservoir"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
-sky_top_color = Color(0.3, 0.55, 0.82, 1)
-sky_horizon_color = Color(0.74, 0.84, 0.92, 1)
-ground_bottom_color = Color(0.36, 0.5, 0.58, 1)
-ground_horizon_color = Color(0.74, 0.84, 0.92, 1)
+sky_top_color = Color(0.4745, 0.7255, 0.8471, 1)
+sky_horizon_color = Color(0.851, 0.9098, 0.9137, 1)
+ground_bottom_color = Color(0.42, 0.52, 0.56, 1)
+ground_horizon_color = Color(0.851, 0.9098, 0.9137, 1)
 sun_angle_max = 20.0
 
 [sub_resource type="Sky" id="Sky_2"]
@@ -23,24 +23,29 @@ sky_material = SubResource("ProceduralSkyMaterial_1")
 [sub_resource type="Environment" id="Environment_3"]
 background_mode = 2
 sky = SubResource("Sky_2")
-ambient_light_source = 3
-ambient_light_energy = 0.6
+ambient_light_source = 2
+ambient_light_color = Color(0.6588, 0.8314, 0.8784, 1)
+ambient_light_energy = 0.45
 reflected_light_source = 2
 tonemap_mode = 3
+tonemap_exposure = 0.95
 tonemap_white = 6.0
 ssao_enabled = true
 ssao_radius = 1.2
-ssao_intensity = 2.0
+ssao_intensity = 1.5
+ssao_power = 1.2
+ssao_detail = 0.5
+ssao_light_affect = 0.0
 glow_enabled = true
-glow_intensity = 0.4
-glow_bloom = 0.04
+glow_intensity = 0.3
+glow_bloom = 0.0
 fog_enabled = true
-fog_light_color = Color(0.74, 0.84, 0.92, 1)
-fog_density = 0.0012
+fog_light_color = Color(0.851, 0.9098, 0.9137, 1)
+fog_density = 0.0006
 fog_sky_affect = 0.3
 adjustment_enabled = true
-adjustment_contrast = 1.08
-adjustment_saturation = 1.2
+adjustment_contrast = 1.14
+adjustment_saturation = 1.08
 
 [sub_resource type="BoxMesh" id="BoxMesh_4"]
 size = Vector3(220, 2, 104)
@@ -64,12 +69,15 @@ environment = SubResource("Environment_3")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.766044, -0.477684, 0.430109, 0, 0.669131, 0.743145, -0.642788, -0.569282, 0.512584, 0, 30, 0)
-light_color = Color(1, 0.96, 0.9, 1)
-light_energy = 1.35
+light_color = Color(1, 0.9412, 0.8627, 1)
+light_energy = 1.75
+light_angular_distance = 0.35
 shadow_enabled = true
-shadow_blur = 1.5
+shadow_opacity = 1.0
+shadow_blur = 1.2
 directional_shadow_mode = 2
-directional_shadow_max_distance = 160.0
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 120.0
 
 [node name="CameraRig" parent="." instance=ExtResource("2_CameraRig")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
