@@ -314,5 +314,5 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 
 ## Açık sorular
 
-- Godot 4.7.2 Standard iki bilgisayarda da aynı mı? (Gün 0'da kontrol)
-- CO2 senaryosu için hangi IPCC AR6 senaryosu kullanılacak? (B karar verir, kaynağı kartta yazar)
+- ~~Godot 4.7.2 Standard iki bilgisayarda da aynı mı?~~ Çözüldü: Mac ve Windows'ta 4.7.2.stable.official (Gün 0).
+- CO2 senaryosu için hangi IPCC AR6 senaryosu kullanılacak? (B karar verir, kaynağı kartta yazar) · Durum: v1.0 sonrasına ertelendi; şimdilik NOAA 1959–2025 ölçümü var, 2040–2052 için oyun "veri yok" gösterir.
