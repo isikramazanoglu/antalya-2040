@@ -364,6 +364,20 @@ Emre'nin kredisi bittiği için kullanıcı kararıyla B yaptı. Ayrı dalda ve 
 - Testler (her biri bir kez): A'nın `test_industry.gd` (B'nin gerçek akışıyla; 1280×720) 25/25 TAMAM: doğru model, duman ekranda hareket ediyor, düşük yoğunlukta açık duman, filtrede beyaz, faaliyet durunca duman kesiliyor, yeniden açılınca ışıklar yanıyor, kayıttan yükleme. B'nin `test_businesses.gd` TAMAM. Gerçek oyunda aylık kurulma (`business_month`) atık tesisi ve ağır sanayiyi kuzey sanayi şeridinde dumanıyla gösterdi. Oyun sahnesi hatasız açılıyor.
 - Eksik: haritada fabrikaya tıklayıp seçme yok; A'nın sanayi görselinde çarpışma şekli yok, B'de dünya ışını yok. İşletme seçimi bugün HUD "Sanayi" panelinden yapılıyor (ad, tür, emisyon, uygunluk, denetimler, kararlar). 10 tür 3 modeli paylaşıyor. Tam test turu teslim sonrasına bırakıldı.
 
+### Prompt 16 notları (B, 2026-11-01) · Final entegrasyon ve teslim
+- Entegrasyon: iki ekibin bütün işleri main'de (v1.2, 0a41116). feature/city-world'de main dışında commit yok; çakışma yok.
+- Testler (her biri bir kez, Mac M5, 1280×720):
+  - açılış ve ana döngü: `test_menu`, `test_playthrough` (menüden 2052 finaline) TAMAM
+  - kamera: `test_camera_nav` (WASD, ok tuşları, sol ve orta tuşla sürükleme, tekerlek, sınırlar) ve `test_showcase` (inşaat sonrası yakınlaştırma, elle müdahale) TAMAM
+  - arayüz: `test_ui` TAMAM
+  - takvim ve ekonomi: `test_months` TAMAM
+  - işletme ve görsel: aynı kodda az önce `test_industry` 25/25 ve `test_businesses` TAMAM
+- Quiz sistemi (aylık quiz, kredi kurtarma sınavı, quiz çözülmeden ay geçişini engelleme) **projede yok**; son dakikada eklenmedi.
+- Ekran görüntüleri: `docs/screenshots/final/` (7 adet, gerçek oyun, 1920×1080). İşletmelerin hemen kurulması için nüfus elle 620 yapıldı; bu yüzden görüntülerde karbon 135.
+- Teslim: GitHub Release v1.2 (`ANTALYA2040_Windows_v1.2.zip`). Yerel klasör `build/ANTALYA2040_Teslim/` (exe, OKUBENI.txt, ekran görüntüleri).
+- Windows build Mac'te üretildi ve `--main-pack` ile pencerede hatasız açıldı. **Windows'ta çalıştırılmadı.**
+- Bilinen eksikler: quiz sistemi; haritada fabrikaya tıklayarak seçme (işletmelere "Sanayi" panelinden ulaşılıyor); 10 tür 3 modeli paylaşıyor; Windows ve zayıf ekran kartında FPS ölçülmedi.
+
 ### Jüri demo akışı (5–7 dk, sabit kriz yılları, ek demo modu gerekmez)
 1. Giriş (30 sn): ana menü, arkada canlı şehir; "Oyun hakkında".
 2. 2040 şehri (45 sn): HUD; kaynak paneli, enerji üretim/tüketim, yerel emisyon.
