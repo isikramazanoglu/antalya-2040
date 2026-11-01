@@ -7,7 +7,7 @@ script = ExtResource("1_camera_rig")
 zoom_min = 22.0
 zoom_max = 105.0
 rotate_limit_deg = 0.0
-bounds = Rect2(-30, -28, 62, 41)
+bounds = Rect2(-30, -36, 62, 49)
 
 [node name="Pitch" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.731354, 0.681998, 0, -0.681998, 0.731354, 0, 0, 0)

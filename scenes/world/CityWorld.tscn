@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/Reservoir.tscn" id="9_Reservoir"]
 [ext_resource type="Script" path="res://scripts/world/pedestrians.gd" id="10_pedestrians"]
 [ext_resource type="Script" path="res://scripts/world/traffic.gd" id="11_traffic"]
+[ext_resource type="Script" path="res://scripts/world/industry.gd" id="12_industry"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.4745, 0.7255, 0.8471, 1)
@@ -210,6 +211,9 @@ script = ExtResource("10_pedestrians")
 
 [node name="Traffic" type="Node3D" parent="."]
 script = ExtResource("11_traffic")
+
+[node name="Industry" type="Node3D" parent="."]
+script = ExtResource("12_industry")
 
 [node name="DisasterFX" parent="." node_paths=PackedStringArray("world_environment", "sun", "sea") instance=ExtResource("4_DisasterFX")]
 world_environment = NodePath("../WorldEnvironment")

@@ -118,6 +118,7 @@ const SIDE_FIELDS: Array[Rect2] = [Rect2(-100, -31, 43.5, 43), Rect2(56.5, -31, 
 ## Belediye meydanı (ana caddenin kuzeyinde, batı mahallesinde) ve kordon meydanı (iskelenin başında).
 const TOWN_SQUARE := Rect2(-34, -14.3, 11, 8)
 const COAST_SQUARE := Rect2(-6.5, 9.6, 8, 4)
+const INDUSTRY := preload("res://scripts/world/industry.gd")
 const HOUSE_AREAS: Array[Rect2] = [
 	Rect2(-56, -14, 33, 20), Rect2(23, -14, 33, 20), Rect2(-56, -31, 27, 12), Rect2(29, -31, 27, 12),
 	Rect2(-56, 9.6, 38, 4), Rect2(18, 9.6, 38, 4),
@@ -205,6 +206,8 @@ func _collect_blocked() -> void:
 	_blocked.append(PIER)
 	_blocked.append(TOWN_SQUARE.grow(0.5))
 	_blocked.append(COAST_SQUARE)
+	# Prompt A14: sanayi şeridi (industry.gd) — sanayi yerleri ve servis yolu boş kalır.
+	_blocked.append_array(INDUSTRY.blocked_rects())
 	var reservoir := get_parent().get_node_or_null("Reservoir")
 	if reservoir and reservoir.get("footprint") != null:
 		_blocked.append((reservoir.get("footprint") as Rect2).grow(1.5))
