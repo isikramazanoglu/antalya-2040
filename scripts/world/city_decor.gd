@@ -570,6 +570,7 @@ func _build_houses() -> void:
 		var z := area.position.y + 2.2
 		while z < area.end.y - 1.0:
 			var x := area.position.x + 0.3
+			var last := &""
 			while x < area.end.x - 2.0:
 				if _rng.randf() < 0.08:
 					x += 2.5  # boş bahçe / ara sokak
@@ -578,9 +579,12 @@ func _build_houses() -> void:
 				# Ana caddeye bakan sıra (caddenin kuzeyi, ön cephe caddeye dönük): dükkânlar.
 				var shop := hz < avenue.position.y and hz + 2.0 > avenue.position.y - SIDEWALK - 3.4
 				var placed := Rect2()
-				for key in [_pick_model(i, x, hz, shop), &"house_c", &"house_a"]:
+				for key in [_pick_model(i, x, hz, shop, last), &"house_c", &"house_a"]:
 					placed = _try_place(key, x, hz, area)
 					if placed.has_area():
+						last = key
+						if shop:
+							_frontage_tree(placed, avenue)
 						break
 				x = placed.end.x + _rng.randf_range(0.3, 1.1) if placed.has_area() else x + 1.0
 			z += 4.6
@@ -588,7 +592,7 @@ func _build_houses() -> void:
 
 ## Mahalleye göre model seçimi: kıyıda villa ve alçak evler, kuzeyde apartmanlar, cadde cephesinde dükkânlar,
 ## kenarlarda villalar. Yüksek modeller arsaların ve ana caddenin kamera tarafına (+x, +z) konmaz.
-func _pick_model(area_index: int, x: float, z: float, shop: bool) -> StringName:
+func _pick_model(area_index: int, x: float, z: float, shop: bool, avoid := &"") -> StringName:
 	var tall := (x < TALL_WEST_X or x > TALL_EAST_X) and z < ROADS_EW[1].position.y
 	var pool: Array
 	if shop:
@@ -603,7 +607,24 @@ func _pick_model(area_index: int, x: float, z: float, shop: bool) -> StringName:
 		pool = [&"house_a", &"house_c", &"house_b", &"apartment_a", &"apartment_b", &"house_c", &"apartment_c"]
 	else:
 		pool = [&"house_a", &"house_b", &"house_c", &"villa_a", &"villa_b", &"house_b"]
+	# Komşuyla aynı model art arda gelmesin (sıra yapay görünüyordu); havuzda başka model yoksa aynısı kalır.
+	var others := pool.filter(func(k): return k != avoid)
+	if not others.is_empty():
+		pool = others
 	return pool[_rng.randi() % pool.size()]
+
+
+## Dükkân cephesiyle ana cadde kaldırımı arasında geniş boş şerit kalırsa ortasına küçük bir zeytin ağacı.
+## Yaya rotaları kaldırımda (z −6,4) olduğu için ağaç rotaya girmez; yer doluysa (_is_free) konmaz.
+func _frontage_tree(footprint: Rect2, avenue: Rect2) -> void:
+	var front := footprint.end.y
+	var curb := avenue.position.y - SIDEWALK - 0.4
+	if curb - front < 2.4:
+		return
+	var spot := Rect2(footprint.get_center().x - 0.6, (front + curb) * 0.5 - 0.6, 1.2, 1.2)
+	if _is_free(spot):
+		_olive(spot.get_center().x, spot.get_center().y, 0.6)
+		_blocked.append(spot)
 
 
 ## Model alana sığar ve boşsa yerleştirir (left: tabanın sol kenarı, z: pivot; ön cephe +z) ve tabanı döndürür;

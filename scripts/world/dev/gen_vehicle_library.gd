@@ -370,7 +370,9 @@ func _bus() -> Array:
 		box("paint", Vector3(0, 0.87, z), Vector3(w + 0.012, 0.5, 0.05))
 	# Turkuaz şerit ve alt kaplama.
 	box("livery_turquoise", Vector3(0, 0.5, 0.0), Vector3(w + 0.014, 0.12, l - 0.04))
-	box("trim", Vector3(0, 0.2, 0.0), Vector3(w + 0.012, 0.1, l - 0.1))
+	# Alt kaplama tekerlek boşluklarıyla (tek parça şerit tekerlekleri örtüyordu).
+	for seg: Vector2 in [Vector2(-hl + 0.05, -1.7), Vector2(-1.2, 0.9), Vector2(1.4, hl - 0.05)]:
+		box("trim", Vector3(0, 0.2, (seg.x + seg.y) * 0.5), Vector3(w + 0.012, 0.1, seg.y - seg.x))
 	# Kapılar (sağ, +x): ön ve orta.
 	for dz: float in [-hl + 0.42, 0.1]:
 		box("glass", Vector3(x + 0.002, 0.62, dz), Vector3(0.006, 0.95, 0.5))
@@ -386,8 +388,9 @@ func _bus() -> Array:
 	box("plate", Vector3(0, 0.2, -hl - 0.012), Vector3(0.22, 0.05, 0.01))
 	box("trim", Vector3(0, 1.38, 0.6), Vector3(0.7, 0.12, 0.9))
 	box("trim", Vector3(0, 0.13, -hl), Vector3(w + 0.01, 0.1, 0.05))
-	return [[Vector3(0.47, 0.2, -1.45), "wheel_bus"], [Vector3(-0.47, 0.2, -1.45), "wheel_bus"],
-		[Vector3(0.47, 0.2, 1.15), "wheel_bus"], [Vector3(-0.47, 0.2, 1.15), "wheel_bus"]]
+	# Tekerlek dış yüzü gövdeden (yarı genişlik 0,545) biraz taşar; yandan görünsün.
+	return [[Vector3(0.51, 0.2, -1.45), "wheel_bus"], [Vector3(-0.51, 0.2, -1.45), "wheel_bus"],
+		[Vector3(0.51, 0.2, 1.15), "wheel_bus"], [Vector3(-0.51, 0.2, 1.15), "wheel_bus"]]
 
 
 ## Minibüs (dolmuş): 6 m, kısa burun, yüksek tavan, sağda sürgülü kapı, krem gövde + kiremit şerit.
