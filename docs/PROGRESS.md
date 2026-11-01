@@ -354,6 +354,16 @@ Emre'nin kredisi bittiği için kullanıcı kararıyla B yaptı. Ayrı dalda ve 
 - Testler: yeni `tests/test_businesses.gd` (promptun 16 senaryosu + kayıt/yükleme) TAMAM; B'nin 13 testi + A'nın 10 testi iki çözünürlükte TAMAM. `test_ui` emisyon grafiği 5 kaleme, `test_months` rapor toplamı ceza/denetim satırlarına uyarlandı. `test_integration` ve `test_playthrough` Ekip A12 inşaat gösterimi bitene kadar bekliyor (tıklama ıskalıyordu).
 - Ekip A için: sanayi yerlerinin konumu ve 10 modelin eşleştirmesi (`visual_id`), `business_spawned/updated/removed` dinleyicisi, duman `smoke_intensity`'den. Ayrıntı: BUSINESS_SYSTEM.md §8.
 
+### Prompt 15 notları (B, 2026-11-01) · Sanayi görsel entegrasyonu
+- Ekip A'nın A14'ü (PR #32, develop b160ca0) `feature/simulation-ui`'ye birleştirildi (fast-forward). A yalnızca kendi dosyalarına ve PROGRESS/ASSET_LICENSES'taki kendi satırlarına dokunmuş.
+- Entegrasyon için B'de kod değişikliği gerekmedi: A'nın `scripts/world/industry.gd` dosyası sözleşme v1.10'u birebir kullanıyor. `business_spawned` → model, `business_updated` → duman/ışık/uyarı, `business_removed` → kaldır; kayıttan yüklemede `GameState.businesses`'tan kurar. Duman yalnızca `smoke_intensity`'den; filtre → beyaz duman, `suspended` → duman yok.
+- Model eşleşmesi (A'nın `MODEL_FOR_VISUAL`, B'nin `visual_id`'leri değişmedi):
+  - `assets/industrial/small_factory.tscn` ← küçük fabrika, gıda, tekstil, atölye
+  - `assets/industrial/heavy_factory.tscn` ← ağır sanayi, kimya, beton, atık işleme
+  - `assets/industrial/logistics_warehouse.tscn` ← lojistik deposu, soğuk depolu alışveriş merkezi
+- Testler (her biri bir kez): A'nın `test_industry.gd` (B'nin gerçek akışıyla; 1280×720) 25/25 TAMAM: doğru model, duman ekranda hareket ediyor, düşük yoğunlukta açık duman, filtrede beyaz, faaliyet durunca duman kesiliyor, yeniden açılınca ışıklar yanıyor, kayıttan yükleme. B'nin `test_businesses.gd` TAMAM. Gerçek oyunda aylık kurulma (`business_month`) atık tesisi ve ağır sanayiyi kuzey sanayi şeridinde dumanıyla gösterdi. Oyun sahnesi hatasız açılıyor.
+- Eksik: haritada fabrikaya tıklayıp seçme yok; A'nın sanayi görselinde çarpışma şekli yok, B'de dünya ışını yok. İşletme seçimi bugün HUD "Sanayi" panelinden yapılıyor (ad, tür, emisyon, uygunluk, denetimler, kararlar). 10 tür 3 modeli paylaşıyor. Tam test turu teslim sonrasına bırakıldı.
+
 ### Jüri demo akışı (5–7 dk, sabit kriz yılları, ek demo modu gerekmez)
 1. Giriş (30 sn): ana menü, arkada canlı şehir; "Oyun hakkında".
 2. 2040 şehri (45 sn): HUD; kaynak paneli, enerji üretim/tüketim, yerel emisyon.
