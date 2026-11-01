@@ -111,6 +111,12 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
   - Windows export: `build/windows/ANTALYA2040.exe` (110 MB) pencereli açılıyor, hata yok.
   - Demo provası export edilmiş exe ile, jüri akışına göre elle yapıldı (menü → yatırım → İklim Laboratuvarı → kriz → 2052 → "Şehrin dönüşümünü izle", Esc ile atlama, rapora ve ana menüye dönüş): sorun yok.
   - FPS: yukarıdaki tablo (orta seviye PC yerine Intel UHD).
+- Görsel revizyon 2 (A, 2026-11-01) · Arsa temizliği ve vurgu sistemi:
+  - Normal oyunda arsa kimlik etiketleri ("U01 · KENT") gizli; silinmedi, `BuildPlot/VisualOverlay/DebugOverlay/Label` altında. Açmak için: CityWorld Inspector → `show_debug_overlay`, CitySandbox'ta F3. Ayrı ızgara mesh'i yoktu; ızgara görüntüsü arsa zeminleri + etiketlerdi (zemin tasarımı görsel revizyon 5'te).
+  - Vurgu: arsa kenarında ince çerçeve (tek mesh, arsa boyutu başına paylaşılır) + hover/seçimde hafif dolgu. Paylaşılan materyaller `assets/materials/plot_state_*.tres`, `plot_fill_*.tres` (Inspector'dan ayarlanır). Renkler: kurulabilir #65E4B7, hover #44D8E8, seçili #77CFFF, uygun değil (dolu arsada hover) #E5A36A. Animasyon yalnızca hover/seçimde, yavaş (2,4 sn) ve yalnızca saydamlık. Eski pad parlaması ve `plot_highlight.tres` kaldırıldı.
+  - Durumlar: normal → yok; build fazında fare üstü → turkuaz (dolu arsada turuncu); **inşaat modu = build fazında bir arsa seçili (yatırım paneli açık)** → diğer boş arsalar ince yeşil çerçeve, dolu arsalar parlamaz; seçili → mavi (fare başka yere gitse de kalır); build dışı faz → hepsi kapalı. Mevcut ışın testi ve `set_selected`/`set_hovered` kullanıldı, ikinci seçim sistemi yok, `_selected` değişmedi.
+  - Not (B): HUD'daki "İnşaat" düğmesi (arsa seçmeden panel) şehre bildirilmiyor; o anda da uygun arsaların görünmesi istenirse bir EventBus sinyali gerekir (sözleşme değişikliği, şimdilik yapılmadı).
+  - Test: `scripts/world/dev/test_plot_visuals.gd` (26 kontrol, gerçek fare olaylarıyla) 1280×720 ve 1920×1080'de TAMAM; `test_city`, `test_deselect_real` yeni vurgu durumlarına uyarlandı. B'nin 12 testi iki çözünürlükte + A'nın 6 testi TAMAM. Önce/sonra görüntüleri: `build/visual_reference/` (git dışında).
 
 ### Ekip B
 - [x] 12 `BuildingDefinition` + bilgi kartları
