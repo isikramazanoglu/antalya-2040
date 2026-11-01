@@ -180,12 +180,17 @@ func _run() -> void:
 	rig._target_zoom = 74.0
 	rig.focus_on(Vector3(-4, 0, -6))
 	await wait(1.5)
+	# Vsync kapalı ölçülür: 60 Hz ekranda vsync açıkken sonuç tam 60'ta takılıp 59,x ile sınırı kaçırıyordu.
+	var vsync := DisplayServer.window_get_vsync_mode()
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	await wait(0.3)
 	var frames := 0
 	var t0 := Time.get_ticks_msec()
 	while Time.get_ticks_msec() - t0 < 3000:
 		await process_frame
 		frames += 1
 	var fps := frames / ((Time.get_ticks_msec() - t0) / 1000.0)
+	DisplayServer.window_set_vsync_mode(vsync)
 	var draws := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 	print("    12 bina: %.0f FPS, %d draw call" % [fps, draws])
 	check(fps >= 60.0, "12 binalı şehir ≥ 60 FPS (%.0f)" % fps)
