@@ -30,8 +30,15 @@ func mouse_to(id) -> void:
 	var e := InputEventMouseMotion.new()
 	e.position = cam.unproject_position(plot(id).global_position) if id != null else _empty_point()
 	e.global_position = e.position
+	_park_cursor(e.position)
 	root.push_input(e, true)  # görünüm koordinatı (1920x1080 taban ölçeklenir)
 	await wait(0.15)
+
+
+## Gerçek imleç de aynı noktaya: test sırasında fare kımıldarsa gelen gerçek olay aynı arsayı gösterir.
+func _park_cursor(view_pos: Vector2) -> void:
+	var scale := Vector2(DisplayServer.window_get_size()) / root.get_visible_rect().size
+	Input.warp_mouse(view_pos * scale)
 
 
 ## Hiçbir arsanın tıklama kutusuna denk gelmeyen ekran noktası (mevcut ışın testiyle bulunur).

@@ -30,6 +30,11 @@ const CRISIS_DWELL := 3.2
 const CRISIS_FADE := 0.8
 const REGION_HOLD := 3.4
 const STEPS: Array[String] = ["2040", "Dönüşüm", "2052", "Karşılaştırma"]
+## Sinematik derinlik (yalnızca sunum kamerası; oyun kamerasında DoF yok): bakılan nokta net,
+## arkası çok hafif yumuşar. Mesafeler kameranın bakılan noktaya uzaklığına oranlıdır.
+const DOF_FAR_START := 1.15
+const DOF_FAR_TRANSITION := 0.9
+const DOF_AMOUNT := 0.05
 const CATEGORY_NAMES := {
 	&"energy": "Enerji", &"water": "Su", &"heat": "Sıcağa uyum", &"food": "Gıda",
 	&"waste": "Atık", &"transport": "Ulaşım", &"coast": "Kıyı",
@@ -350,6 +355,11 @@ func _sync_camera() -> void:
 	if source:
 		_camera.global_transform = source.global_transform
 		_camera.fov = source.fov
+		# Odak: kameranın baktığı yer (CameraRig'de kamera, bakılan noktadan position.z kadar uzakta).
+		var focus := source.position.z
+		var attributes := _camera.attributes as CameraAttributesPractical
+		attributes.dof_blur_far_distance = focus * DOF_FAR_START
+		attributes.dof_blur_far_transition = focus * DOF_FAR_TRANSITION
 
 
 ## İnşa sırası: yıla göre, aynı yıl içinde kayıt sırasıyla.
@@ -477,6 +487,10 @@ func _build_overlay() -> void:
 	_camera.current = true
 	_camera.near = 0.5
 	_camera.far = 700.0
+	var attributes := CameraAttributesPractical.new()
+	attributes.dof_blur_far_enabled = true
+	attributes.dof_blur_amount = DOF_AMOUNT
+	_camera.attributes = attributes
 	_viewport.add_child(_camera)
 
 	_before = TextureRect.new()
