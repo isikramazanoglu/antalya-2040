@@ -35,13 +35,13 @@ func _run():
 		var plot = city.find_plot(id)
 		await click_at(root.get_camera_3d().unproject_position(plot.global_position))
 		await create_timer(1.2).timeout
-		check(panel.visible and plot.get_node("Highlight").visible, "%s seçildi, panel açık" % id)
+		check(panel.visible and plot.highlight_state() == &"selected", "%s seçildi, panel açık" % id)
 		var sp: Vector2 = root.get_camera_3d().unproject_position(plot.global_position)
 		var pr: Rect2 = panel.get_global_rect()
 		check(not pr.has_point(sp), "%s panelin arkasında kalmadı (arsa %s, panel x≥%.0f)" % [id, sp.round(), pr.position.x])
 		await key(KEY_ESCAPE)
 		await create_timer(0.3).timeout
-		check(not panel.visible and not plot.get_node("Highlight").visible, "%s Esc → panel kapandı, vurgu kalktı" % id)
+		check(not panel.visible and plot.highlight_state() != &"selected", "%s Esc → panel kapandı, vurgu kalktı" % id)
 	var u01 = city.find_plot(&"U01")
 	await click_at(root.get_camera_3d().unproject_position(u01.global_position))
 	await create_timer(1.2).timeout
@@ -54,6 +54,6 @@ func _run():
 	if close_btn:
 		await click_at(close_btn.get_global_rect().get_center())
 		await create_timer(0.3).timeout
-		check(not panel.visible and not u01.get_node("Highlight").visible, "× düğmesi → panel kapandı, vurgu kalktı")
+		check(not panel.visible and u01.highlight_state() != &"selected", "× düğmesi → panel kapandı, vurgu kalktı")
 	print("SONUÇ: " + ("TAMAM" if fails == 0 else "%d HATA" % fails))
 	quit(fails)

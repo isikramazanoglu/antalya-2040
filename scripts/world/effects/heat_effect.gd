@@ -12,11 +12,12 @@ const HEAT_FOG := Color(1.0, 0.8, 0.6)
 
 func contribute(a: Dictionary) -> void:
 	var s := strength()
-	a.sun_color = (a.sun_color as Color).lerp(HEAT_SUN, s * 0.5)
-	a.sun_energy *= 1.0 + 0.2 * s
-	a.fog_color = (a.fog_color as Color).lerp(HEAT_FOG, s * 0.6)
-	a.fog_density += 0.002 * s
-	a.saturation *= 1.0 + 0.1 * s
+	# Görsel revizyon 3: taban güneşi artık daha parlak ve sıcak; katkılar buna göre ölçülü (turuncuya boyamaz).
+	a.sun_color = (a.sun_color as Color).lerp(HEAT_SUN, s * 0.3)
+	a.sun_energy *= 1.0 + 0.08 * s
+	a.fog_color = (a.fog_color as Color).lerp(HEAT_FOG, s * 0.45)
+	a.fog_density += 0.0016 * s
+	a.saturation *= 1.0 + 0.04 * s
 	a.contrast *= 1.0 + 0.04 * s
 	a.weight = maxf(a.weight, s)
 

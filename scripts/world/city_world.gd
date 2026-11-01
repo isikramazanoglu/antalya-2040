@@ -9,6 +9,14 @@ const RAY_LENGTH := 1000.0
 ## Sözleşme §8 sahne yolu. Tanımın `scene` alanı boşsa bu yola bakılır, o da yoksa yer tutucu.
 const BUILDING_SCENE_PATH := "res://scenes/buildings/b_%s.tscn"
 
+## Geliştirici katmanı: arsa kimliği ve türü etiketleri. Normal oyunda kapalı (Inspector'dan açılabilir,
+## CitySandbox'ta F3). Arsa verisi ve kimlikleri bundan etkilenmez.
+@export var show_debug_overlay := false:
+	set(value):
+		show_debug_overlay = value
+		if is_node_ready():
+			set_plot_labels_visible(true)
+
 @onready var _plots: Node3D = $Plots
 @onready var _fx: DisasterFX = $DisasterFX
 @onready var _camera_rig: CameraRig = $CameraRig
@@ -37,6 +45,7 @@ func _ready() -> void:
 	_presentation.name = "FinalPresentation"
 	add_child(_presentation)
 	EventBus.final_presentation_requested.connect(_presentation.play)
+	set_plot_labels_visible(true)
 	# Sahne yeniden açıldıysa GameState'teki binaları animasyonsuz geri kur.
 	for plot in get_plots():
 		var building_id := GameState.get_building_on(plot.plot_id)
@@ -100,6 +109,7 @@ func place_building(plot_id: StringName, building_id: StringName, animate := tru
 		push_warning("CityWorld: '%s' için bina sahnesi yok, yer tutucu gösteriliyor" % building_id)
 	if plot.place_building(scene, animate, building_id) == null:
 		return false
+	_update_build_hints()
 	# Kriz sürerken (ör. hazırlık yılında) kurulan koruyucu bina hemen görünsün.
 	_fx.refresh_protection()
 	return true
@@ -165,15 +175,28 @@ func restore_city_state() -> void:
 		_stand_ins[plot_id].queue_free()
 	_stand_ins.clear()
 	for plot in get_plots():
-		plot.set_label_visible(true)
+		plot.set_debug_visible(show_debug_overlay)
 		var real := plot.get_building()
 		if real:
 			real.visible = true
 
 
+## Geliştirici etiketleri: value false ise her durumda gizli; true ise show_debug_overlay'e uyar.
 func set_plot_labels_visible(value: bool) -> void:
 	for plot in get_plots():
-		plot.set_label_visible(value)
+		plot.set_debug_visible(value and show_debug_overlay)
+
+
+## İnşaat modu = build fazında bir arsa seçili (yatırım paneli açık). O sırada diğer boş arsalar ince
+## "kurulabilir" çerçevesiyle görünür; normal görünümde hiçbiri görünmez. Uygunluk: arsa boş mu (görsel).
+func is_build_mode() -> bool:
+	return _selection_enabled and _selected != null
+
+
+func _update_build_hints() -> void:
+	var on := is_build_mode()
+	for plot in get_plots():
+		plot.set_buildable_hint(on and plot != _selected)
 
 
 func get_camera_rig() -> CameraRig:
@@ -209,6 +232,7 @@ func _select(plot: BuildPlot) -> void:
 		_selected.set_selected(false)
 	_selected = plot
 	plot.set_selected(true)
+	_update_build_hints()
 	EventBus.plot_selected.emit(plot.plot_id, plot.plot_kind, plot.is_empty())
 	# Arsa inşaat panelinin veya diğer panellerin arkasında kalmasın.
 	_camera_rig.bring_into_view(plot.global_position)
@@ -219,6 +243,7 @@ func _deselect() -> void:
 		return
 	_selected.set_selected(false)
 	_selected = null
+	_update_build_hints()
 	EventBus.plot_deselected.emit()
 
 
@@ -240,6 +265,7 @@ func _on_phase_changed(phase: StringName) -> void:
 	if not _selection_enabled:
 		_deselect()
 		_set_hovered(null)
+	_update_build_hints()
 
 
 func _on_build_approved(plot_id: StringName, building_id: StringName) -> void:

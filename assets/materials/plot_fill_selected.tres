@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "plot_fill_selected"
+render_priority = 1
+transparency = 1
+shading_mode = 0
+disable_receive_shadows = true
+albedo_color = Color(0.4667, 0.8118, 1, 0.26)

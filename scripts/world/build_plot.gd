@@ -2,6 +2,9 @@ class_name BuildPlot
 extends Node3D
 ## Sahip: A. Arsa verisi, vurgu ve bina yuvası (mimari §2.5).
 ## plot_id ve plot_kind sözleşme §7'deki listeden gelir; CityWorld.tscn içinde ayarlanır.
+## Görsel katman (VisualOverlay): Highlight (arsa kenarında ince çerçeve), HighlightFill (hafif dolgu),
+## DebugOverlay (geliştirici etiketi, normal oyunda gizli). Seçim ve fare üstü bilgisi CityWorld'den gelir
+## (mevcut ışın testi); arsa yalnızca görünümünü değiştirir, uygunluk hesaplamaz, GameState'e yazmaz.
 
 const KIND_MATERIALS := {
 	&"urban": preload("res://assets/materials/plot_urban.tres"),
@@ -10,13 +13,28 @@ const KIND_MATERIALS := {
 }
 const PLACEHOLDER_SCENE := preload("res://scenes/buildings/Building.tscn")
 const PLACEHOLDER_MATERIAL := preload("res://assets/materials/plaster_white.tres")
-## Arsa etiketinde gösterilen tür adı.
+## Vurgu durumlarının paylaşılan materyalleri (Inspector'dan düzenlenebilir .tres dosyaları).
+const MAT_BUILDABLE := preload("res://assets/materials/plot_state_buildable.tres")
+const MAT_HOVER := preload("res://assets/materials/plot_state_hover.tres")
+const MAT_SELECTED := preload("res://assets/materials/plot_state_selected.tres")
+const MAT_INVALID := preload("res://assets/materials/plot_state_invalid.tres")
+const MAT_FILL_HOVER := preload("res://assets/materials/plot_fill_hover.tres")
+const MAT_FILL_SELECTED := preload("res://assets/materials/plot_fill_selected.tres")
+## Geliştirici etiketinde gösterilen tür adı.
 const KIND_NAMES := {&"urban": "KENT", &"open": "AÇIK ALAN", &"coastal": "KIYI"}
 ## Tıklama kutusunun yüksekliği; binanın üstüne tıklamak da arsayı seçsin.
 const PICK_HEIGHT := 5.0
-## Boş arsa turkuaz, dolu arsa kehribar tonunda parlar.
-const HOVER_EMPTY := Color(0.3, 0.95, 0.9)
-const HOVER_OCCUPIED := Color(1.0, 0.7, 0.3)
+## Çerçeve: arsa kenarının hemen içinde, zeminin (0.12) biraz üstünde; z-fighting olmaz.
+const FRAME_WIDTH := 0.22
+const FRAME_HEIGHT := 0.02
+const FRAME_Y := 0.135
+const FRAME_INSET := 0.04
+## Fare üstü ve seçimde yavaş, hafif nefes alma (saniye cinsinden periyot, saydamlık aralığı).
+const PULSE_PERIOD := 2.4
+const PULSE_DEPTH := 0.25
+
+## Arsa boyutu → çerçeve mesh'i; aynı boyuttaki arsalar tek mesh'i paylaşır.
+static var _frame_meshes := {}
 
 @export var plot_id: StringName
 @export var plot_kind: StringName = &"urban"
@@ -24,8 +42,10 @@ const HOVER_OCCUPIED := Color(1.0, 0.7, 0.3)
 @export var size := 6.0
 
 @onready var _pad: MeshInstance3D = $Pad
-@onready var _highlight: MeshInstance3D = $Highlight
-@onready var _label: Label3D = $Label
+@onready var _highlight: MeshInstance3D = $VisualOverlay/Highlight
+@onready var _fill: MeshInstance3D = $VisualOverlay/HighlightFill
+@onready var _debug: Node3D = $VisualOverlay/DebugOverlay
+@onready var _label: Label3D = $VisualOverlay/DebugOverlay/Label
 @onready var _shape: CollisionShape3D = $PickArea/CollisionShape3D
 @onready var _anchor: Marker3D = $BuildingAnchor
 
@@ -34,15 +54,16 @@ var building_id: StringName = &""
 
 var _pad_material: StandardMaterial3D
 var _pad_base_color: Color
-var _highlight_material: StandardMaterial3D
 var _selected := false
 var _hovered := false
-var _pulse := 0.0
+## İnşaat modunda (bir arsa seçiliyken) boş arsalara ince "kurulabilir" çerçevesi.
+var _buildable_hint := false
+## Final sunumu karşılaştırmasında yatırımlı arsaların çerçevesi.
+var _showcase := false
 
 
 func _ready() -> void:
 	_pad.scale = Vector3(size, 1.0, size)
-	_highlight.scale = Vector3(size + 0.7, 1.0, size + 0.7)
 	var box := BoxShape3D.new()
 	box.size = Vector3(size, PICK_HEIGHT, size)
 	_shape.shape = box
@@ -50,16 +71,17 @@ func _ready() -> void:
 	_pad_material = KIND_MATERIALS.get(plot_kind, KIND_MATERIALS[&"urban"]).duplicate()
 	_pad.material_override = _pad_material
 	_pad_base_color = _pad_material.albedo_color
-	_highlight_material = _highlight.get_surface_override_material(0).duplicate()
-	_highlight.set_surface_override_material(0, _highlight_material)
+	_highlight.mesh = _frame_mesh(size)
+	_fill.scale = Vector3(size - FRAME_INSET * 2.0, 1.0, size - FRAME_INSET * 2.0)
 	_label.text = "%s · %s" % [plot_id, KIND_NAMES.get(plot_kind, String(plot_kind))]
 	_label.position = Vector3(-size * 0.5 + 0.25, _label.position.y, size * 0.5 - 0.25)
 	_refresh()
 
 
-func _process(delta: float) -> void:
-	_pulse += delta
-	_highlight.transparency = 0.15 + 0.25 * (0.5 + 0.5 * sin(_pulse * 4.0))
+## Yalnızca fare üstü ya da seçiliyken çalışır; boşta hiçbir arsa her kare iş yapmaz.
+func _process(_delta: float) -> void:
+	var phase := fmod(Time.get_ticks_msec() / 1000.0, PULSE_PERIOD) / PULSE_PERIOD
+	_highlight.transparency = PULSE_DEPTH * (0.5 - 0.5 * cos(phase * TAU))
 
 
 func is_empty() -> bool:
@@ -86,9 +108,46 @@ func set_hovered(value: bool) -> void:
 		_refresh()
 
 
-## Final sunumunda arsa etiketi gizlenir (sinematik görüntü); sunum bitince geri gelir.
+## İnşaat modu ipucu (CityWorld verir): boş arsada ince "kurulabilir" çerçevesi.
+func set_buildable_hint(value: bool) -> void:
+	if _buildable_hint != value:
+		_buildable_hint = value
+		_refresh()
+
+
+## Final sunumu karşılaştırması: yatırımlı arsa hafif çerçeveyle belirtilir.
+func set_showcase(value: bool) -> void:
+	if _showcase != value:
+		_showcase = value
+		_refresh()
+
+
+## Geliştirici katmanı (arsa kimliği ve türü). Normal oyunda kapalı; CityWorld.show_debug_overlay yönetir.
+func set_debug_visible(value: bool) -> void:
+	_debug.visible = value
+
+
+## Eski ad (final sunumu kullanıyor): geliştirici katmanının görünürlüğü.
 func set_label_visible(value: bool) -> void:
-	_label.visible = value
+	set_debug_visible(value)
+
+
+func is_debug_visible() -> bool:
+	return _debug.visible
+
+
+## Görünen vurgu durumu (test ve araçlar için): &"", &"buildable", &"hover", &"selected", &"invalid", &"showcase".
+func highlight_state() -> StringName:
+	if not _highlight.visible:
+		return &""
+	match _highlight.material_override:
+		MAT_SELECTED:
+			return &"selected"
+		MAT_HOVER:
+			return &"hover"
+		MAT_INVALID:
+			return &"invalid"
+	return &"showcase" if _showcase and not _buildable_hint else &"buildable"
 
 
 ## Kriz görselleri için zemin rengini geçici olarak bir tona çeker (0 = asıl renk).
@@ -111,14 +170,46 @@ func place_building(scene: PackedScene, animate := true, id: StringName = &"") -
 	return building
 
 
+## Öncelik: seçili > fare üstü (boşsa turkuaz, doluysa turuncu) > kurulabilir ipucu > sunum > yok.
 func _refresh() -> void:
-	var color := HOVER_OCCUPIED if is_occupied() else HOVER_EMPTY
-	_highlight.visible = _selected
-	set_process(_selected)
-	_pad_material.emission_enabled = _selected or _hovered
-	_pad_material.emission = color
-	_pad_material.emission_energy_multiplier = 0.45 if _selected else 0.2
-	_highlight_material.albedo_color = Color(color, 0.8)
+	var outline: Material = null
+	var fill: Material = null
+	if _selected:
+		outline = MAT_SELECTED
+		fill = MAT_FILL_SELECTED
+	elif _hovered:
+		outline = MAT_HOVER if is_empty() else MAT_INVALID
+		fill = MAT_FILL_HOVER if is_empty() else null
+	elif _buildable_hint and is_empty():
+		outline = MAT_BUILDABLE
+	elif _showcase:
+		outline = MAT_BUILDABLE
+	_highlight.visible = outline != null
+	_highlight.material_override = outline
+	_highlight.transparency = 0.0
+	_fill.visible = fill != null
+	_fill.material_override = fill
+	set_process(_selected or _hovered)
+
+
+## Arsa kenarında dört ince kenardan oluşan çerçeve (tek mesh, tek draw call).
+static func _frame_mesh(plot_size: float) -> Mesh:
+	if _frame_meshes.has(plot_size):
+		return _frame_meshes[plot_size]
+	var half := plot_size * 0.5 - FRAME_INSET - FRAME_WIDTH * 0.5
+	var length := plot_size - FRAME_INSET * 2.0
+	var st := SurfaceTool.new()
+	for side in 4:
+		var edge := BoxMesh.new()
+		# Yan kenarlar köşelerde üst üste binmesin (saydamlıkta köşe parlamasın).
+		var edge_length := length if side % 2 == 0 else length - FRAME_WIDTH * 2.0
+		edge.size = Vector3(edge_length, FRAME_HEIGHT, FRAME_WIDTH)
+		var xform := Transform3D(Basis(Vector3.UP, side * PI * 0.5), Vector3.ZERO)
+		xform = xform * Transform3D(Basis.IDENTITY, Vector3(0, FRAME_Y, half))
+		st.append_from(edge, 0, xform)
+	var mesh := st.commit()
+	_frame_meshes[plot_size] = mesh
+	return mesh
 
 
 func _make_placeholder() -> Node3D:
