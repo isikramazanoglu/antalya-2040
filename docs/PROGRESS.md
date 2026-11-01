@@ -135,6 +135,14 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
   - FPS (Game.tscn, vsync kapalı; normal / 8 bina / kriz / sunum): Intel UHD 1080p 60 / 59 / 56 / 45, Intel UHD 720p 113 / 109 / 103 / 86, RTX 5060 1080p 438 / 419 / 388 / 291.
   - Arsa seçimi yeni açıyla 3 zoom ve iki çözünürlükte ekrandaki her arsanın merkezinde doğru arsayı buluyor. `test_plot_visuals.gd` gerçek imleci de yapay olayın konumuna taşır (test sırasında fare kımıldarsa karışmasın).
   - Testler: B'nin 12 testi iki çözünürlükte, A'nın 7 testi TAMAM. Önce/sonra: `build/visual_reference/prompt4/`.
+- **Ekip B'ye devir notu (A, 2026-11-01) · görsel revizyon 5 ve 6:** Kullanıcının kararıyla revizyon 5 (ölçek, dekor, arsa tasarımı) ve 6 (arayüz cilası, son kalite kontrolü) B'de. 5'in dokunduğu dosyalar sahiplik tablosunda A'nındır; bu iş için B'ye açıktır. A bu sırada aynı dosyalarda çalışmayacak (çakışma olmasın).
+  - Dekor (evler, yollar, ağaçlar, marina, trafik): `scripts/world/city_decor.gd`, sabit seed + MultiMesh, sahneye kaydedilmez. Ortak bina paleti `assets/materials/buildings/bld_*.tres`; dekor hâlâ eski, daha doygun `assets/materials/*.tres` paletini kullanıyor.
+  - Arsalar: `scenes/world/BuildPlot.tscn` + `scripts/world/build_plot.gd` (Pad zemini, VisualOverlay/Highlight çerçeve, DebugOverlay etiket). Vurgu durumları `highlight_state()`; `_selected` B'nin test_integration'ı için korunmalı.
+  - Bina modelleri elle düzenlenmez: `py scripts/world/dev/gen_buildings.py .` (arsa sınırı, zemin, yükseklik standardı denetlenir), küçük resimler `scripts/world/dev/render_thumbnails.gd`.
+  - Işık/kamera: `scenes/world/CityWorld.tscn` (Environment, Sun, CameraRig dönüşü), `scenes/world/CameraRig.tscn`; `camera_rig.gd` zoom'u kamera uzaklığıyla yapar (ortografik için script değişmeli).
+  - Revizyon 4'te görülen eksikler (5 için): dekor evlerinin yan cepheleri boş (yeni açıda görünüyor), yollarda kaldırım/bordür/yaya geçidi/sokak ağacı yok, boş arsalar düz bej kare, araçlar iki kutu, kordon düz.
+  - Revizyon 6 için: kenar yumuşatma (MSAA), yumuşak gölge filtre kalitesi, SSAO kalite ayarları `project.godot`'ta varsayılan (görsel olarak en büyük kalan kazanç).
+  - Görsel kontrol: önce/sonra görüntüleri A'nın bilgisayarında `build/visual_reference/` (git dışında). Testler: B'nin 12 testi + `scripts/world/dev/test_*.gd` (7 test; `test_final_presentation` ~2,5 dk, `test_plot_visuals` gerçek fare olaylarıyla). FPS: aynı dizüstünün Intel UHD'si (`--gpu-index 1`) zayıf kart ölçüsü olarak kullanıldı.
 
 ### Ekip B
 - [x] 12 `BuildingDefinition` + bilgi kartları
