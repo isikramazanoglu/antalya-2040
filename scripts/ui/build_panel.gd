@@ -146,7 +146,7 @@ func _make_card(def: BuildingDefinition) -> Button:
 	for k in def.allowed_plot_kinds:
 		kinds.append(UiText.PLOT_KIND_SHORT.get(k, str(k)))
 	var affordable: bool = GameState.stats.credits >= def.cost
-	var price := _label("%s kredi · gider %d/yıl · %s · %s" % [UiText.thousands(def.cost), def.upkeep_per_year, ", ".join(kinds), UiText.CATEGORY_THEME.get(def.category, "")], 14,
+	var price := _label("%s kredi · bakımı her yıl %d · %s" % [UiText.thousands(def.cost), def.upkeep_per_year, ", ".join(kinds)], 14,
 			Color.WHITE if affordable else UiText.C_CRIT, true)
 	text.add_child(price)
 	var chips := PackedStringArray()
@@ -183,26 +183,26 @@ func _label(text: String, size: int, color: Color, wrap := false) -> Label:
 static func effects(def: BuildingDefinition) -> Array:
 	var out := []
 	if def.energy_production > 0.0:
-		out.append(["Yenilenebilir enerji +%d" % def.energy_production, true])
+		out.append(["Temiz elektrik üretir +%d" % def.energy_production, true])
 	if def.energy_consumption != 0.0:
-		out.append(["Enerji talebi %+d" % def.energy_consumption, def.energy_consumption < 0.0])
+		out.append([("Daha az elektrik harcar (%d)" if def.energy_consumption < 0.0 else "Elektrik harcar (+%d)") % def.energy_consumption, def.energy_consumption < 0.0])
 	if def.water_production > 0.0:
-		out.append(["Su arzı +%d" % def.water_production, true])
+		out.append(["Şehre su kazandırır +%d" % def.water_production, true])
 	if def.recycled_water_production > 0.0:
-		out.append(["Geri kazanılmış su +%d (içme dışı)" % def.recycled_water_production, true])
+		out.append(["Kullanılmış suyu temizler +%d (sulama ve temizlik için, içilmez)" % def.recycled_water_production, true])
 	if def.water_consumption != 0.0:
-		out.append(["Su talebi %+d" % def.water_consumption, def.water_consumption < 0.0])
+		out.append([("Daha az su harcar (%d)" if def.water_consumption < 0.0 else "Su harcar (+%d)") % def.water_consumption, def.water_consumption < 0.0])
 	for key in def.on_build_effects:
 		var v: float = def.on_build_effects[key]
 		out.append(["%s %s" % [UiText.STAT_NAMES.get(key, key), UiText.format_delta(v)], v > 0.0])
 	for sector in def.emission_multipliers:
 		var m: float = def.emission_multipliers[sector]
-		out.append(["%s emisyonu %+d%%" % [UiText.SECTOR_NAMES.get(sector, sector), roundi(m * 100)], m < 0.0])
+		out.append(["%s kaynaklı karbon %%%d %s" % [UiText.SECTOR_NAMES.get(sector, sector), absi(roundi(m * 100)), "azalır" if m < 0.0 else "artar"], m < 0.0])
 	for key in def.yearly_effects:
 		var y: float = def.yearly_effects[key]
-		out.append(["%s %s/yıl" % [UiText.STAT_NAMES.get(key, key), UiText.format_delta(y)], y > 0.0])
+		out.append(["%s her yıl %s" % [UiText.STAT_NAMES.get(key, key), UiText.format_delta(y)], y > 0.0])
 	for risk in def.risk_reduction:
-		out.append(["%s hasarı -%d%%" % [UiText.RISK_NAMES.get(risk, risk), roundi(def.risk_reduction[risk] * 100)], true])
+		out.append(["%s %%%d daha az zarar" % [UiText.RISK_IN.get(risk, risk), roundi(def.risk_reduction[risk] * 100)], true])
 	return out
 
 
@@ -231,7 +231,7 @@ func _show_detail(def: BuildingDefinition) -> void:
 	var card := def.info_card
 	var t := "[b]%s[/b]   [color=#4dd9d1]%s[/color]\n" % [def.display_name, UiText.CATEGORY_THEME.get(def.category, "")]
 	if card and card.benefit != "":
-		t += "[b]Temel fayda:[/b] %s\n[b]İklim bağlantısı:[/b] %s\n[b]Stratejik avantaj:[/b] %s\n" % [card.benefit, card.climate_link, card.strategic]
+		t += "[b]Ne işe yarar?[/b] %s\n[b]İklime faydası:[/b] %s\n[b]Neden önemli?[/b] %s\n" % [card.benefit, card.climate_link, card.strategic]
 	t += "\n"
 	for e in effects(def):
 		t += "[color=%s]%s %s[/color]\n" % [("#6bd185" if e[1] else "#ff8c73"), "+" if e[1] else "−", e[0]]
@@ -247,7 +247,7 @@ func _show_detail(def: BuildingDefinition) -> void:
 		for e in effects(syn):
 			bonus.append(e[0])
 		t += "[color=#%s]%s[/color] %s ile: %s\n" % [("6bd185" if active else "fad159"), "Kombinasyon etkin ·" if active else "Kombinasyon ·", " + ".join(partners), ", ".join(bonus)]
-	t += "[font_size=13][color=#b8c4c2]Değerler oyun dengeleme parametresidir, gerçek ölçüm değildir.[/color][/font_size]"
+	t += "[font_size=13][color=#b8c4c2]Bu sayılar oyunun puanlarıdır, gerçek ölçüm değildir.[/color][/font_size]"
 	%DetailSummary.text = t
 	var body := card.body if card else ""
 	if card:

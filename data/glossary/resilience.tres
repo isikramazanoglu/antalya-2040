@@ -6,7 +6,7 @@
 script = ExtResource("1_w8niv")
 id = &"resilience"
 title = "İklim dayanıklılığı"
-definition = "Bir şehrin iklim kaynaklı şoklara hazırlanma, onları atlatma ve toparlanma kapasitesi."
+definition = "Bir şehrin kuraklık, sıcak ya da taşkın gibi iklim olaylarına önceden hazırlanması, onları az zararla atlatması ve çabuk toparlanması."
 example = "Önceden kurulmuş su deposu sayesinde kuraklığı az kayıpla geçirmek."
-game_link = "D bölümünde her risk için hazırlık kapasitesi gösterilir."
+game_link = "\"Tehlikeler\" sayfasında her tehlike için ne kadar hazır olduğun gösterilir."
 sources = Array[String](["NASA Science, Mitigation and Adaptation (web sayfası), https://science.nasa.gov/climate-change/adaptation-mitigation/, erişim 2026-10-31"])

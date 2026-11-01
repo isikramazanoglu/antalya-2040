@@ -109,7 +109,7 @@ func _run() -> void:
 	_check(gs.stats.credits == credits_before + int(r.damage.credits) + rep.income - rep.upkeep + rep.missions.reward, "9) kriz maliyeti kasadan bir kez düştü")
 	_check(rep.crisis_results.size() == 1 and rep.crisis_results[0].has("assessment") and rep.crisis_results[0].severity > 0.0, "12) sonuç ve hasar dökümü yıl sonu raporunda")
 	var report_body: String = current_scene.get_node("UI/YearReport").find_child("Body", true, false).text
-	_check(report_body.contains("İklim olayı") and report_body.contains("Şiddet"), "12) YearReport kriz bölümünü gösteriyor")
+	_check(report_body.contains("Bu yıl yaşanan kriz") and report_body.contains("şiddet"), "12) YearReport kriz bölümünü gösteriyor")
 	bus.report_closed.emit()
 	_check(gs.phase == &"build" and gs.stats.year == 2044 and stages.any(func(s): return s[0] == &"heatwave" and s[1] == &"ended"), "11) kriz bitti (ended), 2044'te normal tura dönüldü")
 	bus.crisis_response_chosen.emit(&"heatwave", &"do_nothing")

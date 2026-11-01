@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_aa5wx")
 id = &"ecosystem_65"
-title = "Ekosistem sağlığını 65'te tut"
+title = "Doğa puanını 65'e çıkar"
 description = "Kıyıyı ve yeşil alanları koru."
 stat = "ecosystem_health"
 target = 65.0

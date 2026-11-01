@@ -6,7 +6,7 @@
 script = ExtResource("1_hyplm")
 id = &"greenhouse_effect"
 title = "Sera etkisi"
-definition = "Sera gazlarının Dünya'dan yayılan ısının bir kısmını tutarak atmosferi ısıtması. İnsan faaliyetleri bu etkiyi güçlendirmektedir."
+definition = "Havadaki bazı gazların, Dünya'dan uzaya kaçmak isteyen ısının bir kısmını tutarak Dünya'yı ısıtması. İnsanlar bu gazları artırdıkça etki de güçleniyor."
 example = "Güneşte bırakılan kapalı arabanın içinin ısınmasına benzetilir."
-game_link = "İklim Laboratuvarı'nın Küresel CO₂ bölümünde anlatılır."
+game_link = "İklim Laboratuvarı'nın \"Dünyanın havası\" sayfasında anlatılır."
 sources = Array[String](["NASA Science, Causes of climate change (web sayfası), https://science.nasa.gov/climate-change/causes/, erişim 2026-10-31"])

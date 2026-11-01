@@ -9,5 +9,5 @@ title = "Az suyla tarım"
 body = "Damla sulama suyu doğrudan bitkinin köküne verir, buharlaşma ile kaybolan su azalır. Bölgenin iklimine uygun bitkiler kurak yıllarda daha az etkilenir."
 benefit = "Şehirde taze gıda üretir ve yeşil alan sağlar."
 climate_link = "Damla sulama ve iklime uygun bitkiler az suyla üretim yapar."
-strategic = "Yaşam kalitesine ve ekosisteme katkı verir; kuraklıkta küçük bir koruma sağlar."
+strategic = "Yaşam kalitesine ve doğaya katkı verir; kuraklıkta biraz korur."
 sources = Array[String](["FAO, Agricultural water management (web sayfası), https://www.fao.org/land-water/water/water-management/en/, erişim 2026-10-31"])

@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_emh0l")
 id = &"emissions_85"
-title = "Yerel emisyonu 85'in altına indir"
-description = "Enerji, ulaşım ve atıktan gelen emisyonu azalt."
+title = "Karbon salımını 85'in altına indir"
+description = "Elektrikten, arabalardan ve çöpten çıkan karbonu azalt."
 stat = "emissions_total"
 target = 85.0
 at_most = true

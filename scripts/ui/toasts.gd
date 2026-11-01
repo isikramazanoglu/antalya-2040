@@ -67,8 +67,8 @@ func _on_crisis_warned(w: Dictionary) -> void:
 func _on_stats_changed(stats: Dictionary) -> void:
 	var share: float = stats.get("renewable_share", 0.0)
 	if share > _last_renewable + 0.001:
-		show_toast("Yenilenebilir enerji payın %%%d oldu." % roundi(share * 100), UiText.C_GOOD, "energy")
+		show_toast("Temiz elektrik payın %%%d oldu." % roundi(share * 100), UiText.C_GOOD, "energy")
 	_last_renewable = share
 	if stats.water_security < 35.0 and not _water_alerted:
-		show_toast("Su rezervlerin kritik seviyeye yaklaşıyor.", UiText.C_CRIT, "water")
+		show_toast("Şehrin suyu azalıyor, dikkat!", UiText.C_CRIT, "water")
 	_water_alerted = stats.water_security < 35.0

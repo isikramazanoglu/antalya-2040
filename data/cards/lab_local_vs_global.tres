@@ -5,6 +5,6 @@
 [resource]
 script = ExtResource("1_p373y")
 id = &"lab_local_vs_global"
-title = "Yerel emisyon ve küresel CO2"
+title = "Şehrimin karbonu ve dünyanın havası"
 body = "Şehrinin emisyonu, atmosfere eklenen sera gazının küçük bir parçasıdır. Atmosferdeki CO2 yoğunluğu dünyadaki bütün kaynakların toplamıyla değişir. Bu yüzden oyunda yaptığın yatırımlar yerel emisyonu düşürür ama küresel eğriyi tek başına değiştirmez."
 sources = Array[String](["NOAA Global Monitoring Laboratory, Trends in Atmospheric Carbon Dioxide (web sayfası), https://gml.noaa.gov/ccgg/trends/, erişim 2026-10-31"])

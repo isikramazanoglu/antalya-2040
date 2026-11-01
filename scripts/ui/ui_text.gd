@@ -5,13 +5,14 @@ extends RefCounted
 const STAT_NAMES := {
 	"credits": "Kredi",
 	"population": "Nüfus",
-	"water_security": "Su güvenliği",
-	"energy_security": "Enerji güvenliği",
+	"water_security": "Su",
+	"energy_security": "Elektrik",
 	"quality_of_life": "Yaşam kalitesi",
-	"ecosystem_health": "Ekosistem",
-	"emissions_total": "Emisyon",
+	"ecosystem_health": "Doğa",
+	"emissions_total": "Karbon salımı",
 }
 
+const MONTHS := ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
 const PLOT_KINDS := {&"urban": "Kent arsası", &"open": "Açık alan", &"coastal": "Kıyı arsası"}
 
 const REJECT_REASONS := {
@@ -49,11 +50,13 @@ const C_MUTED := Color(0.85, 0.88, 0.87, 0.7)
 
 const PLOT_KIND_SHORT := {&"urban": "kent", &"open": "açık alan", &"coastal": "kıyı"}
 const CATEGORY_THEME := {
-	&"energy": "Temiz enerji", &"water": "Su güvenliği", &"heat": "Aşırı sıcağa uyum", &"food": "Gıda ve döngüsel ekonomi",
-	&"waste": "Atık ve döngüsel ekonomi", &"transport": "Sürdürülebilir ulaşım", &"coast": "Kıyı ekosistemi ve uyum", &"synergy": "Kombinasyon",
+	&"energy": "Temiz enerji", &"water": "Su", &"heat": "Sıcağa karşı", &"food": "Gıda ve çöp",
+	&"waste": "Çöp ve geri dönüşüm", &"transport": "Toplu taşıma", &"coast": "Kıyıyı koruma", &"synergy": "Birlikte daha güçlü",
 }
-const SECTOR_NAMES := {"energy": "Enerji", "transport": "Ulaşım", "buildings": "Binalar", "waste": "Atık"}
-const RISK_NAMES := {"drought": "Kuraklık", "heat": "Aşırı sıcak", "coastal_flood": "Kıyı taşkını"}
+const SECTOR_NAMES := {"energy": "Elektrik", "transport": "Ulaşım", "buildings": "Binalar", "waste": "Çöp"}
+const RISK_NAMES := {"drought": "Kuraklık", "heat": "Sıcak hava dalgası", "coastal_flood": "Kıyı taşkını"}
+## "…da/de" hâli: yatırım etkilerinde "Kuraklıkta %20 daha az zarar".
+const RISK_IN := {"drought": "Kuraklıkta", "heat": "Sıcak hava dalgasında", "coastal_flood": "Kıyı taşkınında"}
 
 
 ## 0-100 gösterge için durum: renk tek başına anlam taşımasın diye yazıyla birlikte döner.
@@ -63,8 +66,8 @@ static func status(value: float) -> Array:
 	if value >= 50.0:
 		return ["Orta", C_WARN]
 	if value >= 30.0:
-		return ["Yüksek risk", C_HIGH]
-	return ["Kritik", C_CRIT]
+		return ["Kötü", C_HIGH]
+	return ["Çok kötü", C_CRIT]
 
 
 ## 1000 → "1.000", -250 → "-250"

@@ -6,7 +6,7 @@
 script = ExtResource("1_8p08t")
 id = &"climate_change"
 title = "İklim değişikliği"
-definition = "Sıcaklık ve hava düzenlerinde uzun dönemli değişim. Günümüzdeki ısınma büyük ölçüde insan faaliyetlerinden, özellikle fosil yakıt kullanımından kaynaklanır."
+definition = "Havanın sıcaklığının ve hava durumunun uzun yıllar içinde değişmesi. Bugünkü ısınmanın en büyük sebebi insanların kömür, petrol ve doğalgaz yakmasıdır."
 example = "Sıcak hava dalgalarının ve kuraklıkların daha sık görülmesi."
 game_link = "Oyundaki riskler her yıl biraz artar; krizler bu eğilimi temsil eder."
 sources = Array[String](["NASA Science, What Is Climate Change? (web sayfası), https://science.nasa.gov/climate-change/what-is-climate-change/, erişim 2026-10-31"])

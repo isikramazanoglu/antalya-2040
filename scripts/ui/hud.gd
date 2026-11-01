@@ -5,10 +5,10 @@ extends Control
 const MAIN_MENU := "res://scenes/main/MainMenu.tscn"
 ## [anahtar, başlık, ikon]
 const RESOURCES := [
-	["water_security", "Su güvenliği", "water"],
-	["energy_security", "Enerji dengesi", "energy"],
+	["water_security", "Su", "water"],
+	["energy_security", "Elektrik", "energy"],
 	["quality_of_life", "Yaşam kalitesi", "quality"],
-	["ecosystem_health", "Ekosistem sağlığı", "ecosystem"],
+	["ecosystem_health", "Doğa", "ecosystem"],
 ]
 
 var _cards: Dictionary = {}  # anahtar -> {"value": Label, "status": Label, "bar": ProgressBar, "detail": Label}
@@ -16,6 +16,8 @@ var _shown_credits := 0.0
 var _credits_tween: Tween
 var _last_net := 0  # son yıl sonu net bakiyesi (gelir - gider)
 var _has_report := false  # "Son rapor" ilk yıl sonundan önce kapalı
+var _speed_buttons: Array[Button] = []
+var _shown_month := 0  # uyarılardaki "kaç ay kaldı" her ay yenilensin
 
 
 func _ready() -> void:
@@ -33,6 +35,7 @@ func _ready() -> void:
 	%MenuButton.pressed.connect(%QuitConfirm.popup_centered)
 	%QuitConfirm.confirmed.connect(func(): get_tree().change_scene_to_file(MAIN_MENU))
 	%CollapseButton.pressed.connect(_toggle_resources)
+	_build_speed_buttons()
 	EventBus.stats_changed.connect(_on_stats_changed)
 	EventBus.phase_changed.connect(_on_phase_changed)
 	EventBus.year_ended.connect(_on_year_ended)
@@ -44,6 +47,62 @@ func _ready() -> void:
 	_on_stats_changed(GameState.get_stats())
 	_refresh_warnings()
 	_refresh_missions()
+
+
+## Takvim hız düğmeleri (Durdur, 1×, 2×, 3×): YearProgress'in sağına, kodla.
+func _build_speed_buttons() -> void:
+	var group := ButtonGroup.new()
+	var box := HBoxContainer.new()
+	box.add_theme_constant_override("separation", 2)
+	var labels := ["Durdur", "1×", "2×", "3×"]
+	var tips := ["Zamanı durdur (Boşluk)", "Normal hız", "İki kat hızlı", "Üç kat hızlı"]
+	for i in labels.size():
+		var b := Button.new()
+		b.text = labels[i]
+		b.toggle_mode = true
+		b.button_group = group
+		b.focus_mode = Control.FOCUS_NONE
+		b.tooltip_text = tips[i]
+		b.add_theme_font_size_override("font_size", 14)
+		b.pressed.connect(func(): _clock_call("set_speed", i))
+		box.add_child(b)
+		_speed_buttons.append(b)
+	%YearProgress.add_sibling(box)
+
+
+func _clock() -> MonthClock:
+	return get_tree().get_first_node_in_group("month_clock") as MonthClock
+
+
+func _clock_call(method: String, arg = null) -> void:
+	var c := _clock()
+	if c:
+		c.call(method, arg) if arg != null else c.call(method)
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE:
+		_clock_call("toggle_pause")
+		get_viewport().set_input_as_handled()
+
+
+## Tarih ve ay çubuğu her karede (ay değişimi stats_changed yaymaz; çubuk ay içinde de akar).
+func _process(_delta: float) -> void:
+	var b: BalanceConfig = Catalog.data.balance
+	var year: int = GameState.stats.year
+	if GameState.month != _shown_month:
+		_shown_month = GameState.month
+		_refresh_warnings()
+	%YearValue.text = "%s %d" % [UiText.MONTHS[GameState.month - 1], year]
+	var c := _clock()
+	var total := float((b.end_year - b.start_year + 1) * 12)
+	var done := (year - b.start_year) * 12 + GameState.month - 1 + (c.progress if c else 0.0)
+	%YearProgress.max_value = total
+	%YearProgress.value = done
+	%YearProgress.tooltip_text = "%d. yıl / %d · %d. ay" % [year - b.start_year + 1, b.end_year - b.start_year + 1, GameState.month]
+	if c:
+		for i in _speed_buttons.size():
+			_speed_buttons[i].set_pressed_no_signal(i == c.speed)
 
 
 func _open_panel(panel_name: String) -> void:
@@ -73,8 +132,8 @@ func _toggle_resources() -> void:
 func _build_resource_cards() -> void:
 	for r in RESOURCES:
 		_cards[r[0]] = _make_card(r[1], r[2])
-	_cards["economy"] = _make_card("Ekonomik durum", "economy")
-	_cards["emissions_total"] = _make_card("Yerel emisyon", "emission")
+	_cards["economy"] = _make_card("Para", "economy")
+	_cards["emissions_total"] = _make_card("Karbon salımı", "emission")
 
 
 func _make_card(title: String, icon_name: String) -> Dictionary:
@@ -133,29 +192,27 @@ func _bar_fill(color: Color) -> StyleBoxFlat:
 
 func _on_stats_changed(stats: Dictionary) -> void:
 	var b: BalanceConfig = Catalog.data.balance
-	%YearValue.text = str(stats.year)
-	%YearProgress.max_value = b.end_year - b.start_year + 1
-	%YearProgress.value = stats.year - b.start_year + 1
-	%YearProgress.tooltip_text = "%d / %d. yıl" % [stats.year - b.start_year + 1, b.end_year - b.start_year + 1]
 	%PopulationValue.text = UiText.thousands(stats.population)
 	_animate_credits(stats.credits)
 
 	for r in RESOURCES:
 		var detail := ""
 		if r[0] == "energy_security":
-			detail = "Üretim %d / tüketim %d · denge %+d · yenilenebilir %%%d" % [roundi(stats.renewable_energy), roundi(stats.energy_demand),
-					roundi(stats.renewable_energy - stats.energy_demand), roundi(stats.renewable_share * 100)]
+			var need := roundi(stats.energy_demand)
+			var clean := roundi(stats.renewable_energy)
+			detail = "İhtiyaç %d · temiz enerji %d" % [need, clean] + (" · hepsi temiz" if clean >= need else " · %d kömür ve doğalgazdan" % (need - clean))
 		elif r[0] == "water_security":
-			detail = "Su arzı %d%s / talep %d · denge %+d" % [roundi(stats.water_supply),
-					" + %d geri kazanılmış" % roundi(stats.recycled_water_used) if stats.recycled_water_used > 0.0 else "", roundi(stats.water_demand),
-					roundi(stats.water_supply + stats.recycled_water_used - stats.water_demand)]
+			var have := roundi(stats.water_supply + stats.recycled_water_used)
+			var want := roundi(stats.water_demand)
+			detail = "Su %d%s · ihtiyaç %d · %s" % [have, " (%d geri kazanılmış)" % roundi(stats.recycled_water_used) if stats.recycled_water_used > 0.0 else "",
+					want, "%d fazla" % (have - want) if have >= want else "%d eksik" % (want - have)]
 		_set_card(r[0], stats[r[0]], str(roundi(stats[r[0]])), detail)
 
 	# Ekonomik durum: kasanın en ucuz yatırıma yetmesi ve son yılın net bakiyesi.
 	var cheapest := _cheapest_available_cost()
 	var econ := 80.0 if stats.credits >= cheapest else (40.0 if stats.credits >= 0 else 10.0)
 	_set_card("economy", econ, UiText.thousands(stats.credits),
-			("Geçen yıl net %s · " % UiText.format_delta(_last_net) if _has_report else "") + ("en ucuz yatırım %d" % cheapest if cheapest > 0 else "bütün yatırımlar yapıldı"))
+			("Geçen yıl %s kredi · " % UiText.format_delta(_last_net) if _has_report else "") + ("en ucuz yatırım %d kredi" % cheapest if cheapest > 0 else "bütün yatırımlar yapıldı"))
 
 
 	# Emisyonda düşük iyidir: 80 ve altı iyi, 120 üstü kritik olacak şekilde 0-100 ölçeğine çevrilip durum rengi alınır.
@@ -164,7 +221,8 @@ func _on_stats_changed(stats: Dictionary) -> void:
 		start_total += v
 	var em: float = stats.emissions_total
 	_set_card("emissions_total", clampf(150.0 - em, 0.0, 100.0), str(roundi(em)),
-			"Başlangıç %d · fark %+d (oyun birimi)" % [roundi(start_total), roundi(em - start_total)])
+			"Başta %d · %s · az olması iyi" % [roundi(start_total), "%d azaldı" % roundi(start_total - em) if em < start_total - 0.5
+					else ("%d arttı" % roundi(em - start_total) if em > start_total + 0.5 else "değişmedi")])
 
 
 func _cheapest_available_cost() -> int:
@@ -195,8 +253,9 @@ func _refresh_warnings() -> void:
 		child.queue_free()
 	for w in GameState.pending_crises:
 		var def := Catalog.get_event(w.event_id)
-		var left: int = w.due_year - GameState.stats.year
-		var when := "bu yıl sonunda, hazırlık için son yıl" if left <= 0 else "%d sonunda · %d yıl hazırlık süresi" % [w.due_year, left]
+		var month: int = def.month if def else 12
+		var left: int = (w.due_year - GameState.stats.year) * 12 + month - GameState.month
+		var when := "%s %d · %s" % [UiText.MONTHS[month - 1], w.due_year, "şimdi" if left <= 0 else "%d ay kaldı" % left]
 		var label := _side_label("Uyarı · %s · %s" % [def.display_name if def else str(w.event_id), when], UiText.C_HIGH)
 		label.tooltip_text = def.warning_text if def else ""
 		label.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -210,14 +269,50 @@ func _refresh_missions() -> void:
 	for child in %Missions.get_children():
 		child.queue_free()
 	var stats := GameState.get_stats()
+	var rows: Array = []
 	for m in Catalog.data.missions:
-		if m.category != &"goal" or GameState.missions.get(m.id, &"active") != &"active":
-			continue
-		var label := _side_label("Görev · %s %s%d · şu an %d · son yıl %d · +%d" % [
-				UiText.STAT_NAMES.get(m.stat, m.stat), "en çok " if m.at_most else "", roundi(m.target), roundi(stats[m.stat]), m.deadline_year, m.reward_credits], Color.WHITE)
-		label.tooltip_text = m.description
-		label.mouse_filter = Control.MOUSE_FILTER_PASS
-		%Missions.add_child(label)
+		if m.category == &"goal" and GameState.missions.get(m.id, &"active") == &"active":
+			rows.append(m)
+	if rows.is_empty():
+		return
+	# Kaynak paneliyle aynı görünümde kart: başlık, ilerleme çubuğu, şu an / hedef, son tarih, ödül.
+	var card := PanelContainer.new()
+	card.mouse_filter = Control.MOUSE_FILTER_PASS
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	card.add_child(box)
+	var head := Label.new()
+	head.text = "Görevler"
+	head.add_theme_font_size_override("font_size", 17)
+	head.add_theme_color_override("font_color", UiText.C_ACCENT)
+	box.add_child(head)
+	for m in rows:
+		var current: float = stats[m.stat]
+		var reached: bool = current <= m.target if m.at_most else current >= m.target
+		# "En çok" görevde çubuk hedefe yaklaştıkça dolar (hedef / şu an).
+		var ratio := clampf(m.target / maxf(current, 0.01) if m.at_most else current / maxf(m.target, 0.01), 0.0, 1.0)
+		var title := Label.new()
+		title.text = ("✓ " if reached else "") + m.title
+		title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		title.add_theme_font_size_override("font_size", 15)
+		title.tooltip_text = m.description
+		title.mouse_filter = Control.MOUSE_FILTER_PASS
+		box.add_child(title)
+		var bar := ProgressBar.new()
+		bar.show_percentage = false
+		bar.custom_minimum_size = Vector2(0, 8)
+		bar.max_value = 1.0
+		bar.value = ratio
+		bar.add_theme_stylebox_override("fill", _bar_fill(UiText.C_GOOD if reached else UiText.C_WARN))
+		box.add_child(bar)
+		var info := Label.new()
+		info.text = "Şu an %d · hedef %s%d · %d sonuna kadar · ödül +%d" % [
+				roundi(current), "en çok " if m.at_most else "", roundi(m.target), m.deadline_year, m.reward_credits]
+		info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		info.add_theme_font_size_override("font_size", 13)
+		info.add_theme_color_override("font_color", UiText.C_MUTED)
+		box.add_child(info)
+	%Missions.add_child(card)
 
 
 ## Şehrin üstünde açık zeminde de okunsun diye koyu kenar çizgili etiket.

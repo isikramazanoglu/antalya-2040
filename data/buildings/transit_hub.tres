@@ -8,7 +8,7 @@
 [resource]
 script = ExtResource("2_quxjm")
 id = &"transit_hub"
-display_name = "Düşük emisyonlu toplu taşıma merkezi"
+display_name = "Temiz toplu taşıma merkezi"
 short_description = "Elektrikli otobüs ve tramvay hatlarını bisiklet yollarıyla birleştirir."
 category = &"transport"
 cost = 400

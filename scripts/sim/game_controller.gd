@@ -13,6 +13,9 @@ func _ready() -> void:
 	EventBus.end_turn_requested.connect(turn_manager.end_year)
 	EventBus.report_closed.connect(turn_manager.close_report)
 	EventBus.crisis_response_chosen.connect(turn_manager.on_crisis_response)
+	var clock := MonthClock.new()
+	clock.name = "MonthClock"
+	add_child(clock)
 	# UI node'ları _ready'lerini bitirsin, ilk year_started'ı kaçırmasın.
 	turn_manager.start_game.call_deferred()
 
@@ -71,6 +74,10 @@ func apply_phase(phase: StringName) -> void:
 
 func advance_year() -> void:
 	GameState.advance_year()
+
+
+func set_month(value: int) -> void:
+	GameState.set_month(value)
 
 
 func record_history() -> void:

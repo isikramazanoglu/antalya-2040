@@ -11,6 +11,7 @@ var crisis_log: Array = []  # yaşanan krizlerin sonuçları (+ "year"), İklim 
 var build_log: Array = []  # Prompt 10A: {"plot_id", "building_id", "year", "cost"} her onaylanan inşaat
 var year_reports: Array = []  # Prompt 10A: her yıl sonu raporunun kopyası (sözleşme §5.4)
 var phase: StringName = &"build"
+var month: int = 1  # takvim ayı 1–12; yıllık hesapları etkilemez
 var rng_seed: int = 0
 
 
@@ -55,6 +56,7 @@ func reset() -> void:
 	build_log.clear()
 	year_reports.clear()
 	phase = &"build"
+	month = 1
 	rng_seed = randi()
 	EventBus.stats_changed.emit(get_stats())
 
@@ -96,7 +98,12 @@ func set_phase(new_phase: StringName) -> void:
 	phase = new_phase
 
 
+func set_month(value: int) -> void:
+	month = value
+
+
 func advance_year() -> void:
+	month = 1
 	stats.year += 1
 	EventBus.stats_changed.emit(get_stats())
 
