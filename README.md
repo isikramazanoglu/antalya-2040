@@ -1,13 +1,22 @@
 <p align="center"><img src="docs/logo.jpg" alt="ANTALYA 2040 logosu" width="220"></p>
 
+<p align="center">
+<a href="https://github.com/isikramazanoglu/antalya-2040/releases/download/v1.4/ANTALYA2040_Windows_v1.4.zip"><b>🎮 Oyunu indir (Windows)</b></a> &nbsp;·&nbsp;
+<a href="oynanis_videosu.mp4"><b>🎬 Oynanış videosu</b></a> &nbsp;·&nbsp;
+<a href="ANTALYA2040_Sunum.pptx"><b>📊 Sunum</b></a>
+</p>
+
+<p align="center"><a href="oynanis_videosu.mp4"><img src="docs/oynanis_onizleme.gif" alt="Oynanış önizlemesi" width="720"></a><br>
+<sub>Oynanıştan kısa bir önizleme · tam video (61 sn) için görsele tıklayın</sub></p>
+
 # ANTALYA 2040 · İklimin Geleceği
 
 Antalya'dan esinlenen bir Akdeniz şehrini 2040'tan 2052'ye yönetip iklim krizlerine hazırladığın eğitici 3D şehir kurma ve iklim simülasyonu oyunu (Godot 4.7). Game Up Türkiye oyun hackathonu, COP31 temaları: iklim değişikliğine uyum ve dayanıklı şehirler, azaltım, iklim eğitimi.
 
 ## İndir ve izle
 - **Oyun (Windows, v1.4):** [ANTALYA2040_Windows_v1.4.zip](https://github.com/isikramazanoglu/antalya-2040/releases/download/v1.4/ANTALYA2040_Windows_v1.4.zip) · zip'i aç, `ANTALYA2040.exe`'ye çift tıkla (kurulum ve internet gerekmez).
-- **Oynanış videosu (61 sn):** [oynanis_videosu.mp4](https://github.com/isikramazanoglu/antalya-2040/releases/download/v1.4/oynanis_videosu.mp4)
-- **Sunum:** [ANTALYA2040_Sunum.pptx](https://github.com/isikramazanoglu/antalya-2040/releases/download/v1.4/ANTALYA2040_Sunum.pptx)
+- **Oynanış videosu (61 sn):** [oynanis_videosu.mp4](oynanis_videosu.mp4) (repoda; ayrıca [Release](https://github.com/isikramazanoglu/antalya-2040/releases/download/v1.4/oynanis_videosu.mp4))
+- **Sunum:** [ANTALYA2040_Sunum.pptx](ANTALYA2040_Sunum.pptx) (repoda; ayrıca [Release](https://github.com/isikramazanoglu/antalya-2040/releases/download/v1.4/ANTALYA2040_Sunum.pptx))
 - **Bütün sürümler:** [Releases](https://github.com/isikramazanoglu/antalya-2040/releases) · **Ekran görüntüleri:** [`docs/screenshots/final/`](docs/screenshots/final/)
 
 <p align="center"><img src="docs/screenshots/final/03_baca_dumani.jpg" width="49%"> <img src="docs/screenshots/final/06_cevre_denetimi_ihlal.jpg" width="49%"></p>
