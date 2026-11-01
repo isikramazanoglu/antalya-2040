@@ -73,10 +73,16 @@ func _run() -> void:
 	var label: Label3D = city.find_plot(&"O02").get_node("VisualOverlay/DebugOverlay/Label")
 	check(label.text == "O02 · AÇIK ALAN" and not city.find_plot(&"O02").is_debug_visible(),
 		"geliştirici etiketi kimlik + tür (%s), normal oyunda gizli" % label.text)
-	var car: Node3D = decor.get_node("Traffic").get_child(0)
-	var car_x := car.position.x
+	# Görsel revizyon 9: trafik CityWorld/Traffic düğümünde (PathFollow3D).
+	# Geçitte bekleyen olabilir: en az bir aracın ilerlemesi yeter.
+	var cars: Array = city.get_node("Traffic")._vehicles
+	var before := cars.map(func(v): return (v.follow as Node3D).global_position)
 	await create_timer(0.5).timeout
-	check(not is_equal_approx(car.position.x, car_x), "caddede araç hareket ediyor")
+	var moved := 0
+	for i in cars.size():
+		if (cars[i].follow as Node3D).global_position.distance_to(before[i]) > 0.05:
+			moved += 1
+	check(moved > cars.size() / 2, "caddede araçlar hareket ediyor (%d / %d)" % [moved, cars.size()])
 
 	# Kamera 1 sn otursun.
 	await create_timer(1.0).timeout

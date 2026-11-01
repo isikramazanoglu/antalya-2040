@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "arch_facade_rose"
+albedo_color = Color(0.91, 0.8, 0.74, 1)
+roughness = 0.9

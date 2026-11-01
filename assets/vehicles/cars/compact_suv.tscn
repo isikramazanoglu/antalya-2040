@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/vehicles/cars/compact_suv_body.tres" id="1_m1rxt"]
+[ext_resource type="ArrayMesh" path="res://assets/vehicles/wheels/wheel_car.tres" id="2_u0g8o"]
+
+[node name="CompactSuv" type="Node3D" unique_id=1744425112]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=806880501]
+mesh = ExtResource("1_m1rxt")
+
+[node name="Wheel_0" type="MeshInstance3D" parent="." unique_id=248823905]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 0.135, -0.62)
+mesh = ExtResource("2_u0g8o")
+
+[node name="Wheel_1" type="MeshInstance3D" parent="." unique_id=1564670816]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.38, 0.135, -0.62)
+mesh = ExtResource("2_u0g8o")
+
+[node name="Wheel_2" type="MeshInstance3D" parent="." unique_id=1812483515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 0.135, 0.62)
+mesh = ExtResource("2_u0g8o")
+
+[node name="Wheel_3" type="MeshInstance3D" parent="." unique_id=1735959384]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.38, 0.135, 0.62)
+mesh = ExtResource("2_u0g8o")

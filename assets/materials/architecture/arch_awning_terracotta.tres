@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "arch_awning_terracotta"
+albedo_color = Color(0.75, 0.45, 0.33, 1)
+roughness = 0.8

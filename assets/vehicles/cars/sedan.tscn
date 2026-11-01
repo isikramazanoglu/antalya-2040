@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/vehicles/cars/sedan_body.tres" id="1_kiwgk"]
+[ext_resource type="ArrayMesh" path="res://assets/vehicles/wheels/wheel_car.tres" id="2_a8u73"]
+
+[node name="Sedan" type="Node3D" unique_id=1211707397]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=679060039]
+mesh = ExtResource("1_kiwgk")
+
+[node name="Wheel_0" type="MeshInstance3D" parent="." unique_id=745047999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36, 0.135, -0.62)
+mesh = ExtResource("2_a8u73")
+
+[node name="Wheel_1" type="MeshInstance3D" parent="." unique_id=466437196]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.36, 0.135, -0.62)
+mesh = ExtResource("2_a8u73")
+
+[node name="Wheel_2" type="MeshInstance3D" parent="." unique_id=152401996]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36, 0.135, 0.62)
+mesh = ExtResource("2_a8u73")
+
+[node name="Wheel_3" type="MeshInstance3D" parent="." unique_id=1591475041]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.36, 0.135, 0.62)
+mesh = ExtResource("2_a8u73")

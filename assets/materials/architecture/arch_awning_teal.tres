@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "arch_awning_teal"
+albedo_color = Color(0.33, 0.6, 0.6, 1)
+roughness = 0.8

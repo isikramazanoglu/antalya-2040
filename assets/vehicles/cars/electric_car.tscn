@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/vehicles/cars/electric_car_body.tres" id="1_2scnv"]
+[ext_resource type="ArrayMesh" path="res://assets/vehicles/wheels/wheel_car.tres" id="2_0ydbp"]
+
+[node name="ElectricCar" type="Node3D" unique_id=1024378011]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=1626973596]
+mesh = ExtResource("1_2scnv")
+
+[node name="Wheel_0" type="MeshInstance3D" parent="." unique_id=1419429442]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.375, 0.135, -0.64)
+mesh = ExtResource("2_0ydbp")
+
+[node name="Wheel_1" type="MeshInstance3D" parent="." unique_id=382130265]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.375, 0.135, -0.64)
+mesh = ExtResource("2_0ydbp")
+
+[node name="Wheel_2" type="MeshInstance3D" parent="." unique_id=594942731]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.375, 0.135, 0.64)
+mesh = ExtResource("2_0ydbp")
+
+[node name="Wheel_3" type="MeshInstance3D" parent="." unique_id=59086262]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.375, 0.135, 0.64)
+mesh = ExtResource("2_0ydbp")

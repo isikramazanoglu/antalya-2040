@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/buildings/villas/villa_mediterranean_b.tres" id="1_b41pe"]
+
+[node name="VillaMediterraneanB" type="MeshInstance3D" unique_id=1996362672]
+mesh = ExtResource("1_b41pe")
