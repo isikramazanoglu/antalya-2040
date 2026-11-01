@@ -71,7 +71,32 @@ const FLOWERS: Array[Material] = [
 	preload("res://assets/materials/city/flower_purple.tres"),
 	preload("res://assets/materials/buildings/bld_fruit.tres"),
 	preload("res://assets/materials/city/flower_white.tres"),
+	preload("res://assets/materials/city/flower_yellow.tres"),
 ]
+const M_POT_STONE := preload("res://assets/materials/buildings/bld_stone.tres")
+const M_POT_CREAM := preload("res://assets/materials/buildings/bld_cream.tres")
+const M_BIN := preload("res://assets/materials/buildings/bld_green_accent.tres")
+const SKINS: Array[Material] = [
+	preload("res://assets/materials/city/skin_light.tres"),
+	preload("res://assets/materials/city/skin_mid.tres"),
+	preload("res://assets/materials/city/skin_dark.tres"),
+]
+const SHIRTS: Array[Material] = [
+	preload("res://assets/materials/buildings/bld_turquoise.tres"),
+	preload("res://assets/materials/buildings/bld_terracotta.tres"),
+	preload("res://assets/materials/buildings/bld_cream.tres"),
+	preload("res://assets/materials/buildings/bld_bin_blue.tres"),
+	preload("res://assets/materials/buildings/bld_green_accent.tres"),
+	preload("res://assets/materials/buildings/bld_bin_yellow.tres"),
+	preload("res://assets/materials/city/flower_pink.tres"),
+]
+const TROUSERS: Array[Material] = [
+	preload("res://assets/materials/buildings/bld_metal_dark.tres"),
+	preload("res://assets/materials/buildings/bld_window.tres"),
+	preload("res://assets/materials/buildings/bld_wood.tres"),
+	preload("res://assets/materials/buildings/bld_stone.tres"),
+]
+const M_HAIR := preload("res://assets/materials/buildings/bld_soil_dark.tres")
 const M_LIGHT := preload("res://assets/materials/signal_light.tres")
 const ACCENTS: Array[Material] = [
 	preload("res://assets/materials/buildings/bld_turquoise.tres"),
@@ -136,6 +161,9 @@ var _cylinder := CylinderMesh.new()
 var _cone := CylinderMesh.new()
 var _pyramid := CylinderMesh.new()
 var _car_meshes := {}
+## Statik insan figürleri tek mesh'te birleşir: materyal başına bir yüzey (birkaç draw call).
+var _people_tools := {}
+var _capsule := CapsuleMesh.new()
 
 
 func _ready() -> void:
@@ -144,6 +172,11 @@ func _ready() -> void:
 	_batches.clear()
 	_cars.clear()
 	_car_meshes.clear()
+	_people_tools.clear()
+	_capsule.radius = 0.5
+	_capsule.height = 2.0
+	_capsule.radial_segments = 8
+	_capsule.rings = 2
 	_box.size = Vector3.ONE
 	_prism.size = Vector3.ONE
 	_sphere.radius = 0.5
@@ -171,6 +204,7 @@ func _ready() -> void:
 	_build_seafront()
 	_build_mountains()
 	_flush_batches()
+	_flush_people()
 	_build_traffic()
 
 
@@ -299,6 +333,11 @@ func _build_streets() -> void:
 			_push(_car_mesh(CAR_COLORS[_rng.randi() % CAR_COLORS.size()]), null,
 					Transform3D(Basis(Vector3.UP, yaw), Vector3(bx + bay * 0.5, 0.045, park.get_center().y)))
 		bx += bay
+	var hx := park.position.x + 1.5
+	while hx < park.end.x - 1.0:
+		if _rng.randf() < 0.6:
+			_add(_sphere, M_HEDGE, Vector3(hx, 0.15, park.position.y - SIDEWALK - 0.25), Vector3(0.6, 0.32, 0.4))
+		hx += 2.0
 	# Mahalle yollarının kaldırımları: kuzey yolundan ana caddeye, ana caddeden kordona.
 	for road in ROADS_NS:
 		for span in [Vector2(north.end.y + SIDEWALK, avenue.position.y - SIDEWALK), Vector2(avenue.end.y + SIDEWALK, PROMENADE.position.y)]:
@@ -496,8 +535,13 @@ func _build_town_square() -> void:
 		var corner := Vector3(cx + side * (sq.size.x * 0.5 - 1.0), 0.06, sq.end.y - 0.9)
 		_planter_box(corner, Vector3(1.2, 0.35, 0.7))
 		_olive(cx + side * 2.6, sq.end.y - 0.7, 0.7)
-		_bench(Vector3(cx + side * 1.2, 0.06, fountain.z + 1.5), 0.0)
+		_bench(Vector3(cx + side * 1.2, 0.06, fountain.z + 1.5), PI)
+		_person(Vector3(cx + side * 1.3, 0.06, fountain.z + 1.48), PI, &"sit")
 		_pot(Vector3(cx + side * 1.8, 0.06, portico_z + 0.9), 0.9)
+		_lamp(Vector3(cx + side * (sq.size.x * 0.5 - 0.6), 0.06, sq.position.y + 3.6), -1.0)
+	_person(Vector3(cx - 0.8, 0.06, fountain.z - 1.4), 0.3, &"stand")
+	_person(Vector3(cx - 0.55, 0.06, fountain.z - 1.55), -2.6, &"stand")
+	_person(Vector3(cx + 2.8, 0.06, fountain.z - 0.6), PI * 0.5, &"walk")
 
 
 ## Kordon meydanı: taş zemin, küçük çeşme, büfe, banklar.
@@ -520,7 +564,12 @@ func _build_coast_square() -> void:
 		_add(_cylinder, M_WOOD, t + Vector3(0, 0.6, 0), Vector3(0.04, 1.1, 0.04))
 		_add(_cone, AWNINGS[k % AWNINGS.size()], t + Vector3(0, 1.2, 0), Vector3(1.0, 0.25, 1.0))
 	for corner in [Vector3(COAST_SQUARE.position.x + 0.4, 0.06, COAST_SQUARE.position.y + 0.4), Vector3(COAST_SQUARE.end.x - 0.4, 0.06, COAST_SQUARE.position.y + 0.4)]:
-		_pot(corner, 1.0)
+		_pot_group(corner, 0.9)
+	_person(Vector3(c.x - 0.6, 0.06, c.y - 0.62), PI, &"sit")
+	_person(Vector3(c.x + 0.55, 0.06, c.y - 1.2), 0.0, &"sit")
+	_person(Vector3(c.x + 1.9, 0.06, c.y - 0.1), PI * 0.8, &"stand")
+	_person(Vector3(c.x + 2.15, 0.06, c.y - 0.3), -PI * 0.6, &"stand")
+	_lamp(Vector3(c.x - 2.6, 0.06, c.y - 1.6), -1.0)
 
 
 # --- Mevcut evler: beyaz sıva, terracotta çatı, damda güneş kolektörü ---
@@ -600,6 +649,15 @@ func _house(x: float, z: float, w: float, d: float, shop := false) -> void:
 		var door_x := x - w * 0.5 + 0.5 * w / cols
 		if _is_free(Rect2(door_x + 0.15, front + 0.05, 0.4, 0.4)):
 			_pot(Vector3(door_x + 0.38, 0.0, front + 0.22), 0.7)
+	# Giriş taşı (kapı önü) ve bazı evlerde alçak taş bahçe duvarı + yan ağaç.
+	if not shop:
+		var door := x - w * 0.5 + 0.5 * w / cols
+		if _is_free(Rect2(door - 0.3, front, 0.6, 0.35)):
+			_add(_box, M_PAVING_LIGHT, Vector3(door, 0.02, front + 0.17), Vector3(0.6, 0.04, 0.35), Vector3.ZERO, false)
+		if floors <= 2 and _rng.randf() < 0.25 and _is_free(Rect2(x - w * 0.5, front + 0.5, w, 0.25)):
+			_add(_box, M_POT_STONE, Vector3(x + w * 0.12, 0.13, front + 0.62), Vector3(w * 0.76, 0.26, 0.14))
+		if _rng.randf() < 0.2 and _is_free(Rect2(side + 0.3, z - 0.5, 1.0, 1.0)):
+			_olive(side + 0.7, z, 0.65)
 	if floors == 1 and _rng.randf() < 0.4:
 		var garden := Rect2(x - w * 0.5, z + d * 0.5 + 0.15, w, 0.35)
 		if _is_free(garden):
@@ -809,7 +867,11 @@ func _build_seafront() -> void:
 				elif k % 3 == 1:
 					_pot(Vector3(bx, top, SEAFRONT.get_center().y - 0.1), 0.95)
 				else:
-					_bench(Vector3(bx, top, SEAFRONT.get_center().y + 0.05), PI)
+					_bench(Vector3(bx, top, SEAFRONT.get_center().y + 0.05), 0.0)
+					if _rng.randf() < 0.45:
+						_person(Vector3(bx + _rng.randf_range(-0.3, 0.3), top, SEAFRONT.get_center().y + 0.07), 0.0, &"sit")
+					elif k % 6 == 3:
+						_trash_bin(Vector3(bx + 0.8, top, SEAFRONT.get_center().y))
 			bx += 2.2
 			k += 1
 	# Dinlenme alanları: pergola, iki bank, saksı ve ağaç.
@@ -827,16 +889,44 @@ func _build_seafront() -> void:
 			_add(_box, M_WOOD, Vector3(rx - 1.2 + s * 0.48, top + 1.42, cz), Vector3(0.07, 0.05, 0.8))
 		_add(_box, M_WOOD, Vector3(rx, top + 1.38, cz - 0.32), Vector3(2.5, 0.06, 0.06))
 		_add(_box, M_WOOD, Vector3(rx, top + 1.38, cz + 0.32), Vector3(2.5, 0.06, 0.06))
-		_bench(Vector3(rx - 0.6, top, cz + 0.05), PI)
-		_bench(Vector3(rx + 0.6, top, cz + 0.05), PI)
+		_bench(Vector3(rx - 0.6, top, cz + 0.05), 0.0)
+		_bench(Vector3(rx + 0.6, top, cz + 0.05), 0.0)
+		_person(Vector3(rx - 0.75, top, cz + 0.07), 0.0, &"sit")
+		_person(Vector3(rx + 0.5, top, cz + 0.07), 0.1, &"sit")
+		_trash_bin(Vector3(rx + 1.95, top, cz - 0.25))
 		_pot(Vector3(rx - 1.6, top, cz), 1.0)
 		_pot(Vector3(rx + 1.6, top, cz), 1.0)
+	# Kordonda yürüyenler ve sahil yolunda denize bakanlar (az ve dağınık).
+	var wx := PROMENADE.position.x + 3.0
+	while wx < PROMENADE.end.x - 3.0:
+		if not _near_ns_road(wx, 0.6) and _rng.randf() < 0.55:
+			var lane := PROMENADE.get_center().y + _rng.randf_range(-0.5, 0.4)
+			_person(Vector3(wx + _rng.randf_range(-1.0, 1.0), 0.05, lane), PI * 0.5 if _rng.randf() < 0.5 else -PI * 0.5, &"walk")
+			if _rng.randf() < 0.35:
+				_person(Vector3(wx + 0.3, 0.05, lane + 0.25), PI * 0.5, &"walk")
+		wx += _rng.randf_range(4.0, 7.0)
+	for span in _spans(SEAFRONT.position.x, SEAFRONT.end.x, gaps):
+		var vx := span.x + 3.0
+		while vx < span.y - 3.0:
+			if _rng.randf() < 0.3 and not _near(vx, SEAFRONT_REST, 2.2):
+				_person(Vector3(vx, 0.06, SEAFRONT.end.y - 0.32), _rng.randf_range(-0.3, 0.3), &"stand")
+			vx += 5.0
+	# Seyir noktası, yönlendirme tabelaları, bisiklet parkı.
+	_viewpoint(Vector3(-15.0 if not _near(-15.0, BEACH_OPENINGS, 1.0) else -17.0, 0.06, SEAFRONT.end.y + 0.35))
+	_signpost(Vector3(COAST_SQUARE.end.x + 0.5, 0.05, PROMENADE.end.y - 0.2))
+	_signpost(Vector3(TOWN_SQUARE.end.x + 0.6, 0.06, TOWN_SQUARE.end.y - 0.4))
+	_bike_rack(Vector3(COAST_SQUARE.position.x + 0.6, 0.06, COAST_SQUARE.end.y - 0.45), 3)
 	# Kordonda (palmiye sırası) banklar ve saksılar.
 	var x := PROMENADE.position.x + 4.5
 	while x < PROMENADE.end.x - 3.0:
 		if not _near_ns_road(x, 0.6) and not COAST_SQUARE.grow(0.8).has_point(Vector2(x, PROMENADE.end.y)):
 			_bench(Vector3(x, 0.05, PROMENADE.end.y - 0.45), 0.0)
-			_pot(Vector3(x + 1.0, 0.05, PROMENADE.end.y - 0.45), 0.8)
+			if _rng.randf() < 0.35:
+				_person(Vector3(x + 0.25, 0.05, PROMENADE.end.y - 0.43), 0.0, &"sit")
+			if _rng.randf() < 0.5:
+				_pot_group(Vector3(x + 1.2, 0.05, PROMENADE.end.y - 0.45), 0.8)
+			else:
+				_trash_bin(Vector3(x + 0.9, 0.05, PROMENADE.end.y - 0.4))
 		x += 6.0
 
 
@@ -847,7 +937,7 @@ func _near(x: float, list: Array, margin: float) -> bool:
 	return false
 
 
-## Bank: ahşap oturak ve sırtlık, taş ayaklar. yaw 0: sırtlık kuzeyde (oturan güneye bakar), PI: denize.
+## Bank: ahşap oturak ve sırtlık, taş ayaklar. yaw 0: sırtlık kuzeyde, oturan güneye (+z, denize) bakar.
 func _bench(base: Vector3, yaw: float) -> void:
 	var b := Basis(Vector3.UP, yaw)
 	_push(_box, M_WOOD, Transform3D(b * Basis.from_scale(Vector3(1.1, 0.07, 0.36)), base + Vector3(0, 0.3, 0)))
@@ -856,11 +946,134 @@ func _bench(base: Vector3, yaw: float) -> void:
 		_push(_box, M_PLANTER, Transform3D(b * Basis.from_scale(Vector3(0.08, 0.3, 0.32)), base + b * Vector3(sx, 0.15, 0)))
 
 
-## Terracotta saksı, yeşillik ve çiçek.
+## Saksı: terracotta, taş, krem beton, modern dikdörtgen ya da geniş kase; içinde çalı + çiçek ya da küçük süs ağacı.
 func _pot(base: Vector3, s: float) -> void:
-	_add(_cylinder, M_POT, base + Vector3(0, 0.16 * s, 0), Vector3(0.36, 0.32, 0.36) * s)
-	_add(_sphere, M_HEDGE, base + Vector3(0, 0.42 * s, 0), Vector3(0.42, 0.32, 0.42) * s)
-	_add(_sphere, FLOWERS[_rng.randi() % FLOWERS.size()], base + Vector3(0.05, 0.55 * s, 0.03), Vector3(0.24, 0.16, 0.24) * s)
+	var kind := _rng.randi() % 5
+	var top := 0.32 * s
+	match kind:
+		0:
+			_add(_cylinder, M_POT, base + Vector3(0, 0.16 * s, 0), Vector3(0.36, 0.32, 0.36) * s)
+		1:
+			_add(_box, M_POT_STONE, base + Vector3(0, 0.15 * s, 0), Vector3(0.36, 0.3, 0.36) * s)
+			top = 0.3 * s
+		2:
+			_add(_cylinder, M_POT_CREAM, base + Vector3(0, 0.2 * s, 0), Vector3(0.4, 0.4, 0.4) * s)
+			top = 0.4 * s
+		3:
+			_add(_box, M_RAIL, base + Vector3(0, 0.22 * s, 0), Vector3(0.26, 0.44, 0.26) * s)
+			top = 0.44 * s
+		_:
+			_add(_sphere, M_POT_STONE, base + Vector3(0, 0.1 * s, 0), Vector3(0.52, 0.26, 0.52) * s)
+			top = 0.18 * s
+	if _rng.randf() < 0.25:
+		# Küçük süs ağacı (zeytin).
+		_add(_cylinder, M_WOOD, base + Vector3(0, top + 0.2 * s, 0), Vector3(0.05, 0.4, 0.05) * s)
+		_add(_sphere, M_OLIVE, base + Vector3(0, top + 0.48 * s, 0), Vector3(0.42, 0.36, 0.42) * s)
+		return
+	_add(_sphere, M_HEDGE, base + Vector3(0, top + 0.1 * s, 0), Vector3(0.42, 0.32, 0.42) * s)
+	_add(_sphere, FLOWERS[_rng.randi() % FLOWERS.size()], base + Vector3(0.05, top + 0.23 * s, 0.03), Vector3(0.24, 0.16, 0.24) * s)
+
+
+## 2-3 saksılık küçük grup (tek tek dağılmasın diye).
+func _pot_group(base: Vector3, s: float) -> void:
+	var n := 2 + _rng.randi() % 2
+	for k in n:
+		_pot(base + Vector3((k - (n - 1) * 0.5) * 0.36 * s, 0, _rng.randf_range(-0.08, 0.08)), s * _rng.randf_range(0.8, 1.1))
+
+
+## Çöp kutusu (yeşil gövde, koyu kapak).
+func _trash_bin(base: Vector3) -> void:
+	_add(_cylinder, M_BIN, base + Vector3(0, 0.17, 0), Vector3(0.2, 0.34, 0.2))
+	_add(_cylinder, M_RAIL, base + Vector3(0, 0.355, 0), Vector3(0.22, 0.03, 0.22))
+
+
+## Yönlendirme tabelası: direk ve iki ok levhası.
+func _signpost(base: Vector3) -> void:
+	_add(_cylinder, M_RAIL, base + Vector3(0, 0.55, 0), Vector3(0.05, 1.1, 0.05))
+	_add(_box, M_TURQUOISE, base + Vector3(0.12, 0.98, 0), Vector3(0.3, 0.09, 0.02), Vector3(0, 0.3, 0))
+	_add(_box, M_POT_CREAM, base + Vector3(-0.1, 0.86, 0), Vector3(0.28, 0.08, 0.02), Vector3(0, -0.4, 0))
+
+
+## Bisiklet parkı: U demirleri ve birkaç bisiklet (tekerlekler, gövde, gidon).
+func _bike_rack(base: Vector3, count: int) -> void:
+	for k in count + 1:
+		var x := base.x + k * 0.36
+		_add(_box, M_RAIL, Vector3(x, base.y + 0.17, base.z), Vector3(0.03, 0.34, 0.03))
+		_add(_box, M_RAIL, Vector3(x, base.y + 0.34, base.z), Vector3(0.03, 0.03, 0.28))
+	for k in count:
+		var x := base.x + 0.18 + k * 0.36
+		var frame: Material = SHIRTS[_rng.randi() % SHIRTS.size()]
+		for wz in [-0.22, 0.22]:
+			_add(_cylinder, M_TYRE, Vector3(x, base.y + 0.13, base.z + wz), Vector3(0.26, 0.03, 0.26), Vector3(0, 0, PI * 0.5))
+		_add(_box, frame, Vector3(x, base.y + 0.2, base.z), Vector3(0.03, 0.03, 0.42))
+		_add(_box, frame, Vector3(x, base.y + 0.28, base.z - 0.05), Vector3(0.03, 0.18, 0.03))
+		_add(_box, M_RAIL, Vector3(x, base.y + 0.36, base.z + 0.2), Vector3(0.18, 0.02, 0.02))
+
+
+## Seyir noktası: taş platform, korkuluk ve dürbün.
+func _viewpoint(base: Vector3) -> void:
+	_add(_box, M_STONE, base + Vector3(0, -0.02, 0), Vector3(1.6, 0.12, 0.9))
+	_add(_box, M_RAIL, base + Vector3(0, 0.38, 0.42), Vector3(1.6, 0.04, 0.04))
+	_add(_cylinder, M_RAIL, base + Vector3(0.4, 0.3, 0.15), Vector3(0.05, 0.6, 0.05))
+	_add(_box, M_RAIL, base + Vector3(0.4, 0.64, 0.17), Vector3(0.1, 0.07, 0.18), Vector3(deg_to_rad(-12), 0, 0))
+
+
+# --- İnsanlar: statik, düşük poligonlu figürler (simülasyon yok) ---
+
+## Ayakta, yürüyen ya da oturan figür; boy yaklaşık 0,78 birim (≈ 1,75 m). +z ileri.
+func _person(base: Vector3, yaw: float, pose: StringName) -> void:
+	var shirt: Material = SHIRTS[_rng.randi() % SHIRTS.size()]
+	var trousers: Material = TROUSERS[_rng.randi() % TROUSERS.size()]
+	var skin: Material = SKINS[_rng.randi() % SKINS.size()]
+	var holder := Transform3D(Basis(Vector3.UP, yaw), base)
+	for part in _person_parts(pose, shirt, trousers, skin):
+		if not _people_tools.has(part[1]):
+			_people_tools[part[1]] = SurfaceTool.new()
+		(_people_tools[part[1]] as SurfaceTool).append_from(part[0], 0,
+				holder * Transform3D(Basis.from_euler(part[4]) * Basis.from_scale(part[3]), part[2]))
+
+
+func _flush_people() -> void:
+	if _people_tools.is_empty():
+		return
+	var mesh := ArrayMesh.new()
+	for material in _people_tools:
+		(_people_tools[material] as SurfaceTool).commit(mesh)
+		mesh.surface_set_material(mesh.get_surface_count() - 1, material)
+	var instance := MeshInstance3D.new()
+	instance.name = "People"
+	instance.mesh = mesh
+	add_child(instance)
+	_people_tools.clear()
+
+
+## Figürün parçaları: [mesh, materyal, konum, ölçek, dönüş].
+func _person_parts(pose: StringName, shirt: Material, trousers: Material, skin: Material) -> Array:
+	var parts: Array = []  # [mesh, material, pos, scale, rot]
+	var hip := 0.36
+	if pose == &"sit":
+		hip = 0.33
+		for lx in [-0.045, 0.045]:
+			parts.append([_capsule, trousers, Vector3(lx, hip, 0.1), Vector3(0.07, 0.11, 0.07), Vector3(PI * 0.5, 0, 0)])
+			parts.append([_capsule, trousers, Vector3(lx, hip * 0.5, 0.2), Vector3(0.06, 0.09, 0.06), Vector3.ZERO])
+	else:
+		var swing := 0.25 if pose == &"walk" else 0.0
+		for k in 2:
+			var lx := -0.045 if k == 0 else 0.045
+			var a := swing if k == 0 else -swing
+			parts.append([_capsule, trousers, Vector3(lx, hip * 0.5, 0), Vector3(0.07, hip * 0.5, 0.07), Vector3(a, 0, 0)])
+	var chest := hip + 0.15
+	parts.append([_capsule, shirt, Vector3(0, chest, 0), Vector3(0.15, 0.12, 0.1), Vector3.ZERO])
+	var arm_swing := 0.3 if pose == &"walk" else 0.08
+	for k in 2:
+		var ax := -0.1 if k == 0 else 0.1
+		var a := arm_swing if k == 0 else -arm_swing
+		if pose == &"sit":
+			a = -0.6
+		parts.append([_capsule, shirt, Vector3(ax, chest - 0.02, 0.02 if pose == &"sit" else 0.0), Vector3(0.045, 0.11, 0.045), Vector3(a, 0, 0)])
+	parts.append([_sphere, skin, Vector3(0, chest + 0.2, 0), Vector3(0.12, 0.13, 0.12), Vector3.ZERO])
+	parts.append([_sphere, M_HAIR, Vector3(0, chest + 0.24, -0.01), Vector3(0.125, 0.08, 0.125), Vector3.ZERO])
+	return parts
 
 
 ## Taş çiçeklik: yeşillik ve iki renk çiçek.

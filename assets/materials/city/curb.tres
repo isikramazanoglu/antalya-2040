@@ -2,5 +2,5 @@
 
 [resource]
 resource_name = "curb"
-albedo_color = Color(0.86, 0.84, 0.79, 1)
-roughness = 0.85
+albedo_color = Color(0.518, 0.498, 0.447, 1)
+roughness = 0.9
