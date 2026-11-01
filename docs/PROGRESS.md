@@ -117,6 +117,16 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
   - Durumlar: normal → yok; build fazında fare üstü → turkuaz (dolu arsada turuncu); **inşaat modu = build fazında bir arsa seçili (yatırım paneli açık)** → diğer boş arsalar ince yeşil çerçeve, dolu arsalar parlamaz; seçili → mavi (fare başka yere gitse de kalır); build dışı faz → hepsi kapalı. Mevcut ışın testi ve `set_selected`/`set_hovered` kullanıldı, ikinci seçim sistemi yok, `_selected` değişmedi.
   - Not (B): HUD'daki "İnşaat" düğmesi (arsa seçmeden panel) şehre bildirilmiyor; o anda da uygun arsaların görünmesi istenirse bir EventBus sinyali gerekir (sözleşme değişikliği, şimdilik yapılmadı).
   - Test: `scripts/world/dev/test_plot_visuals.gd` (26 kontrol, gerçek fare olaylarıyla) 1280×720 ve 1920×1080'de TAMAM; `test_city`, `test_deselect_real` yeni vurgu durumlarına uyarlandı. B'nin 12 testi iki çözünürlükte + A'nın 6 testi TAMAM. Önce/sonra görüntüleri: `build/visual_reference/` (git dışında).
+- Görsel revizyon 3 (A, 2026-11-01) · Işık ve Akdeniz atmosferi (yalnızca `CityWorld.tscn` Environment/Sky/Sun, `ground.tres`, `heat_effect.gd`):
+  - Godot 4.7.2, Forward+ (değişmedi). Tek WorldEnvironment (CityWorld.tscn içinde gömülü; oyun, ana menü ve CitySandbox aynı sahneyi kullanır), kamerada ayrı Environment yok, tek ışık `Sun`.
+  - Gökyüzü: üst #79B9D8, ufuk #D9E8E9. Ortam ışığı gökyüzü yerine sabit renk #A8D4E0 × 0,45 (açık gökyüzü sahneyi düzleştiriyordu; gölgeler artık hafif serin). Tonemap ACES (Filmic/AgX denendi: Filmic sarı, AgX donuk), exposure 0,95, white 6. Kontrast 1,14, doygunluk 1,08 (önce 1,2). Glow 0,3, bloom 0 (beyazlar patlamasın). Sis 0,0012 → 0,0006.
+  - Güneş: #FFF0DC × 1,75 (önce 1,35), yön aynı. Gölge: opaklık 1, blur 1,2, angular distance 0 → 0,35° (PCSS, yumuşak kenar), max mesafe 160 → 120 (en uzak zoom'da şehrin tamamı gölgeli), 4 parça + blend splits.
+  - SSAO: yarıçap 1,2, yoğunluk 1,5 (önce 2,0), güç 1,2, detail 0,5, light affect 0.
+  - Materyal: yalnızca şehir zemini `ground.tres` nötrleştirildi (0,72/0,66/0,48 → 0,74/0,71/0,60; sıcak güneşle birlikte sahneyi sarıya boyuyordu). Asfaltın mor görünmesi ortam ışığından kaynaklanıyordu, materyale dokunulmadı.
+  - Sıcak hava efekti yeni ışığa göre ölçeklendi (güneş tonu 0,5 → 0,3, enerji +%20 → +%8, sis): şehir turuncuya boyanmıyor.
+  - FPS (gerçek Game.tscn, vsync kapalı, normal / 8 bina / kriz / final): Intel UHD 1080p 63 / 62 / 58 / 56 (önce 63 / 62 / 59 / 60), Intel UHD 720p 118 / 116 / 107 / 106 (önce 120 / 113 / 108 / 113). RTX 5060 değerleri güç durumuna göre oynadığı için karşılaştırma dışı (bu oturumda 1080p 455–464 normal, 720p kriz ~770). RTX 720p'de 7 ölçümün 2'sinde kriz/final sırasında ~0 FPS donma görüldü, sonraki 3 ölçümde (pencere durumu kaydıyla) tekrar etmedi; sebep kanıtlanamadı.
+  - **B için (project.godot):** SSAO kalitesi/half size, yumuşak gölge filtre kalitesi ve 3D kenar yumuşatma (MSAA) varsayılanda; değişiklik istenirse B'nin dosyası.
+  - Testler: A'nın 6 testi + B'nin day1, crises, final, menu, integration, playthrough testleri TAMAM. Önce/sonra: `build/visual_reference/prompt3/`.
 
 ### Ekip B
 - [x] 12 `BuildingDefinition` + bilgi kartları
