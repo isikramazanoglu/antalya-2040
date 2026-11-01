@@ -129,6 +129,12 @@ func _run() -> void:
 	print("\n[4-6] şehre yerleştirme, zemin, çakışma, kamera")
 	sb.build_all()
 	await wait(1.5)
+	# A12: her inşaattan sonra kamera binayı kısa süre gösterir; açılış kadrajı kontrolü gösterim bitince yapılır.
+	var showcase_wait := 0.0
+	while rig.is_showcasing() and showcase_wait < 8.0:
+		await wait(0.1)
+		showcase_wait += 0.1
+	check(not rig.is_showcasing(), "inşaat gösterimi bitti, kamera açılış görünümüne döndü (%.1f sn)" % showcase_wait)
 	var placed := {}  # building_id -> [plot, building]
 	for plot in city.get_plots():
 		var b = plot.get_building()
