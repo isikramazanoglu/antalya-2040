@@ -63,6 +63,15 @@ const SIDEWALK_TOP := 0.09
 const CURB := 0.1
 const PARKING := 1.0
 const FLOOR_H := 1.4
+const M_POT := preload("res://assets/materials/buildings/bld_terracotta.tres")
+const M_PLANTER := preload("res://assets/materials/buildings/bld_stone_dark.tres")
+const M_PAVING_LIGHT := preload("res://assets/materials/city/paving_light.tres")
+const FLOWERS: Array[Material] = [
+	preload("res://assets/materials/city/flower_pink.tres"),
+	preload("res://assets/materials/city/flower_purple.tres"),
+	preload("res://assets/materials/buildings/bld_fruit.tres"),
+	preload("res://assets/materials/city/flower_white.tres"),
+]
 const M_LIGHT := preload("res://assets/materials/signal_light.tres")
 const ACCENTS: Array[Material] = [
 	preload("res://assets/materials/buildings/bld_turquoise.tres"),
@@ -90,6 +99,11 @@ const ROADS_NS: Array[Rect2] = [
 	Rect2(8.5, -17.5, 3, 25.3), Rect2(19.25, -17.5, 2.5, 25.3),
 ]
 const PROMENADE := Rect2(-56, 5.8, 112, 2.4)
+## Sahil yürüyüş yolu: kumsalın başında, denize bakan bank, saksı, korkuluk ve dinlenme alanları.
+const SEAFRONT := Rect2(-56, 13.7, 112, 0.95)
+## Kumsala inen korkuluk açıklıkları (merdiven yerleri), x merkezleri.
+const BEACH_OPENINGS: Array[float] = [-44.0, -30.0, -2.5, 22.0, 38.0]
+const SEAFRONT_REST: Array[float] = [-37.0, -22.0, 28.0, 46.0]
 const FIELDS := Rect2(-100, -58, 200, 27)
 const ORCHARD := Rect2(-98, -55, 196, 21)
 ## Şehrin batısında ve doğusunda kırsal tarım alanları (kamera kenara gidince şehir kırsala döner).
@@ -154,6 +168,7 @@ func _ready() -> void:
 	_build_houses()
 	_build_trees()
 	_build_coast()
+	_build_seafront()
 	_build_mountains()
 	_flush_batches()
 	_build_traffic()
@@ -184,6 +199,7 @@ func _collect_blocked() -> void:
 	var north: Rect2 = ROADS_EW[0]
 	_blocked.append(Rect2(north.position.x, north.position.y - PARKING - SIDEWALK - 0.3, north.size.x, PARKING + SIDEWALK + 0.3))
 	_blocked.append(PROMENADE.grow(0.3))
+	_blocked.append(SEAFRONT.grow(0.15))
 	_blocked.append(PIER)
 	_blocked.append(TOWN_SQUARE.grow(0.5))
 	_blocked.append(COAST_SQUARE)
@@ -243,6 +259,10 @@ func _build_ground_cover() -> void:
 	for area in SIDE_FIELDS:
 		_flat(area, 0.015, 0.03, M_FIELD)
 	_flat(PROMENADE, 0.045, 0.06, M_STONE)
+	# Kordon döşemesi: kenarlarda koyu taş bant, ortada açık taş şerit.
+	for z in [PROMENADE.position.y + 0.15, PROMENADE.end.y - 0.15]:
+		_flat(Rect2(PROMENADE.position.x, z - 0.15, PROMENADE.size.x, 0.3), 0.05, 0.02, M_PLANTER)
+	_flat(Rect2(PROMENADE.position.x, PROMENADE.get_center().y - 0.35, PROMENADE.size.x, 0.7), 0.049, 0.02, M_PAVING_LIGHT)
 	_build_streets()
 
 
@@ -408,6 +428,11 @@ func _build_street_furniture(avenue: Rect2) -> void:
 					_olive(x, z, 0.5)
 		x += 3.5
 		i += 1
+	# Kavşak köşelerinde çiçeklik (yaya geçidinin kenarı, kaldırımın dış yarısı).
+	for road in ROADS_NS:
+		for cx in [road.position.x - SIDEWALK - 0.55, road.end.x + SIDEWALK + 0.55]:
+			for cz in [avenue.position.y - SIDEWALK * 0.5, avenue.end.y + SIDEWALK * 0.5]:
+				_planter_box(Vector3(cx, SIDEWALK_TOP, cz), Vector3(0.7, 0.28, 0.45))
 	x = PROMENADE.position.x + 6.0
 	while x < PROMENADE.end.x - 4.0:
 		var spot := Vector2(x, PROMENADE.position.y + 0.3)
@@ -461,6 +486,18 @@ func _build_town_square() -> void:
 		_olive(cx + side * 4.4, TOWN_SQUARE.end.y - 1.3, 0.9)
 		_cypress(cx + side * 4.6, hall_z + 0.2, 0.9)
 		_add(_box, M_WOOD, Vector3(cx + side * 2.3, 0.25, fountain.z), Vector3(0.4, 0.3, 1.2))
+	# Döşeme: kenarda koyu taş bant, çeşmenin çevresinde açık taş halka; köşelerde çiçeklik ve ağaç grubu.
+	var sq := TOWN_SQUARE
+	for edge in [Rect2(sq.position.x, sq.position.y, sq.size.x, 0.35), Rect2(sq.position.x, sq.end.y - 0.35, sq.size.x, 0.35),
+			Rect2(sq.position.x, sq.position.y, 0.35, sq.size.y), Rect2(sq.end.x - 0.35, sq.position.y, 0.35, sq.size.y)]:
+		_flat(edge, 0.058, 0.02, M_PLANTER)
+	_add(_cylinder, M_PAVING_LIGHT, fountain + Vector3(0, 0.055, 0), Vector3(3.6, 0.02, 3.6), Vector3.ZERO, false)
+	for side in [-1.0, 1.0]:
+		var corner := Vector3(cx + side * (sq.size.x * 0.5 - 1.0), 0.06, sq.end.y - 0.9)
+		_planter_box(corner, Vector3(1.2, 0.35, 0.7))
+		_olive(cx + side * 2.6, sq.end.y - 0.7, 0.7)
+		_bench(Vector3(cx + side * 1.2, 0.06, fountain.z + 1.5), 0.0)
+		_pot(Vector3(cx + side * 1.8, 0.06, portico_z + 0.9), 0.9)
 
 
 ## Kordon meydanı: taş zemin, küçük çeşme, büfe, banklar.
@@ -475,6 +512,15 @@ func _build_coast_square() -> void:
 	for x in [-3.4, 0.4]:
 		_add(_box, M_WOOD, Vector3(c.x + x, 0.25, c.y + 1.3), Vector3(1.2, 0.3, 0.4))
 	_olive(c.x - 3.3, c.y - 1.2, 0.7)
+	# Büfenin önünde kafe masaları ve şemsiyeleri, köşelerde saksılar.
+	for k in 3:
+		var t := Vector3(c.x - 0.6 + k * 1.15, 0.06, c.y - 0.9)
+		_add(_cylinder, M_WOOD, t + Vector3(0, 0.22, 0), Vector3(0.5, 0.05, 0.5))
+		_add(_cylinder, M_RAIL, t + Vector3(0, 0.11, 0), Vector3(0.06, 0.22, 0.06))
+		_add(_cylinder, M_WOOD, t + Vector3(0, 0.6, 0), Vector3(0.04, 1.1, 0.04))
+		_add(_cone, AWNINGS[k % AWNINGS.size()], t + Vector3(0, 1.2, 0), Vector3(1.0, 0.25, 1.0))
+	for corner in [Vector3(COAST_SQUARE.position.x + 0.4, 0.06, COAST_SQUARE.position.y + 0.4), Vector3(COAST_SQUARE.end.x - 0.4, 0.06, COAST_SQUARE.position.y + 0.4)]:
+		_pot(corner, 1.0)
 
 
 # --- Mevcut evler: beyaz sıva, terracotta çatı, damda güneş kolektörü ---
@@ -545,6 +591,15 @@ func _house(x: float, z: float, w: float, d: float, shop := false) -> void:
 		_add(_box, awning, Vector3(x, FLOOR_H * 0.86, front + 0.28), Vector3(w * 0.86, 0.05, 0.55), Vector3(deg_to_rad(14), 0, 0))
 		_add(_box, M_STONE, Vector3(x, FLOOR_H * 0.98, front + 0.01), Vector3(w * 0.6, 0.18, 0.03), Vector3.ZERO, false)
 	_roof(x, z, w, d, h, floors, wall)
+	# Giriş saksısı (kapının yanında) ya da dükkân önünde iki saksı.
+	if shop:
+		for sx in [-0.42, 0.42]:
+			if _is_free(Rect2(x + sx * w - 0.2, front + 0.1, 0.4, 0.4)):
+				_pot(Vector3(x + sx * w, 0.0, front + 0.3), 0.85)
+	elif _rng.randf() < 0.5:
+		var door_x := x - w * 0.5 + 0.5 * w / cols
+		if _is_free(Rect2(door_x + 0.15, front + 0.05, 0.4, 0.4)):
+			_pot(Vector3(door_x + 0.38, 0.0, front + 0.22), 0.7)
 	if floors == 1 and _rng.randf() < 0.4:
 		var garden := Rect2(x - w * 0.5, z + d * 0.5 + 0.15, w, 0.35)
 		if _is_free(garden):
@@ -709,6 +764,114 @@ func _boat(pos: Vector3, yaw: float, sail: bool) -> void:
 		_push(part[0], part[1], holder * Transform3D(Basis(Vector3.UP, part_yaw) * Basis.from_scale(part[3]), part[2]))
 
 
+# --- Sahil yürüyüş yolu ve peyzaj parçaları ---
+
+## Kumsalın başında taş yürüyüş yolu: denize bakan banklar, aralarında saksılar, deniz tarafında korkuluk
+## (merdiven açıklıklarıyla), aydınlatma ve pergolalı dinlenme alanları. Kıyı arsaları ve iskele boş kalır.
+func _build_seafront() -> void:
+	var gaps: Array[Vector2] = [Vector2(PIER.position.x - 0.2, PIER.end.x + 0.2)]
+	var plots := get_parent().get_node_or_null("Plots")
+	if plots:
+		for plot in plots.get_children():
+			var plot_size: float = plot.get("size") if plot.get("size") != null else 6.0
+			if plot.position.z + plot_size * 0.5 > SEAFRONT.position.y:
+				gaps.append(Vector2(plot.position.x - plot_size * 0.5 - 0.4, plot.position.x + plot_size * 0.5 + 0.4))
+	var top := 0.06
+	for span in _spans(SEAFRONT.position.x, SEAFRONT.end.x, gaps):
+		# Kumsal eğimi üstünde duran döşeme (altı kumun içine iner).
+		var c := Vector2((span.x + span.y) * 0.5, SEAFRONT.get_center().y)
+		_add(_box, M_STONE, Vector3(c.x, top - 0.17, c.y), Vector3(span.y - span.x, 0.34, SEAFRONT.size.y), Vector3.ZERO, false)
+		_flat(Rect2(span.x, SEAFRONT.end.y - 0.18, span.y - span.x, 0.18), top + 0.01, 0.02, M_PLANTER)
+		# Korkuluk: direkler ve tutamak; merdiven açıklıklarında kesilir.
+		var rail_gaps: Array[Vector2] = []
+		for ox in BEACH_OPENINGS:
+			rail_gaps.append(Vector2(ox - 0.9, ox + 0.9))
+		for rail in _spans(span.x + 0.2, span.y - 0.2, rail_gaps):
+			var rz := SEAFRONT.end.y - 0.09
+			_add(_box, M_RAIL, Vector3((rail.x + rail.y) * 0.5, top + 0.42, rz), Vector3(rail.y - rail.x, 0.05, 0.05))
+			_add(_box, M_RAIL, Vector3((rail.x + rail.y) * 0.5, top + 0.22, rz), Vector3(rail.y - rail.x, 0.03, 0.03), Vector3.ZERO, false)
+			var px := rail.x
+			while px <= rail.y + 0.01:
+				_add(_box, M_RAIL, Vector3(px, top + 0.22, rz), Vector3(0.05, 0.44, 0.05))
+				px += 1.2
+		for ox in BEACH_OPENINGS:
+			if ox > span.x + 1.0 and ox < span.y - 1.0:
+				for k in 3:
+					var base_y := -(SEAFRONT.end.y + 0.25 + k * 0.3 - BEACH_START_Z) * BEACH_SLOPE
+					_add(_box, M_STONE, Vector3(ox, top - 0.05 - k * 0.08 + minf(base_y, 0.0) * 0.3, SEAFRONT.end.y + 0.2 + k * 0.3), Vector3(1.6, 0.12, 0.32))
+		# Denize bakan banklar, aralarında saksılar; düzenli aralıklarla aydınlatma.
+		var bx := span.x + 1.6
+		var k := 0
+		while bx < span.y - 1.2:
+			if not _near(bx, BEACH_OPENINGS, 1.4) and not _near(bx, SEAFRONT_REST, 2.0):
+				if k % 3 == 2:
+					_lamp(Vector3(bx, top, SEAFRONT.position.y + 0.18), -1.0)
+				elif k % 3 == 1:
+					_pot(Vector3(bx, top, SEAFRONT.get_center().y - 0.1), 0.95)
+				else:
+					_bench(Vector3(bx, top, SEAFRONT.get_center().y + 0.05), PI)
+			bx += 2.2
+			k += 1
+	# Dinlenme alanları: pergola, iki bank, saksı ve ağaç.
+	for rx in SEAFRONT_REST:
+		var inside := false
+		for span in _spans(SEAFRONT.position.x, SEAFRONT.end.x, gaps):
+			inside = inside or (rx > span.x + 2.0 and rx < span.y - 2.0)
+		if not inside:
+			continue
+		var cz := SEAFRONT.get_center().y
+		for sx in [-1.2, 1.2]:
+			for sz in [-0.3, 0.3]:
+				_add(_box, M_WOOD, Vector3(rx + sx, top + 0.7, cz + sz), Vector3(0.07, 1.4, 0.07))
+		for s in 6:
+			_add(_box, M_WOOD, Vector3(rx - 1.2 + s * 0.48, top + 1.42, cz), Vector3(0.07, 0.05, 0.8))
+		_add(_box, M_WOOD, Vector3(rx, top + 1.38, cz - 0.32), Vector3(2.5, 0.06, 0.06))
+		_add(_box, M_WOOD, Vector3(rx, top + 1.38, cz + 0.32), Vector3(2.5, 0.06, 0.06))
+		_bench(Vector3(rx - 0.6, top, cz + 0.05), PI)
+		_bench(Vector3(rx + 0.6, top, cz + 0.05), PI)
+		_pot(Vector3(rx - 1.6, top, cz), 1.0)
+		_pot(Vector3(rx + 1.6, top, cz), 1.0)
+	# Kordonda (palmiye sırası) banklar ve saksılar.
+	var x := PROMENADE.position.x + 4.5
+	while x < PROMENADE.end.x - 3.0:
+		if not _near_ns_road(x, 0.6) and not COAST_SQUARE.grow(0.8).has_point(Vector2(x, PROMENADE.end.y)):
+			_bench(Vector3(x, 0.05, PROMENADE.end.y - 0.45), 0.0)
+			_pot(Vector3(x + 1.0, 0.05, PROMENADE.end.y - 0.45), 0.8)
+		x += 6.0
+
+
+func _near(x: float, list: Array, margin: float) -> bool:
+	for v in list:
+		if absf(x - v) < margin:
+			return true
+	return false
+
+
+## Bank: ahşap oturak ve sırtlık, taş ayaklar. yaw 0: sırtlık kuzeyde (oturan güneye bakar), PI: denize.
+func _bench(base: Vector3, yaw: float) -> void:
+	var b := Basis(Vector3.UP, yaw)
+	_push(_box, M_WOOD, Transform3D(b * Basis.from_scale(Vector3(1.1, 0.07, 0.36)), base + Vector3(0, 0.3, 0)))
+	_push(_box, M_WOOD, Transform3D(b * Basis.from_scale(Vector3(1.1, 0.26, 0.06)), base + b * Vector3(0, 0.46, -0.17)))
+	for sx in [-0.45, 0.45]:
+		_push(_box, M_PLANTER, Transform3D(b * Basis.from_scale(Vector3(0.08, 0.3, 0.32)), base + b * Vector3(sx, 0.15, 0)))
+
+
+## Terracotta saksı, yeşillik ve çiçek.
+func _pot(base: Vector3, s: float) -> void:
+	_add(_cylinder, M_POT, base + Vector3(0, 0.16 * s, 0), Vector3(0.36, 0.32, 0.36) * s)
+	_add(_sphere, M_HEDGE, base + Vector3(0, 0.42 * s, 0), Vector3(0.42, 0.32, 0.42) * s)
+	_add(_sphere, FLOWERS[_rng.randi() % FLOWERS.size()], base + Vector3(0.05, 0.55 * s, 0.03), Vector3(0.24, 0.16, 0.24) * s)
+
+
+## Taş çiçeklik: yeşillik ve iki renk çiçek.
+func _planter_box(center: Vector3, size: Vector3) -> void:
+	_add(_box, M_PLANTER, center + Vector3(0, size.y * 0.5, 0), size)
+	_add(_box, M_HEDGE, center + Vector3(0, size.y + 0.05, 0), Vector3(size.x - 0.1, 0.14, size.z - 0.1))
+	for k in 2:
+		_add(_sphere, FLOWERS[_rng.randi() % FLOWERS.size()], center + Vector3((k - 0.5) * size.x * 0.45, size.y + 0.14, 0),
+				Vector3(size.z * 0.45, 0.16, size.z * 0.45))
+
+
 # --- Arka plan: dağ silüeti ---
 
 func _build_mountains() -> void:
@@ -719,6 +882,16 @@ func _build_mountains() -> void:
 		var z := _rng.randf_range(-82.0, -70.0)
 		_add(_cone, M_MOUNTAIN, Vector3(x, h * 0.5, z), Vector3(r * 2.0, h, r * 2.0), Vector3(0, _rng.randf() * TAU, 0), false)
 		x += _rng.randf_range(12.0, 18.0)
+	# Toros etekleri batıya ve doğuya kıvrılır: kara parçasının yan kenarı (x = ±110) ve arkası görünmez.
+	for side in [-1.0, 1.0]:
+		var sz := -62.0
+		while sz < -2.0:
+			var r := _rng.randf_range(10.0, 15.0)
+			var h := _rng.randf_range(7.0, 15.0) * clampf(1.0 + (sz + 30.0) * -0.01, 0.6, 1.3)
+			var sx: float = side * _rng.randf_range(104.0, 112.0)
+			_add(_cone, M_HILL if sz > -35.0 else M_MOUNTAIN, Vector3(sx, h * 0.5, sz), Vector3(r * 2.0, h, r * 2.0),
+					Vector3(0, _rng.randf() * TAU, 0), false)
+			sz += _rng.randf_range(9.0, 13.0)
 	x = -80.0
 	while x < 80.0:
 		var r := _rng.randf_range(8.0, 13.0)

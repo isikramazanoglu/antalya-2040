@@ -15,7 +15,7 @@ noise = SubResource("FastNoiseLite_1")
 
 [resource]
 resource_name = "sidewalk"
-albedo_color = Color(0.82, 0.78, 0.7, 1)
+albedo_color = Color(0.64, 0.625, 0.59, 1)
 albedo_texture = SubResource("NoiseTexture2D_3")
 roughness = 0.95
 uv1_scale = Vector3(0.18, 0.18, 0.18)
