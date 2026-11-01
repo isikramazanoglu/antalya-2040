@@ -290,10 +290,14 @@ func _place_people(spots: Array) -> void:
 
 ## Karakteri o anki iskelet pozunda statik mesh'e çevirip malzeme başına birleştirir (çok az draw call).
 func _bake(body: Node3D, tools: Dictionary) -> void:
+	if DisplayServer.get_name() == "headless":  # sahte renderer deriyi kaydetmez; bake hata basar
+		return
 	var skeleton: Skeleton3D = body.find_child("Skeleton3D", true, false)
 	skeleton.force_update_all_bone_transforms()
 	for mesh_instance: MeshInstance3D in skeleton.find_children("*", "MeshInstance3D", false, false):
 		var posed := mesh_instance.bake_mesh_from_current_skeleton_pose()
+		if posed == null:  # headless (sahte renderer) iskelet derisini kaydetmez; bu karakter atlanır
+			continue
 		var xform := global_transform.affine_inverse() * mesh_instance.global_transform
 		for s in posed.get_surface_count():
 			var material := mesh_instance.get_surface_override_material(s)

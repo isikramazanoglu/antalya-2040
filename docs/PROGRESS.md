@@ -309,6 +309,20 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
 - Windows demo yeniden üretildi (10B dahil): `build/windows/ANTALYA2040.exe` (110 MB) + `OKUBENI.txt`, `build/ANTALYA2040_Windows_Demo.zip` (38 MB). Pakette final_presentation var, tests/ ve dev/ yok; `--main-pack` ile açılıyor, script hatası yok.
 - A'ya not (düşük): `test_final_presentation.gd` 1920×1080'de bir kez [6] kenar durumlarında 3 kontrol düşürdü, iki tekrarda TAMAM. Zamanlamaya bağlı titreklik; oyunda karşılığı görülmedi.
 
+### Prompt 10 · Görsel cila (B, Ekip A adına, 2026-11-01, dal `feature/visual-polish`)
+Emre'nin kredisi bittiği için kullanıcı kararıyla B yaptı. Ayrı dalda ve PR ile; Emre incelesin. Çalışan sistem yeniden yazılmadı, yalnızca ölçülen sorunlar düzeltildi.
+- **Denetim** (gerçek Game.tscn, 1920×1080, 12 görünüm, yakın/orta/uzak zoom): debug yazısı, havada/gömülü model, kara-deniz sınırı sorunu görülmedi. Ölçek tutarlı: 1 birim ≈ 2,3 m (kat 1,4); sedan 2,06 birim ≈ 4,7 m, otobüs 4,84 ≈ 11 m, yaya 0,75–0,89 ≈ 1,75–2 m.
+- **Kenar yumuşatma** (`project.godot`, B dosyası): SMAA açıldı (`anti_aliasing/quality/screen_space_aa=2`). Final sunumu SubViewport'u ayarı ana görünümden kopyalıyor. Bu Mac'te (M5, 1920×1080, vsync kapalı, uzak/orta/yakın) denenenler: ayarsız 116/106/99, FXAA 112/103/96 (bulanık), SMAA 107/99/93, MSAA 2x/4x %20–25 düşüş. MSAA zayıf kartta (Intel UHD 1080p ~42–57) 40'ın altına indirebileceği için seçilmedi.
+- **Otobüs tekerlekleri** (`gen_vehicle_library.gd` → `city_bus.tscn`, `city_bus_body.tres`): tekerlekler gövdenin içindeydi (x 0,47; gövde yarı genişliği 0,545) ve tam boy alt kaplama onları örtüyordu. Tekerlekler x 0,51'e alındı, alt kaplamada tekerlek boşlukları açıldı. Diğer araç dosyaları yeniden üretimde yalnızca kimlik/sayı gürültüsü değiştiği için geri alındı.
+- **Tekrar eden binalar** (`city_decor.gd`): dükkân sırasında aynı model art arda 5 kez geliyordu. `_pick_model` komşuyla aynı modeli seçmez (havuzda başka yoksa aynısı kalır).
+- **Boş cadde önü** (`city_decor.gd`, `_frontage_tree`): ana cadde kaldırımı ile dükkân cephesi arasında 2,4 birimden geniş boşluk kalırsa ortasına küçük zeytin ağacı. Yaya rotaları kaldırımda olduğu için rotaya girmez.
+- **Final sunumu alt yazısı** (`final_presentation.gd`): parlak zeminde zor okunuyordu; kontur koyulaştı, yumuşak koyu gölge eklendi.
+- **Headless hata** (`pedestrians.gd`): pencere olmadan 41 kez "skin registered with a valid skeleton" + `get_surface_count on null` yazıyordu. Headless'ta bake atlanır, ayrıca null kontrolü var. Pencereli oyun değişmedi.
+- **FPS sonrası** (bu Mac, SMAA dahil): 1920×1080 108/100/93, 1280×720 171/150/162. Intel UHD'de ölçülmedi (Windows gerekir; Emre ölçebilir).
+- **Testler:** B'nin 12 + A'nın 9 testi 1280×720 ve 1920×1080'de, 34 çalıştırmanın hepsi TAMAM; balance_sim değişmedi. Gerçek pencerede final sunumu: düğme görünür, ~55 sn, rapor geri geliyor, GameState ve kamera değişmiyor.
+- **Ekran görüntüleri** (gerçek oyun, arayüz gizli, 1920×1080, JPG): `docs/screenshots/01_city_overview.jpg`, `02_coastal_promenade.jpg`, `03_urban_district.jpg`, `04_public_space.jpg`, `05_city_life.jpg`, `06_closeup_architecture.jpg` (klasörde `.gdignore`: oyun paketine girmez).
+- **Yapılmadı / test edilmedi:** ışık ve atmosfer ayarları değiştirilmedi (görsel revizyon 3 sonucu korunuyor); LOD eklenmedi (FPS yeterli, ölçülmüş bir darboğaz yok); bisiklet süren karakter, mahalle sokaklarında hareketli trafik ve trafik ışıklarının trafiği yönetmesi hâlâ yok (Emre'nin notu); yayaların birbirinin içinden geçip geçmediği yalnızca A'nın `test_pedestrians.gd`'si ve görüntülerle kontrol edildi; Windows'ta çalıştırılmadı.
+
 ### Jüri demo akışı (5–7 dk, sabit kriz yılları, ek demo modu gerekmez)
 1. Giriş (30 sn): ana menü, arkada canlı şehir; "Oyun hakkında".
 2. 2040 şehri (45 sn): HUD; kaynak paneli, enerji üretim/tüketim, yerel emisyon.

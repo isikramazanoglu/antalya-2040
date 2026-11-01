@@ -3,23 +3,23 @@
 [ext_resource type="ArrayMesh" path="res://assets/vehicles/buses/city_bus_body.tres" id="1_fyrxe"]
 [ext_resource type="ArrayMesh" path="res://assets/vehicles/wheels/wheel_bus.tres" id="2_agdrl"]
 
-[node name="CityBus" type="Node3D" unique_id=1124189943]
+[node name="CityBus" type="Node3D" unique_id=919904890]
 
-[node name="Body" type="MeshInstance3D" parent="." unique_id=1812254195]
+[node name="Body" type="MeshInstance3D" parent="." unique_id=1544378088]
 mesh = ExtResource("1_fyrxe")
 
-[node name="Wheel_0" type="MeshInstance3D" parent="." unique_id=468840360]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47, 0.2, -1.45)
+[node name="Wheel_0" type="MeshInstance3D" parent="." unique_id=1849817626]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.51, 0.2, -1.45)
 mesh = ExtResource("2_agdrl")
 
-[node name="Wheel_1" type="MeshInstance3D" parent="." unique_id=1777712725]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.47, 0.2, -1.45)
+[node name="Wheel_1" type="MeshInstance3D" parent="." unique_id=257444564]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.51, 0.2, -1.45)
 mesh = ExtResource("2_agdrl")
 
-[node name="Wheel_2" type="MeshInstance3D" parent="." unique_id=403316888]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47, 0.2, 1.15)
+[node name="Wheel_2" type="MeshInstance3D" parent="." unique_id=481074941]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.51, 0.2, 1.15)
 mesh = ExtResource("2_agdrl")
 
-[node name="Wheel_3" type="MeshInstance3D" parent="." unique_id=1874700537]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.47, 0.2, 1.15)
+[node name="Wheel_3" type="MeshInstance3D" parent="." unique_id=2131492855]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.51, 0.2, 1.15)
 mesh = ExtResource("2_agdrl")
