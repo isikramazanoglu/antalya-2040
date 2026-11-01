@@ -74,6 +74,8 @@ func _render(report: Dictionary) -> void:
 	t += _pair("Başlangıç bütçesi", UiText.thousands(before.credits))
 	t += _pair("Toplam gelir", "[color=#6bd185]+%s[/color]" % UiText.thousands(report.income))
 	t += _pair("İşletme giderleri", "[color=#ff8c73]-%s[/color]" % UiText.thousands(report.upkeep))
+	if report.get("investment_cost", 0) > 0:
+		t += _pair("Yatırımlar", "[color=#ff8c73]-%s[/color]" % UiText.thousands(report.investment_cost))
 	if crisis_cost > 0.0:
 		t += _pair("Kriz giderleri", "[color=#ff8c73]-%s[/color]" % UiText.thousands(roundi(crisis_cost)))
 	if report.missions.reward > 0:

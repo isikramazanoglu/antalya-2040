@@ -51,6 +51,7 @@ script = ExtResource("3_h6vr7")
 id = &"coastal_flood"
 display_name = "Kıyı taşkını"
 description = "Fırtına ve yüksek dalgalar kıyı yolunu ve sahil işletmelerini su altında bırakıyor."
+month = 11
 risk_type = &"coastal_flood"
 earliest_year = 2046
 scripted_year = 2049

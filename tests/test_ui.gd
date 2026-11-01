@@ -70,8 +70,8 @@ func _process(_d: float) -> bool:
 		40:
 			print("Pencere %s, viewport %s" % [DisplayServer.window_get_size(), root.get_visible_rect().size])
 			_check(_ui("HUD").visible and _find("HUD", "TopBar").visible, "1) HUD açılıyor")
-			_check(_find("HUD", "YearValue").text == "2040" and _find("HUD", "PopulationValue").text == "500" and _find("HUD", "CreditsValue").text == "1.000",
-					"2) yıl 2040, nüfus 500, bütçe 1.000 gösteriliyor")
+			_check(_find("HUD", "YearValue").text == "Ocak 2040" and _find("HUD", "PopulationValue").text == "500" and _find("HUD", "CreditsValue").text == "1.000",
+					"2) tarih Ocak 2040, nüfus 500, bütçe 1.000 gösteriliyor")
 			_click_plot("O01")
 		50:
 			_check(_ui("BuildPanel").visible, "6) boş arsa seçince BuildPanel açıldı (gerçek tıklama)")

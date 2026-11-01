@@ -63,6 +63,7 @@ script = ExtResource("3_xj6rt")
 id = &"heatwave"
 display_name = "Sıcak hava dalgası"
 description = "Günlerce süren aşırı sıcak, şehirde sağlık sorunlarına ve iş kaybına yol açıyor."
+month = 7
 risk_type = &"heat"
 earliest_year = 2042
 scripted_year = 2043

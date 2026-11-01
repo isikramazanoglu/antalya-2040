@@ -54,6 +54,7 @@ script = ExtResource("3_m6xv3")
 id = &"drought"
 display_name = "Kuraklık"
 description = "Yağışların azaldığı bir yıl: barajlar düşük, yer altı suyu çekiliyor."
+month = 8
 risk_type = &"drought"
 earliest_year = 2044
 scripted_year = 2046

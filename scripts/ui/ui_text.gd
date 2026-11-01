@@ -12,6 +12,7 @@ const STAT_NAMES := {
 	"emissions_total": "Emisyon",
 }
 
+const MONTHS := ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
 const PLOT_KINDS := {&"urban": "Kent arsası", &"open": "Açık alan", &"coastal": "Kıyı arsası"}
 
 const REJECT_REASONS := {
