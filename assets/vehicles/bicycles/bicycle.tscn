@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/vehicles/bicycles/bicycle_body.tres" id="1_u56ov"]
+[ext_resource type="ArrayMesh" path="res://assets/vehicles/wheels/wheel_bicycle.tres" id="2_5wp2a"]
+
+[node name="Bicycle" type="Node3D" unique_id=1331404566]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=78807999]
+mesh = ExtResource("1_u56ov")
+
+[node name="Wheel_0" type="MeshInstance3D" parent="." unique_id=1758925610]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1625, -0.31)
+mesh = ExtResource("2_5wp2a")
+
+[node name="Wheel_1" type="MeshInstance3D" parent="." unique_id=548570823]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1625, 0.31)
+mesh = ExtResource("2_5wp2a")

@@ -45,6 +45,8 @@ const HAIR_ELDER := [Color(0.82, 0.82, 0.8), Color(0.62, 0.62, 0.6)]
 
 @export var decor_path: NodePath = ^"../Decor"
 @export var camera_rig_path: NodePath = ^"../CameraRig"
+## Görsel revizyon 9: yaya geçidinde araç varsa bekleme (Traffic düğümü; yoksa yayalar beklemeden yürür).
+@export var traffic_path: NodePath = ^"../Traffic"
 
 var _rng := RandomNumberGenerator.new()
 var _scenes := {}
@@ -54,6 +56,12 @@ var _walkers: Array[Dictionary] = []
 ## Canlı bekleyenler: {body, player, tier, acc, meshes}
 var _idlers: Array[Dictionary] = []
 var _lod_timer := 0.0
+var _traffic: Node
+## Aynı rota + aynı şerit kayması grupları (öndekine çok yaklaşan bekler): {route: Path3D, offset} → yürüyenler.
+var _lanes := {}
+## Geçitte bekleme ve sıraya girme (yürüyen biri durunca arkadakiler araya mesafe bırakır).
+const QUEUE_GAP := 0.4
+const CROSSING_LOOK := 0.35
 
 
 func _ready() -> void:
@@ -70,9 +78,22 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _traffic == null:
+		_traffic = get_node_or_null(traffic_path)
+	for key in _lanes:
+		var lane: Array = _lanes[key]
+		var length: float = ((lane[0].follow as PathFollow3D).get_parent() as Path3D).curve.get_baked_length()
+		for i in lane.size():
+			var w: Dictionary = lane[i]
+			var follow: PathFollow3D = w.follow
+			var go := not _must_wait(follow)
+			if go and lane.size() > 1:
+				var leader: PathFollow3D = lane[(i + 1) % lane.size()].follow
+				go = fposmod(leader.progress - follow.progress, length) > QUEUE_GAP
+			if go:
+				follow.progress += w.speed * delta
+			_set_walking(w, go)
 	for w in _walkers:
-		var follow: PathFollow3D = w.follow
-		follow.progress += w.speed * delta
 		_advance(w, delta)
 	for a in _idlers:
 		_advance(a, delta)
@@ -173,8 +194,45 @@ func _add_walker(path: Path3D, progress: float, speed: float, file: String, late
 	player.seek(_rng.randf() * 1.25, true)  # herkes aynı adım fazında olmasın
 	player.speed_scale = speed / WALK_SPEED
 	player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
-	_walkers.append({"follow": follow, "speed": speed, "body": body, "player": player, "tier": -1, "acc": 0.0,
+	var lane_key := "%s|%.2f" % [path.name, lateral]
+	if not _lanes.has(lane_key):
+		_lanes[lane_key] = []
+	_walkers.append({"follow": follow, "speed": speed, "body": body, "player": player, "tier": -1, "acc": 0.0, "walking": true,
 		"meshes": body.find_children("*", "MeshInstance3D", true, false)})
+	_lanes[lane_key].append(_walkers[-1])
+	(_lanes[lane_key] as Array).sort_custom(func(a, b): return (a.follow as PathFollow3D).progress < (b.follow as PathFollow3D).progress)
+
+
+## Geçide girmek üzereyken (henüz girmemiş) geçitte araç varsa bekle.
+func _must_wait(follow: PathFollow3D) -> bool:
+	if _traffic == null:
+		return false
+	var crossings: Array = _traffic.get("crossings")
+	var pos := follow.global_position
+	var ahead := pos - follow.global_transform.basis.z * CROSSING_LOOK
+	for i in crossings.size():
+		var zone: Rect2 = crossings[i]
+		if zone.has_point(Vector2(ahead.x, ahead.z)) and not zone.has_point(Vector2(pos.x, pos.z)) and _traffic.vehicle_in_zone(i):
+			return true
+	return false
+
+
+## Beklerken Idle, yürürken Walk (kısa geçişle).
+func _set_walking(w: Dictionary, value: bool) -> void:
+	if w.walking == value:
+		return
+	w.walking = value
+	var player: AnimationPlayer = w.player
+	player.play("Walk" if value else "Idle", 0.25)
+
+
+## Trafik sistemi için yürüyenlerin dünya konumları.
+func walker_positions() -> PackedVector3Array:
+	var out := PackedVector3Array()
+	out.resize(_walkers.size())
+	for i in _walkers.size():
+		out[i] = (_walkers[i].follow as PathFollow3D).global_position
+	return out
 
 
 # --- Oturan ve bekleyenler ---

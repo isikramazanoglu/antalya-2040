@@ -87,15 +87,6 @@ const FLOWERS: Array[Material] = [
 const M_POT_STONE := preload("res://assets/materials/buildings/bld_stone.tres")
 const M_POT_CREAM := preload("res://assets/materials/buildings/bld_cream.tres")
 const M_BIN := preload("res://assets/materials/buildings/bld_green_accent.tres")
-const SHIRTS: Array[Material] = [
-	preload("res://assets/materials/buildings/bld_turquoise.tres"),
-	preload("res://assets/materials/buildings/bld_terracotta.tres"),
-	preload("res://assets/materials/buildings/bld_cream.tres"),
-	preload("res://assets/materials/buildings/bld_bin_blue.tres"),
-	preload("res://assets/materials/buildings/bld_green_accent.tres"),
-	preload("res://assets/materials/buildings/bld_bin_yellow.tres"),
-	preload("res://assets/materials/city/flower_pink.tres"),
-]
 const M_LIGHT := preload("res://assets/materials/signal_light.tres")
 const ACCENTS: Array[Material] = [
 	preload("res://assets/materials/buildings/bld_turquoise.tres"),
@@ -105,14 +96,6 @@ const ACCENTS: Array[Material] = [
 const UMBRELLAS: Array[Material] = [
 	preload("res://assets/materials/buildings/bld_turquoise.tres"),
 	preload("res://assets/materials/buildings/bld_terracotta.tres"),
-	preload("res://assets/materials/buildings/bld_bin_yellow.tres"),
-]
-const CAR_COLORS: Array[Material] = [
-	preload("res://assets/materials/buildings/bld_cream.tres"),
-	preload("res://assets/materials/buildings/bld_bin_blue.tres"),
-	preload("res://assets/materials/buildings/bld_turquoise.tres"),
-	preload("res://assets/materials/buildings/bld_terracotta.tres"),
-	preload("res://assets/materials/buildings/bld_metal.tres"),
 	preload("res://assets/materials/buildings/bld_bin_yellow.tres"),
 ]
 
@@ -144,10 +127,8 @@ const PIER := Rect2(2.8, 13.0, 2.4, 17.5)
 const BEACH_START_Z := 14.0
 const BEACH_SLOPE := 1.3 / 9.0
 ## Cadde şeritleri: [z, yön, x başlangıç, x bitiş]
-const LANES: Array = [[-4.85, -1.0, -56.0, 56.0], [-3.15, 1.0, -56.0, 56.0], [-16.6, -1.0, -38.0, 38.0], [-15.4, 1.0, -38.0, 38.0]]
 
 @export var seed := 2040
-@export var car_count := 10
 
 var _rng := RandomNumberGenerator.new()
 var _library := {}
@@ -155,29 +136,28 @@ var _library := {}
 var _building_tools := {}
 var _blocked: Array[Rect2] = []
 var _batches := {}
-var _cars: Array = []
 var _box := BoxMesh.new()
 var _prism := PrismMesh.new()
 var _sphere := SphereMesh.new()
 var _cylinder := CylinderMesh.new()
 var _cone := CylinderMesh.new()
 var _pyramid := CylinderMesh.new()
-var _car_meshes := {}
 ## Görsel revizyon 8: oturan / ayakta duran kişilerin yerleri (Pedestrians düğümü okur). Her öğe:
 ## {position, yaw, pose (&"sit" | &"stand"), look: [int, int, int]}.
 var people_spots: Array[Dictionary] = []
 ## Yerleşen kütüphane binalarının tabanları (yaya rotası testi denetler).
 var building_footprints: Array[Rect2] = []
+## Görsel revizyon 9: park etmiş araç yerleri (Traffic düğümü kurar): {position, yaw (araç ön yönü -Z), look}.
+var parking_spots: Array[Dictionary] = []
 
 
 func _ready() -> void:
 	for child in get_children():
 		child.queue_free()
 	_batches.clear()
-	_cars.clear()
 	people_spots.clear()
 	building_footprints.clear()
-	_car_meshes.clear()
+	parking_spots.clear()
 	_box.size = Vector3.ONE
 	_prism.size = Vector3.ONE
 	_sphere.radius = 0.5
@@ -206,19 +186,6 @@ func _ready() -> void:
 	_build_mountains()
 	_flush_batches()
 	_flush_buildings()
-	_build_traffic()
-
-
-func _process(delta: float) -> void:
-	if Engine.is_editor_hint():
-		return
-	for car in _cars:
-		var node: Node3D = car.node
-		node.position.x += car.dir * car.speed * delta
-		if car.dir > 0.0 and node.position.x > car.x_max:
-			node.position.x = car.x_min
-		elif car.dir < 0.0 and node.position.x < car.x_min:
-			node.position.x = car.x_max
 
 
 func _collect_blocked() -> void:
@@ -330,9 +297,12 @@ func _build_streets() -> void:
 	while bx <= park.end.x + 0.01:
 		_line(Vector3(bx, 0.049, park.get_center().y), Vector3(0.06, 0.01, PARKING - 0.1))
 		if bx + bay <= park.end.x and _rng.randf() < 0.55:
-			var yaw := 0.0 if _rng.randf() < 0.5 else PI
-			_push(_car_mesh(CAR_COLORS[_rng.randi() % CAR_COLORS.size()]), null,
-					Transform3D(Basis(Vector3.UP, yaw), Vector3(bx + bay * 0.5, 0.045, park.get_center().y)))
+			# Araç ön yönü -Z; cep boyunca (±x) park. Yaya geçidinin (x ±37) yanındaki cepler boş kalır.
+			var yaw := PI * 0.5 if _rng.randf() < 0.5 else -PI * 0.5
+			var look := _rng.randi()
+			var cx := bx + bay * 0.5
+			if absf(absf(cx) - 37.0) > 1.6:
+				parking_spots.append({"position": Vector3(cx, 0.045, park.get_center().y), "yaw": yaw, "look": look})
 		bx += bay
 	var hx := park.position.x + 1.5
 	while hx < park.end.x - 1.0:
@@ -346,6 +316,7 @@ func _build_streets() -> void:
 			_sidewalk_z(span, road.end.x, road.end.x + SIDEWALK, false)
 	_build_markings(north, avenue)
 	_build_street_furniture(avenue)
+	_build_street_parking(north, avenue)
 
 
 ## [a, b] aralığından boşlukları çıkarır (kavşak ağızları).
@@ -479,6 +450,8 @@ func _build_street_furniture(avenue: Rect2) -> void:
 		if not _near_ns_road(x, 0.8) and not COAST_SQUARE.grow(0.6).has_point(spot):
 			_lamp(Vector3(x, 0.045, spot.y), -1.0)
 		x += 8.0
+	_bus_stop()
+	_traffic_lights(avenue)
 
 
 func _near_ns_road(x: float, margin: float) -> bool:
@@ -1013,12 +986,57 @@ func _bike_rack(base: Vector3, count: int) -> void:
 		_add(_box, M_RAIL, Vector3(x, base.y + 0.34, base.z), Vector3(0.03, 0.03, 0.28))
 	for k in count:
 		var x := base.x + 0.18 + k * 0.36
-		var frame: Material = SHIRTS[_rng.randi() % SHIRTS.size()]
-		for wz in [-0.22, 0.22]:
-			_add(_cylinder, M_TYRE, Vector3(x, base.y + 0.13, base.z + wz), Vector3(0.26, 0.03, 0.26), Vector3(0, 0, PI * 0.5))
-		_add(_box, frame, Vector3(x, base.y + 0.2, base.z), Vector3(0.03, 0.03, 0.42))
-		_add(_box, frame, Vector3(x, base.y + 0.28, base.z - 0.05), Vector3(0.03, 0.18, 0.03))
-		_add(_box, M_RAIL, Vector3(x, base.y + 0.36, base.z + 0.2), Vector3(0.18, 0.02, 0.02))
+		var look := _rng.randi()  # eski çerçeve rengi çekimi; sıra korunur
+		# Görsel revizyon 9: kütüphane bisikleti (çerçeve, tekerlek, sele, gidon, sepet), rafta ön / arka karışık.
+		_push(VehicleLibrary.merged(&"bicycle"), null, Transform3D(Basis(Vector3.UP, PI if look % 2 == 0 else 0.0), Vector3(x, base.y, base.z)))
+
+
+## Görsel revizyon 9: mahalle yollarında paralel park (yolun batı kenarı, bordüre yakın). Kavşaklar ve yaya
+## geçitleri (rotaların karşıya geçtiği z -14,2 ve 5,5) boş kalır. Rastgele sayı çekilmez (şehrin geri kalanı
+## değişmesin); seçim konumdan türetilir.
+func _build_street_parking(north: Rect2, avenue: Rect2) -> void:
+	for road in ROADS_NS:
+		for span in [Vector2(north.end.y + 1.2, avenue.position.y - 1.2), Vector2(avenue.end.y + 1.2, 4.6)]:
+			var z: float = span.x + 1.1
+			while z < span.y - 1.0:
+				var h := absi(hash(Vector2i(roundi(road.position.x * 10.0), roundi(z * 10.0))))
+				if h % 3 != 0 and absf(z + 14.2) > 1.4 and absf(z - 5.5) > 1.4:
+					parking_spots.append({"position": Vector3(road.position.x + 0.47, 0.045, z),
+						"yaw": 0.0 if h % 2 == 0 else PI, "look": h})
+				z += 2.45
+
+
+## Otobüs durağı: belediye meydanının güney kenarında (kaldırımın arkasında) sundurma, bank, hat tabelası;
+## bekleyen iki kişi. Otobüs (traffic.gd) batıya giden şeritte bu hizada durur.
+const BUS_STOP := Vector3(-31.3, 0.06, -7.0)
+
+
+func _bus_stop() -> void:
+	var p := BUS_STOP
+	for sx in [-0.6, 0.6]:
+		_add(_box, M_RAIL, p + Vector3(sx, 0.4, -0.15), Vector3(0.04, 0.8, 0.04))
+	_add(_box, M_GLASS, p + Vector3(0, 0.45, -0.17), Vector3(1.2, 0.6, 0.02), Vector3.ZERO, false)
+	_add(_box, M_TURQUOISE, p + Vector3(0, 0.82, 0.0), Vector3(1.35, 0.04, 0.42))
+	_add(_box, M_WOOD, p + Vector3(0, 0.105, -0.06), Vector3(0.9, 0.03, 0.18))
+	_add(_box, M_RAIL, p + Vector3(0.75, 0.45, 0.12), Vector3(0.03, 0.9, 0.03))
+	_add(_box, M_TURQUOISE, p + Vector3(0.75, 0.88, 0.12), Vector3(0.2, 0.2, 0.02))
+	people_spots.append({"position": p + Vector3(-0.25, 0.0, -0.07), "yaw": 0.0, "pose": &"sit", "look": [11, 5, 3]})
+	people_spots.append({"position": p + Vector3(0.45, 0.0, 0.2), "yaw": 0.3, "pose": &"stand", "look": [7, 2, 9]})
+
+
+## Dekoratif trafik ışıkları (mantığı yok): ana caddenin üç kavşağında, kaldırımın bordür tarafında; kol yola uzanır.
+func _traffic_lights(avenue: Rect2) -> void:
+	for road in [ROADS_NS[1], ROADS_NS[2], ROADS_NS[3]]:
+		for corner in [[road.position.x - 0.3, avenue.position.y - 0.18, 1.0], [road.end.x + 0.3, avenue.end.y + 0.18, -1.0]]:
+			var base := Vector3(corner[0], SIDEWALK_TOP, corner[1])
+			var side: float = corner[2]
+			_add(_cylinder, M_RAIL, base + Vector3(0, 0.55, 0), Vector3(0.05, 1.1, 0.05))
+			_add(_box, M_RAIL, base + Vector3(0, 1.08, side * 0.35), Vector3(0.03, 0.03, 0.7))
+			var head := base + Vector3(0, 0.98, side * 0.62)
+			_add(_box, M_RAIL, head, Vector3(0.09, 0.22, 0.07))
+			for k in 3:
+				var lamp: Material = [M_TAIL, M_POT_CREAM, M_HEDGE][k]
+				_add(_box, lamp, head + Vector3(side * 0.046, 0.07 - k * 0.07, 0), Vector3(0.01, 0.05, 0.05), Vector3.ZERO, false)
 
 
 ## Seyir noktası: taş platform, korkuluk ve dürbün.
@@ -1115,51 +1133,3 @@ func _build_mountains() -> void:
 		var h := _rng.randf_range(5.0, 9.0)
 		_add(_cone, M_HILL, Vector3(x, h * 0.5, _rng.randf_range(-66.0, -60.0)), Vector3(r * 2.0, h, r * 2.0), Vector3(0, _rng.randf() * TAU, 0), false)
 		x += _rng.randf_range(10.0, 16.0)
-
-
-# --- Cadde trafiği: şeritlerde dolaşan birkaç low-poly araç ---
-
-func _build_traffic() -> void:
-	var traffic := Node3D.new()
-	traffic.name = "Traffic"
-	add_child(traffic)
-	for i in car_count:
-		var lane: Array = LANES[i % LANES.size()]
-		var car := MeshInstance3D.new()
-		car.mesh = _car_mesh(CAR_COLORS[_rng.randi() % CAR_COLORS.size()])
-		car.position = Vector3(_rng.randf_range(lane[2], lane[3]), 0.05, lane[0])
-		car.rotation.y = 0.0 if lane[1] > 0.0 else PI
-		traffic.add_child(car)
-		_cars.append({"node": car, "dir": lane[1], "speed": _rng.randf_range(3.5, 6.0), "x_min": lane[2], "x_max": lane[3]})
-
-
-## Low-poly otomobil (gövde, kabin camı ve tavanı, tekerlekler, ön ve arka lambalar), +x ileri.
-## Tek ArrayMesh; renk başına bir kez kurulur, hareketli ve park etmiş araçlar paylaşır.
-func _car_mesh(color: Material) -> ArrayMesh:
-	if _car_meshes.has(color):
-		return _car_meshes[color]
-	var parts := [
-		[_box, color, Vector3(0, 0.33, 0), Vector3(1.9, 0.38, 0.84), Vector3.ZERO],
-		[_box, M_WINDOW, Vector3(-0.1, 0.62, 0), Vector3(1.02, 0.24, 0.78), Vector3.ZERO],
-		[_box, color, Vector3(-0.1, 0.77, 0), Vector3(1.06, 0.07, 0.8), Vector3.ZERO],
-		[_box, M_TANK, Vector3(0.94, 0.4, 0.27), Vector3(0.04, 0.07, 0.16), Vector3.ZERO],
-		[_box, M_TANK, Vector3(0.94, 0.4, -0.27), Vector3(0.04, 0.07, 0.16), Vector3.ZERO],
-		[_box, M_TAIL, Vector3(-0.94, 0.4, 0.27), Vector3(0.04, 0.07, 0.16), Vector3.ZERO],
-		[_box, M_TAIL, Vector3(-0.94, 0.4, -0.27), Vector3(0.04, 0.07, 0.16), Vector3.ZERO],
-	]
-	for wx in [-0.6, 0.6]:
-		for wz in [-0.4, 0.4]:
-			parts.append([_cylinder, M_TYRE, Vector3(wx, 0.16, wz), Vector3(0.32, 0.12, 0.32), Vector3(PI * 0.5, 0, 0)])
-	var tools := {}
-	for part in parts:
-		var material: Material = part[1]
-		if not tools.has(material):
-			tools[material] = SurfaceTool.new()
-		var xform := Transform3D(Basis.from_euler(part[4]) * Basis.from_scale(part[3]), part[2])
-		(tools[material] as SurfaceTool).append_from(part[0], 0, xform)
-	var mesh := ArrayMesh.new()
-	for material in tools:
-		(tools[material] as SurfaceTool).commit(mesh)
-		mesh.surface_set_material(mesh.get_surface_count() - 1, material)
-	_car_meshes[color] = mesh
-	return mesh

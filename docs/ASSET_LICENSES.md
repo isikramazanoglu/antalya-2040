@@ -1,6 +1,6 @@
 # Varlık kaynakları ve lisansları
 
-Son güncelleme: 2026-11-01 (Ekip A, görsel revizyon 8 · insan karakterleri; revizyon 7 · bina kütüphanesi).
+Son güncelleme: 2026-11-01 (Ekip A, görsel revizyon 9 · araçlar; 8 · insan karakterleri; 7 · bina kütüphanesi).
 
 ## Özet
 
@@ -40,6 +40,32 @@ Modeller **yatırım değildir**: BuildingDefinition'a, yatırım kimliğine ya 
 | `assets/buildings/public/public_building_b.tres` / `.tscn` | Sosyal tesis / okul | Proje içinde üretildi | Ekip A | Proje lisansı |
 | `assets/materials/architecture/arch_*.tres` | Mimari palet (24 StandardMaterial3D) | Proje içinde üretildi | Ekip A | Proje lisansı |
 
+## Araç kütüphanesi (görsel revizyon 9, proje içinde üretildi)
+
+Üretici: `scripts/world/dev/gen_vehicle_library.gd` (Godot `--script`; Blender ya da harici model yok). Yeniden üretmek için:
+
+```
+<godot> --headless --path . --script res://scripts/world/dev/gen_vehicle_library.gd
+```
+
+Yalnızca görsel: araç sayısı bütçe, nüfus, enerji, emisyon ya da ulaşım kapasitesi üretmez.
+
+| Dosya | Tür | Kaynak | Yazar | Lisans |
+|---|---|---|---|---|
+| `assets/vehicles/cars/city_car.tscn` (+ `_body.tres`) | Şehir arabası, 3,9 m | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/vehicles/cars/sedan.tscn` | Sedan, 4,7 m | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/vehicles/cars/compact_suv.tscn` | Kompakt SUV, 4,6 m | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/vehicles/cars/electric_car.tscn` | Elektrikli otomobil, 4,8 m | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/vehicles/buses/city_bus.tscn` | Belediye otobüsü, 11,1 m (marka / yazı yok) | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/vehicles/buses/minibus.tscn` | Minibüs, 6,1 m | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/vehicles/commercial/delivery_van.tscn` | Teslimat vanı, 5,3 m | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/vehicles/bicycles/bicycle.tscn` | Şehir bisikleti, 1,9 m | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/vehicles/wheels/wheel_*.tres` | Tekerlekler (araba, küçük, otobüs, bisiklet) | Proje içinde üretildi | Ekip A | Proje lisansı |
+| `assets/vehicles/materials/veh_*.tres` | Araç paleti (17 materyal) | Proje içinde üretildi | Ekip A | Proje lisansı |
+
+Değerlendirilip kullanılmayan: Kenney "Car Kit" 3.1 (CC0) — otobüs yok, renkler tek dokuya gömülü (prompt paletine
+boyanamıyor) ve oranları oyuncak gibi; projeye eklenmedi.
+
 ## İnsan karakterleri (görsel revizyon 8, harici, CC0)
 
 | Alan | Bilgi |
@@ -71,6 +97,7 @@ Değerlendirilip kullanılmayan: Kenney "Mini Characters" (CC0) — iskelet ve a
 | `scripts/world/city_decor.gd` | Yollar, ağaçlar, insan figürleri, araçlar, marina, dağlar | Kodla üretilir (sahneye kaydedilmez) | Proje lisansı |
 | `assets/models/` | Harici model yok (bkz. `assets/models/LICENSES.md`) | — | — |
 | `scripts/world/pedestrians.gd` | Yaya rotaları, karakter renkleri, oturma yerleşimi | Proje içi kod | Proje lisansı |
+| `scripts/world/traffic.gd`, `scripts/world/vehicle_library.gd` | Trafik rotaları, park etmiş araçlar, araç boyaları | Proje içi kod | Proje lisansı |
 
 Arayüz varlıkları (`assets/ui/`, yazı tipleri, simgeler) Ekip B'nin sorumluluğundadır ve kaynakları B'nin
 belgelerindedir.
