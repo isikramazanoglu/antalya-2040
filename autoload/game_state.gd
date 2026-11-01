@@ -16,12 +16,15 @@ var month: int = 1  # takvim ayı 1–12; yıllık hesapları etkilemez
 var businesses: Array = []
 var business_seq: int = 0
 var inspections_used: int = 0
+## Zorunlu iklim sorusu: çözülen soru sayısı ve en son çözüldüğü ay (yıl × 12 + ay).
+var quiz_count: int = 0
+var quiz_done_key: int = 0
 ## Kayıttan yüklenen oyunda TurnManager'ın iç durumu (start_game bunu kullanır, sonra boşaltır).
 var restored_turn: Dictionary = {}
 var restored_education: Dictionary = {}
 
 const SNAPSHOT_KEYS := ["stats", "plots", "pending_crises", "history", "missions", "crisis_log", "build_log",
-		"year_reports", "month", "rng_seed", "businesses", "business_seq", "inspections_used"]
+		"year_reports", "month", "rng_seed", "businesses", "business_seq", "inspections_used", "quiz_count", "quiz_done_key"]
 var rng_seed: int = 0
 
 
@@ -72,6 +75,8 @@ func reset() -> void:
 	businesses.clear()
 	business_seq = 0
 	inspections_used = 0
+	quiz_count = 0
+	quiz_done_key = 0
 	restored_turn = {}
 	restored_education = {}
 	rng_seed = randi()

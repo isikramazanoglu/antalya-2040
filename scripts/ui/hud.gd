@@ -23,7 +23,16 @@ var _shown_month := 0  # uyarılardaki "kaç ay kaldı" her ay yenilensin
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_build_resource_cards()
-	%EndTurnButton.pressed.connect(EventBus.end_turn_requested.emit)
+	%EndTurnButton.pressed.connect(func():
+		var q := get_tree().get_first_node_in_group("climate_quiz")
+		if q:
+			q.ask(EventBus.end_turn_requested.emit)
+		else:
+			EventBus.end_turn_requested.emit())
+	# Zorunlu iklim sorusu: arayüzün en üstünde, tam ekran.
+	var quiz := ClimateQuiz.new()
+	quiz.name = "ClimateQuiz"
+	get_parent().add_child.call_deferred(quiz)
 	%BuildMenuButton.pressed.connect(_open_panel.bind("build_panel"))
 	%LabButton.pressed.connect(_open_panel.bind("climate_lab"))
 	%CityInfoButton.pressed.connect(_open_panel.bind("city_info"))

@@ -378,6 +378,11 @@ Emre'nin kredisi bittiği için kullanıcı kararıyla B yaptı. Ayrı dalda ve 
 - Windows build Mac'te üretildi ve `--main-pack` ile pencerede hatasız açıldı. **Windows'ta çalıştırılmadı.**
 - Bilinen eksikler: quiz sistemi; haritada fabrikaya tıklayarak seçme (işletmelere "Sanayi" panelinden ulaşılıyor); 10 tür 3 modeli paylaşıyor; Windows ve zayıf ekran kartında FPS ölçülmedi.
 
+### Teslim hotfix (B, 2026-11-01 23:15) · Zorunlu iklim sorusu
+- `scripts/ui/climate_quiz.gd` (HUD tarafından arayüzün en üstüne eklenir): her ay geçişinden (MonthClock) ve "Yıl sonuna atla"dan önce tam ekran soru. Doğru cevap verilmeden ay ilerlemez; yanlışta doğru cevap ve açıklama gösterilir, tekrar denenir; Esc, panel kapatma ve arkadaki düğmeler atlatmaz. Doğru cevaptan sonra geçiş bir kez çalışır.
+- 10 soruluk banka (soru, 4 seçenek, doğru indeks, açıklama ayrı alanlar); sıra rng_seed + sayaçla döner. Bir ayda çözülen soru o ay yeniden sorulmaz. `GameState.quiz_count / quiz_done_key` kayda girer.
+- Test (bir kez, gerçek Game.tscn): açılıyor, yanlışta ay geçmiyor, Esc/panel atlatmıyor, doğruda ay 1 → 2, sonraki ayda yeni soru. `--script` testlerinde quiz kapalı; test_months, test_businesses, test_day1 TAMAM.
+
 ### Jüri demo akışı (5–7 dk, sabit kriz yılları, ek demo modu gerekmez)
 1. Giriş (30 sn): ana menü, arkada canlı şehir; "Oyun hakkında".
 2. 2040 şehri (45 sn): HUD; kaynak paneli, enerji üretim/tüketim, yerel emisyon.

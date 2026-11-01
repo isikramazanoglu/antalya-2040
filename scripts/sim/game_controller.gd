@@ -24,6 +24,12 @@ func _ready() -> void:
 	turn_manager.start_game.call_deferred()
 
 
+## Zorunlu iklim sorusu doğru cevaplandı: bu ay bir daha sorulmaz, sıradaki soru hazırlanır.
+func quiz_passed() -> void:
+	GameState.quiz_done_key = GameState.stats.year * 12 + GameState.month
+	GameState.quiz_count += 1
+
+
 ## Oyunu kaydeder (yalnızca build fazında). HUD "Ana menü" ve otomatik kayıt kullanır.
 func save_game() -> bool:
 	var edu := get_tree().get_first_node_in_group("education")
