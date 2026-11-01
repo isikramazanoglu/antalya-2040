@@ -2,7 +2,9 @@ class_name CameraRig
 extends Node3D
 ## Sahip: A. İzometrik kamera (mimari §2.4). Kök = bakılan nokta, Y ekseninde döner;
 ## Pitch sabit eğim; yakınlaştırma Camera3D'yi Pitch ekseninde ileri geri iter.
-## WASD kaydırma, Q/E ±30° döndürme, tekerlek yakınlaştırma, orta tuşla sürükleme.
+## WASD ve ok tuşlarıyla ekran yönünde kaydırma, tekerlek yakınlaştırma, orta tuşla zemini tutup sürükleme.
+## Q/E döndürme rotate_limit_deg ile sınırlanır (CameraRig.tscn'de 0: sabit açı).
+## Fare girdisi _unhandled_input'tan gelir: arayüzün tükettiği tıklama/sürükleme haritayı oynatmaz.
 ## Sinematik modda (final sunumu) oyuncu girdisi yok sayılır; kamerayı glide_to / play_tour yönetir.
 
 @export var pan_speed := 30.0
@@ -48,12 +50,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE:
 		_dragging = event.pressed
 	elif event is InputEventMouseMotion and _dragging:
-		var motion: Vector2 = event.relative * _target_zoom * drag_sensitivity
-		_target_pos -= _flat_right() * motion.x + _flat_back() * motion.y
+		# Orta tuş arayüzün üstünde bırakıldıysa bırakma olayı buraya gelmez; tuş durumundan anla.
+		if not (event.button_mask & MOUSE_BUTTON_MASK_MIDDLE):
+			_dragging = false
+			return
+		_drag(event.position, event.relative)
 
 
 func _process(delta: float) -> void:
-	var input := Vector2.ZERO if cinematic else Input.get_vector("cam_left", "cam_right", "cam_forward", "cam_back")
+	var input := _pan_input()
 	if input != Vector2.ZERO:
 		var speed := pan_speed * (_target_zoom / 50.0)
 		_target_pos += (_flat_right() * input.x + _flat_back() * input.y) * speed * delta
@@ -69,6 +74,35 @@ func _process(delta: float) -> void:
 	position = position.lerp(_target_pos, t)
 	rotation.y = lerp_angle(rotation.y, _base_yaw + _yaw_offset, t)
 	_camera.position.z = lerpf(_camera.position.z, _target_zoom, t)
+
+
+## Klavye kaydırma yönü: WASD (Input Map) + ok tuşları. Ok tuşları Input Map'te tanımlı değil
+## (project.godot Ekip B'nin), bu yüzden fiziksel tuş olarak okunur. Yazı alanı odaktayken yok sayılır.
+func _pan_input() -> Vector2:
+	if cinematic:
+		return Vector2.ZERO
+	var focus := get_viewport().gui_get_focus_owner()
+	if focus is LineEdit or focus is TextEdit:
+		return Vector2.ZERO
+	var v := Input.get_vector("cam_left", "cam_right", "cam_forward", "cam_back")
+	v.x += float(Input.is_physical_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_LEFT))
+	v.y += float(Input.is_physical_key_pressed(KEY_DOWN)) - float(Input.is_physical_key_pressed(KEY_UP))
+	return v.limit_length(1.0)
+
+
+## Zemini tutup sürükleme: imlecin altındaki zemin noktası imleçle birlikte gider (perspektifte de birebir).
+## Kamera hedefi ve konumu birlikte kayar; açı ve yakınlık değişmez. Sınırlar _process'te uygulanır.
+func _drag(screen: Vector2, relative: Vector2) -> void:
+	var before = _ground_at(screen - relative)
+	var after = _ground_at(screen)
+	var delta := Vector3.ZERO
+	if before != null and after != null:
+		delta = before - after
+	else:
+		var motion := relative * _target_zoom * drag_sensitivity
+		delta = -(_flat_right() * motion.x + _flat_back() * motion.y)
+	_target_pos += delta
+	position += Vector3(delta.x, 0.0, delta.z)
 
 
 ## Kamerayı bir noktaya yumuşakça götürür (CitySandbox ve ileride odaklama için).

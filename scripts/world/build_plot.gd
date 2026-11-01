@@ -2,6 +2,7 @@ class_name BuildPlot
 extends Node3D
 ## Sahip: A. Arsa verisi, vurgu ve bina yuvası (mimari §2.5).
 ## plot_id ve plot_kind sözleşme §7'deki listeden gelir; CityWorld.tscn içinde ayarlanır.
+## Edge: arsanın türüne göre kenarlığı (kent: taş bordür, açık alan ve kıyı: ahşap), her zaman görünür.
 ## Görsel katman (VisualOverlay): Highlight (arsa kenarında ince çerçeve), HighlightFill (hafif dolgu),
 ## DebugOverlay (geliştirici etiketi, normal oyunda gizli). Seçim ve fare üstü bilgisi CityWorld'den gelir
 ## (mevcut ışın testi); arsa yalnızca görünümünü değiştirir, uygunluk hesaplamaz, GameState'e yazmaz.
@@ -20,6 +21,14 @@ const MAT_SELECTED := preload("res://assets/materials/plot_state_selected.tres")
 const MAT_INVALID := preload("res://assets/materials/plot_state_invalid.tres")
 const MAT_FILL_HOVER := preload("res://assets/materials/plot_fill_hover.tres")
 const MAT_FILL_SELECTED := preload("res://assets/materials/plot_fill_selected.tres")
+const EDGE_MATERIALS := {
+	&"urban": preload("res://assets/materials/city/curb.tres"),
+	&"open": preload("res://assets/materials/buildings/bld_wood.tres"),
+	&"coastal": preload("res://assets/materials/buildings/bld_wood.tres"),
+}
+## Kenarlık: arsa sınırında, zeminin (0.12) 6 cm üstüne çıkar.
+const EDGE_WIDTH := 0.16
+const EDGE_HEIGHT := 0.06
 ## Geliştirici etiketinde gösterilen tür adı.
 const KIND_NAMES := {&"urban": "KENT", &"open": "AÇIK ALAN", &"coastal": "KIYI"}
 ## Tıklama kutusunun yüksekliği; binanın üstüne tıklamak da arsayı seçsin.
@@ -27,7 +36,7 @@ const PICK_HEIGHT := 5.0
 ## Çerçeve: arsa kenarının hemen içinde, zeminin (0.12) biraz üstünde; z-fighting olmaz.
 const FRAME_WIDTH := 0.22
 const FRAME_HEIGHT := 0.02
-const FRAME_Y := 0.135
+const FRAME_Y := 0.2  # kenarlığın (üst 0.18) hemen üstü
 const FRAME_INSET := 0.04
 ## Fare üstü ve seçimde yavaş, hafif nefes alma (saniye cinsinden periyot, saydamlık aralığı).
 const PULSE_PERIOD := 2.4
@@ -35,6 +44,7 @@ const PULSE_DEPTH := 0.25
 
 ## Arsa boyutu → çerçeve mesh'i; aynı boyuttaki arsalar tek mesh'i paylaşır.
 static var _frame_meshes := {}
+static var _edge_meshes := {}
 
 @export var plot_id: StringName
 @export var plot_kind: StringName = &"urban"
@@ -42,6 +52,7 @@ static var _frame_meshes := {}
 @export var size := 6.0
 
 @onready var _pad: MeshInstance3D = $Pad
+@onready var _edge: MeshInstance3D = $Edge
 @onready var _highlight: MeshInstance3D = $VisualOverlay/Highlight
 @onready var _fill: MeshInstance3D = $VisualOverlay/HighlightFill
 @onready var _debug: Node3D = $VisualOverlay/DebugOverlay
@@ -72,6 +83,8 @@ func _ready() -> void:
 	_pad.material_override = _pad_material
 	_pad_base_color = _pad_material.albedo_color
 	_highlight.mesh = _frame_mesh(size)
+	_edge.mesh = _edge_mesh(size)
+	_edge.material_override = EDGE_MATERIALS.get(plot_kind, EDGE_MATERIALS[&"urban"])
 	_fill.scale = Vector3(size - FRAME_INSET * 2.0, 1.0, size - FRAME_INSET * 2.0)
 	_label.text = "%s · %s" % [plot_id, KIND_NAMES.get(plot_kind, String(plot_kind))]
 	_label.position = Vector3(-size * 0.5 + 0.25, _label.position.y, size * 0.5 - 0.25)
@@ -209,6 +222,24 @@ static func _frame_mesh(plot_size: float) -> Mesh:
 		st.append_from(edge, 0, xform)
 	var mesh := st.commit()
 	_frame_meshes[plot_size] = mesh
+	return mesh
+
+
+## Arsa sınırında dört kenarlık parçası (tek mesh, boyut başına paylaşılır).
+static func _edge_mesh(plot_size: float) -> Mesh:
+	if _edge_meshes.has(plot_size):
+		return _edge_meshes[plot_size]
+	var half := plot_size * 0.5 - EDGE_WIDTH * 0.5
+	var st := SurfaceTool.new()
+	for side in 4:
+		var edge := BoxMesh.new()
+		var length := plot_size if side % 2 == 0 else plot_size - EDGE_WIDTH * 2.0
+		edge.size = Vector3(length, 0.12 + EDGE_HEIGHT, EDGE_WIDTH)
+		var xform := Transform3D(Basis(Vector3.UP, side * PI * 0.5), Vector3.ZERO)
+		xform = xform * Transform3D(Basis.IDENTITY, Vector3(0, (0.12 + EDGE_HEIGHT) * 0.5, half))
+		st.append_from(edge, 0, xform)
+	var mesh := st.commit()
+	_edge_meshes[plot_size] = mesh
 	return mesh
 
 
