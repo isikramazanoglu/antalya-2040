@@ -23,6 +23,8 @@ const BUILDING_SCENE_PATH := "res://scenes/buildings/b_%s.tscn"
 
 var _selected: BuildPlot
 var _hovered: BuildPlot
+## Sol tuş haritada basıldı; bırakılınca (sürükleme olmadıysa) tıklama olarak işlenir.
+var _click_pending := false
 var _selection_enabled := true
 ## Aşama sinyali bir kez geldiyse görseller onunla sürülür; crisis_started/resolved yalnızca yedektir.
 var _stage_driven := false
@@ -53,11 +55,19 @@ func _ready() -> void:
 			place_building(plot.plot_id, building_id, false)
 
 
+## Seçim sol tuş BIRAKILINCA yapılır (A11): basılıyken imleç sürükleme eşiğini aşarsa CameraRig haritayı sürükler ve
+## bu bırakma tıklama sayılmaz. CameraRig bu node'un çocuğu olduğu için olayı ondan önce alır.
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
-		_set_hovered(_plot_at(event.position) if _selection_enabled else null)
+		var dragging: bool = _camera_rig != null and _camera_rig.is_left_dragging()
+		_set_hovered(_plot_at(event.position) if _selection_enabled and not dragging else null)
 	elif event.is_action_pressed("select"):
-		if not _selection_enabled:
+		_click_pending = _selection_enabled
+	elif event.is_action_released("select"):
+		if not _click_pending:
+			return  # basış arayüzde başladı ya da seçim kapalıydı
+		_click_pending = false
+		if not _selection_enabled or (_camera_rig != null and _camera_rig.was_left_drag()):
 			return
 		var plot := _plot_at(event.position)
 		if plot:
@@ -268,8 +278,42 @@ func _on_phase_changed(phase: StringName) -> void:
 	_update_build_hints()
 
 
+## Yalnızca onaylanmış (başarılı) inşaat: bina arsaya konur ve kamera kısa bir gösterimle yeni binayı gösterir (A12).
+## Açılışta GameState'ten geri kurulan binalar place_building'i doğrudan çağırır, gösterim yapılmaz.
 func _on_build_approved(plot_id: StringName, building_id: StringName) -> void:
-	place_building(plot_id, building_id)
+	if place_building(plot_id, building_id):
+		showcase_building(plot_id)
+
+
+## Arsadaki binayı kamerayla gösterir (A12). Bina yoksa ya da geçersizse arsanın kendisi gösterilir.
+func showcase_building(plot_id: StringName) -> void:
+	var plot := find_plot(plot_id)
+	if plot == null:
+		return
+	_camera_rig.showcase(building_bounds(plot))
+
+
+## Binanın dünya kutusu, büyüme animasyonundan bağımsız (Model ölçeği 0,01'den başlar): görsel parçaların Model'e göre
+## kutusu, Model ölçeği 1 sayılarak dünyaya taşınır. Bina yoksa arsa karesi (yükseklik 1).
+func building_bounds(plot: BuildPlot) -> AABB:
+	var half := plot.size * 0.5
+	var fallback := AABB(plot.global_position - Vector3(half, 0.0, half), Vector3(plot.size, 1.0, plot.size))
+	var building := plot.get_building()
+	if building == null or not is_instance_valid(building):
+		return fallback
+	var model := building.get_node_or_null("Model") as Node3D
+	var root: Node3D = model if model else building
+	var unscaled := Transform3D(root.global_basis.orthonormalized(), root.global_position)
+	var box := AABB()
+	var first := true
+	for vi: VisualInstance3D in root.find_children("*", "VisualInstance3D", true, false):
+		if vi is GPUParticles3D or vi is CPUParticles3D or not vi.visible:
+			continue
+		var local := root.global_transform.affine_inverse() * vi.global_transform
+		var part := unscaled * (local * vi.get_aabb())
+		box = part if first else box.merge(part)
+		first = false
+	return fallback if first else box
 
 
 func _on_crisis_stage_changed(_event_id: StringName, stage: StringName, info: Dictionary) -> void:
