@@ -4,7 +4,7 @@ Bu belge Ekip A (şehir ve 3D) ile Ekip B (simülasyon ve arayüz) arasındaki t
 İki taraf birbirinin koduna yalnızca burada yazan sinyaller, fonksiyonlar ve veri şekilleri üzerinden dokunur.
 Burada yazmayan bir şeye güvenen kod, sözleşme dışıdır.
 
-Sürüm: **v1.9** (2026-10-31). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
+Sürüm: **v1.10** (2026-11-01). Her değişiklikte sürümü artırın ve en alttaki değişiklik günlüğüne satır ekleyin.
 
 ---
 
@@ -132,8 +132,12 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
   "recycled_water": float,        # v1.8: geri kazanılmış su üretimi (içme suyu sayılmaz)
   "recycled_water_used": float,   # v1.8: bunun içme dışı talebi karşılayan kısmı
   "waste_recovery": float,        # v1.9: atık azaltma oranı 0..1
-  "climate_resilience": float     # v1.9: üç risk için ortalama yatırım koruması 0..0.8
+  "climate_resilience": float,    # v1.9: üç risk için ortalama yatırım koruması 0..0.8
+  "air_pollution": float,         # v1.10: işletmelerden yerel hava kirliliği 0..100 (sera gazından ayrı)
+  "waste_pollution": float        # v1.10: işletmelerden atık ve atık su yükü 0..100
 }
+# v1.10: emissions_by_sector içine "industry" (işletmelerin sera gazı) eklendi; emissions_total bunu içerir.
+#        global_co2_ppm işletmelerden etkilenmez (gerçek ölçüm serisi).
 ```
 
 ### 5.2 `warning`
@@ -166,6 +170,17 @@ Sözlük anahtarları düz `String` olarak yazılır (`"credits"`), `StringName`
 
 Ayrıntı ve kabul ölçütleri: `docs/FINAL_VISUAL_CONTRACT.md`.
 
+### 3.5 İşletmeler ve çevre denetimi (v1.10)
+
+| Sinyal | Parametreler | Yayan | Dinleyen |
+|---|---|---|---|
+| `business_spawned` | `info: Dictionary` | B · GameController (yeni işletme ya da kayıttan yükleme: `info.restored = true`) | A · CityWorld (sanayi yerine model koyar) |
+| `business_updated` | `info: Dictionary` | B · GameController (denetim, karar, faaliyet durumu, üretim) | A (duman yoğunluğu, durum görseli) |
+| `business_removed` | `business_id: StringName, site_id: StringName` | B · GameController (işletme kapandı) | A (modeli kaldırır) |
+
+`info` şekli, sanayi yerleri (`I01`–`I08`) ve görsel kimlikleri: `docs/BUSINESS_SYSTEM.md` §8. A görselde hesap yapmaz, yalnızca bu veriyi gösterir.
+Salt okunur durum: `GameState.businesses`, `GameState.month` (takvim ayı 1–12, aylık takvim).
+
 ### 5.6 `info` (crisis_stage_changed, v1.5)
 
 ```
@@ -195,7 +210,10 @@ Bütün aşamalarda bu sekiz anahtarın hepsi vardır. `mitigation` ve `advantag
   "crisis_results": Array,        # §5.3 listesi
   "new_warnings": Array,          # §5.2 listesi
   "missions": { "completed": Array, "failed": Array, "reward": int },  # v1.1
-  "investment_cost": int          # v1.9: o yıl onaylanan yatırımların maliyet toplamı
+  "investment_cost": int,         # v1.9: o yıl onaylanan yatırımların maliyet toplamı
+  "business_income": int,         # v1.10: işletmelerin yıllık katkısı (income'a dahil)
+  "fines": int,                   # v1.10: o yıl kesilen çevre cezaları (kasaya girdi)
+  "inspection_cost": int          # v1.10: ücretli ek denetimler (kasadan çıktı)
 }
 ```
 
@@ -340,6 +358,7 @@ MVP üçlüsü: `solar_plant`, `water_storage`, `green_park`.
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
 | v1.0 | 2026-10-30 | İlk sürüm. |
+| v1.10 | 2026-11-01 | Ekleme (Prompt 13, B): §3.5 işletme sinyalleri, `stats.air_pollution/waste_pollution`, `emissions_by_sector.industry`, `report.business_income/fines/inspection_cost`. `docs/BUSINESS_SYSTEM.md`. Var olan sinyaller değişmedi; A'nın dinlemesi isteğe bağlı. |
 | v1.9 | 2026-10-31 | Ekleme: §3.4 final sunum sinyalleri, `summary.evaluation/city_2040/city_2052`, `report.investment_cost`, `stats.waste_recovery/climate_resilience`. `docs/FINAL_VISUAL_CONTRACT.md`. A'nın kullanması isteğe bağlı. |
 | v1.8 | 2026-10-31 | Ekleme: `stats.recycled_water`, `stats.recycled_water_used`. A etkilenmez. Not: `GameState.built_definitions()` artık etkin kombinasyonları (`SynergyDefinition`) da döndürür; `advantages` listesinde yalnızca bina kimlikleri kalır. |
 | v1.7 | 2026-10-31 | Ekleme: `summary.start_stats` (final ekranında başlangıç ↔ final). Yalnızca B'nin YearReport'u kullanır. |
