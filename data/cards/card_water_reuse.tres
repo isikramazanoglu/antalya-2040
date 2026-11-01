@@ -9,5 +9,5 @@ title = "Suyu iki kez kullanmak"
 body = "Evlerden gelen atık su arıtıldıktan sonra içme suyu gerektirmeyen işlerde, örneğin park sulamasında kullanılabilir. Böylece barajlardan ve yer altından çekilen su azalır."
 benefit = "Arıtılmış suyu sulama ve sanayide yeniden kullanır."
 climate_link = "Barajlardan ve yeraltından çekilen suyu azaltarak kuraklığa dayanıklılığı artırır."
-strategic = "Su arzını büyütür, kuraklık hasarını azaltır ve kıyı arsalarına da kurulabilir."
+strategic = "Şehrin suyunu artırır, kuraklıkta zararı azaltır; kıyı arsalarına da kurulabilir."
 sources = Array[String](["US EPA, Water Reuse and Recycling (web sayfası), https://www.epa.gov/waterreuse, erişim 2026-10-31"])

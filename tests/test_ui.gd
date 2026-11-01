@@ -78,12 +78,12 @@ func _process(_d: float) -> bool:
 			var n: int = _find("BuildPanel", "Cards").get_child_count()
 			_check(n == root.get_node("Catalog").buildings_for_plot_kind(&"open").size(), "7) açık alana uygun %d yatırım listelendi" % n)
 			var labels := _card_labels()
-			_check(labels.contains("Güneş enerjisi tesisi") and labels.contains("400 kredi · gider 10/yıl · açık alan") and labels.contains("Yenilenebilir enerji +20"),
+			_check(labels.contains("Güneş enerjisi tesisi") and labels.contains("400 kredi · bakımı her yıl 10 · açık alan") and labels.contains("Temiz elektrik üretir +20"),
 					"8) kart adı, maliyet, gider, arsa türü ve etki gösteriyor")
 			_check(not _find("BuildPanel", "Cards").find_children("*", "TextureRect", true, false).is_empty(), "8) kartta bina görseli var")
 			_find("BuildPanel", "Cards").get_child(0).pressed.emit()
 		55:
-			_check(_find("BuildPanel", "DetailSummary").text.contains("Temel fayda") and _find("BuildPanel", "DetailSummary").text.contains("İklim bağlantısı"),
+			_check(_find("BuildPanel", "DetailSummary").text.contains("Ne işe yarar?") and _find("BuildPanel", "DetailSummary").text.contains("İklime faydası"),
 					"8) seçilen kartın eğitim ayrıntısı görünüyor")
 			_find("BuildPanel", "BuildButton").pressed.emit()
 			_find("BuildPanel", "BuildButton").pressed.emit()  # çift tıklama denemesi
@@ -93,9 +93,9 @@ func _process(_d: float) -> bool:
 			_check(_find("HUD", "CreditsValue").text == "600", "3) HUD bütçesi güncellendi (%s)" % _find("HUD", "CreditsValue").text)
 			var energy_detail := ""
 			for l in _find("HUD", "ResourceList").find_children("*", "Label", true, false):
-				if l.text.begins_with("Üretim"):
+				if l.text.begins_with("İhtiyaç"):
 					energy_detail = l.text
-			_check(energy_detail.contains("Üretim 20 / tüketim 50 · denge -30"), "5) enerji üretimi, tüketimi ve dengesi gösteriliyor (%s)" % energy_detail)
+			_check(energy_detail.contains("İhtiyaç 50 · temiz enerji 20 · 30 kömür ve doğalgazdan"), "5) enerji üretimi, tüketimi ve dengesi gösteriliyor (%s)" % energy_detail)
 			_check(not _find("BuildPanel", "BuildButton").visible and _find("BuildPanel", "Hint").text.contains("Bu arsada"), "12) dolu arsada inşa düğmesi yok")
 			bus.build_requested.emit(&"O01", &"water_storage")
 			var rejected := log.filter(func(l): return l[0] == "build_rejected")
@@ -112,7 +112,7 @@ func _process(_d: float) -> bool:
 		130:
 			var water_value := ""
 			for l in _find("HUD", "ResourceList").find_children("*", "Label", true, false):
-				if l.get_parent().get_child(1) is Label and l.get_parent().get_child(1).text == "Su güvenliği" and l.get_index() == 2:
+				if l.get_parent().get_child(1) is Label and l.get_parent().get_child(1).text == "Su" and l.get_index() == 2:
 					water_value = l.text
 			_check(water_value == str(int(gs.stats.water_security)) and gs.stats.water_security > get_meta("water_before"), "4) su güvenliği HUD'da %s oldu" % water_value)
 			gs.stats.credits = 100
@@ -142,8 +142,8 @@ func _process(_d: float) -> bool:
 			var chart = _find("ClimateLab", "EmissionChart")
 			var expected: float = gs.stats.emissions_by_sector.energy
 			_check(chart.series.size() == 4 and is_equal_approx(chart.series[0].values[-1], expected), "14) emisyon grafiği gerçek veriyle (enerji %.1f)" % expected)
-			_ui("ClimateLab").open_tab("C · Kaynaklar")
-			_check(_find("ClimateLab", "ResourceText").text.contains("yenilenebilir payı %40"), "13) Laboratuvar (C) güncel enerji verisini gösteriyor")
+			_ui("ClimateLab").open_tab("Su ve elektrik")
+			_check(_find("ClimateLab", "ResourceText").text.contains("temiz elektrik payı %40"), "13) Laboratuvar (C) güncel enerji verisini gösteriyor")
 			_esc()
 		165:
 			_check(not _ui("ClimateLab").visible, "16) Esc ile Laboratuvar kapandı")
@@ -156,7 +156,7 @@ func _process(_d: float) -> bool:
 			_esc()
 			bus.end_turn_requested.emit()
 		200:
-			_check(_ui("YearReport").visible and _find("YearReport", "Body").text.contains("Yıl sonu bütçesi") and _find("YearReport", "Body").text.contains("Yenilenebilir enerji üretimi"),
+			_check(_ui("YearReport").visible and _find("YearReport", "Body").text.contains("Yıl sonu bütçesi") and _find("YearReport", "Body").text.contains("Temiz elektrik"),
 					"15) yıl sonu raporu gerçek verilerle açıldı")
 			_check(_overflow().is_empty(), "18/19) görünür arayüz öğesi ekran dışına taşmıyor %s" % str(_overflow()))
 			_find("YearReport", "ContinueButton").pressed.emit()

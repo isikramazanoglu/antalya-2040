@@ -109,7 +109,7 @@ static func resolve(def: EventDefinition, response: CrisisResponse, severity_val
 		"damage": preview(def, response, a),
 		"severity": severity_value,
 		"assessment": a,
-		"summary_text": "%s: \"%s\" seçildi, yatırımlar hasarı %%%d azalttı." % [def.display_name, response.label, roundi(a.mitigation * 100)],
+		"summary_text": "%s: \"%s\" seçildi; yatırımların zararı %%%d azalttı." % [def.display_name, response.label, roundi(a.mitigation * 100)],
 	}
 
 

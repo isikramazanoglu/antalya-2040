@@ -30,7 +30,7 @@ func _on_build_approved(_plot_id: StringName, building_id: StringName) -> void:
 func show_card(card: InfoCard) -> void:
 	seen_cards[card.id] = true
 	%EduTitle.text = card.title
-	%EduSummary.text = "%s\n[color=#4dd9d1]İklim bağlantısı:[/color] %s" % [card.benefit, card.climate_link] if card.benefit != "" else card.body
+	%EduSummary.text = "%s\n[color=#4dd9d1]İklime faydası:[/color] %s" % [card.benefit, card.climate_link] if card.benefit != "" else card.body
 	var body := card.body
 	for s in card.sources:
 		body += "\n[font_size=12][color=#b8c4c2]Kaynak: %s[/color][/font_size]" % s

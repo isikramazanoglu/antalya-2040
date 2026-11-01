@@ -8,7 +8,7 @@
 [resource]
 script = ExtResource("2_hg7bi")
 id = &"coastal_restoration"
-display_name = "Kıyı ekosistemi restorasyonu ve erken uyarı"
+display_name = "Kıyı onarımı ve erken uyarı"
 short_description = "Kumulları ve kıyı bitki örtüsünü onarır, taşkın uyarı sistemi kurar."
 category = &"coast"
 cost = 350

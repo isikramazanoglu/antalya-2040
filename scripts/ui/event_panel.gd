@@ -22,20 +22,24 @@ func _on_crisis_started(event_id: StringName, _risk_type: StringName, severity: 
 	var buildings := GameState.built_definitions()
 	_assessment = EventManager.assess(_def, severity, GameState.get_stats(), buildings, Catalog.data.balance)
 	%Title.text = _def.display_name
-	var level := UiText.status(100.0 - severity * 100.0)  # şiddet yüksekse durum kötü
-	%Risk.text = "Risk seviyesi: %s (%%%d)" % [level[0], roundi(severity * 100)]
-	%Risk.add_theme_color_override("font_color", level[1])
+	var color: Color = UiText.status(100.0 - severity * 100.0)[1]  # şiddet yüksekse kırmızıya döner
+	var word := "Çok yüksek" if severity >= 0.6 else ("Yüksek" if severity >= 0.4 else ("Orta" if severity >= 0.25 else "Düşük"))
+	%Risk.text = "Ne kadar tehlikeli: %s" % word
+	%Risk.add_theme_color_override("font_color", color)
 
 	var t := _def.description
 	if _def.info_card:
 		t += "\n[i]%s[/i]" % _def.info_card.body
-	t += "\n\n[b]Hasarı belirleyenler[/b]  [color=#b8c4c2](oyun parametreleri)[/color]\n"
-	t += "Tehlike ×%.2f · Maruziyet (nüfus) ×%.2f · Hassasiyet ×%.2f · Uyum kapasitesi −%%%d\n" % [
-		_assessment.hazard, _assessment.exposure, _assessment.vulnerability, roundi(_assessment.mitigation * 100)]
 	var adv := PackedStringArray()
 	for id in _assessment.advantages:
 		adv.append(Catalog.get_building(id).display_name)
-	t += "[b]Yatırım avantajların:[/b] %s" % (", ".join(adv) if adv.size() > 0 else "[color=#ff8c73]yok, bu krize hazırlıksızsın[/color]")
+	if adv.size() > 0:
+		t += "\n\n[b][color=#6bd185]Hazırsın![/color][/b] Kurduğun yatırımlar zararı [b]%%%d[/b] azaltıyor: %s" % [roundi(_assessment.mitigation * 100), ", ".join(adv)]
+	else:
+		t += "\n\n[b][color=#ff8c73]Hazırlıksızsın.[/color][/b] Bu krize karşı henüz bir yatırımın yok."
+	# Hesabın ayrıntısı meraklısı için küçük ve soluk.
+	t += "\n[font_size=12][color=#b8c4c2]Oyun hesabı: tehlike ×%.2f · nüfus ×%.2f · şehrin zayıflığı ×%.2f · hazırlık −%%%d[/color][/font_size]" % [
+		_assessment.hazard, _assessment.exposure, _assessment.vulnerability, roundi(_assessment.mitigation * 100)]
 	%Description.text = t
 
 	for child in %Responses.get_children():
@@ -49,7 +53,7 @@ func _on_crisis_started(event_id: StringName, _risk_type: StringName, severity: 
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		var tag := ""
 		if response.required_building != &"":
-			tag = "   [altyapı: %s]" % Catalog.get_building(response.required_building).display_name
+			tag = "   (%s sayesinde)" % Catalog.get_building(response.required_building).display_name
 		button.text = "%s · %s%s" % [response.label, "ücretsiz" if response.cost == 0 else "%d kredi" % response.cost, tag]
 		button.tooltip_text = response.description
 		if response.cost > credits:
@@ -57,7 +61,7 @@ func _on_crisis_started(event_id: StringName, _risk_type: StringName, severity: 
 			button.tooltip_text += "\nBütçe yetmiyor."
 		button.pressed.connect(_on_response_pressed.bind(response))
 		%Responses.add_child(button)
-	%Preview.text = "[color=#b8c4c2]Bir müdahale seç; olası etkileri burada görünür.[/color]"
+	%Preview.text = "[color=#b8c4c2]Ne yapacağını seç; ne olacağını burada görürsün.[/color]"
 	%ConfirmButton.disabled = true
 	UiText.pop_in(self)
 
@@ -69,7 +73,7 @@ func _on_response_pressed(response: CrisisResponse) -> void:
 	for key in damage:
 		var v: float = damage[key]
 		parts.append("[color=#%s]%s %s[/color]" % [UiText.delta_color(v).to_html(false), UiText.STAT_NAMES.get(key, key), UiText.format_delta(v)])
-	%Preview.text = "[b]Olası etkiler:[/b] " + ("  ·  ".join(parts) if parts.size() > 0 else "etki yok") + "\n[color=#b8c4c2]%s[/color]" % response.description
+	%Preview.text = "[b]Ne olacak:[/b] " + ("  ·  ".join(parts) if parts.size() > 0 else "zarar yok") + "\n[color=#b8c4c2]%s[/color]" % response.description
 	%ConfirmButton.disabled = false
 
 

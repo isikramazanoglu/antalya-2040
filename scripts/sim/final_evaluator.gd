@@ -6,16 +6,16 @@ extends RefCounted
 
 ## Genel puan ağırlıkları (toplam 100). docs/GAME_DESIGN.md "Final değerlendirmesi".
 const WEIGHTS := {"economy": 15, "water": 15, "energy": 15, "adaptation": 15, "ecosystem": 15, "quality": 15, "preparedness": 10}
-const TITLES := {"economy": "Ekonomik sürdürülebilirlik", "water": "Su yönetimi", "energy": "Enerji yönetimi",
-		"adaptation": "İklim değişikliğine uyum", "ecosystem": "Ekosistem koruma", "quality": "Yaşam kalitesi", "preparedness": "Afetlere hazırlık"}
+const TITLES := {"economy": "Parayı iyi kullanma", "water": "Su", "energy": "Temiz elektrik",
+		"adaptation": "Tehlikelere karşı koruma", "ecosystem": "Doğayı koruma", "quality": "Yaşam kalitesi", "preparedness": "Krizlere hazırlık"}
 const ADVICE := {
-	"economy": "Bütçeyi borca düşürmeden yatırım yapmak ve işletme giderlerini gelirle dengelemek.",
-	"water": "Su depolama, geri kazanım ve kent tarımı ile su arzını ve güvenliğini artırmak.",
-	"energy": "Güneş enerjisi ve verimlilik yatırımlarıyla yenilenebilir payı yükseltmek, kişi başı emisyonu düşürmek.",
-	"adaptation": "Kuraklık, sıcak ve taşkın için koruyucu yatırımları dengeli dağıtmak.",
-	"ecosystem": "Park, kent tarımı, kompost ve kıyı restorasyonuyla doğayı güçlendirmek.",
-	"quality": "Yeşil alan, toplu taşıma ve serinleme merkezi gibi halkın gündelik hayatına dokunan yatırımlar.",
-	"preparedness": "Uyarı geldiğinde, kriz gelmeden ilgili koruyucu yatırımı yapmak.",
+	"economy": "Borca girmeden yatırım yap; bakım masraflarını gelirle dengele.",
+	"water": "Su deposu, suyu yeniden kullanma ve kent tarımı ile şehrin suyunu artır.",
+	"energy": "Güneş enerjisi ve verimli binalarla temiz elektriği artır, kişi başına karbonu azalt.",
+	"adaptation": "Kuraklık, sıcak ve taşkın için koruyucu yatırımları dengeli kur.",
+	"ecosystem": "Park, kent tarımı, kompost ve kıyı onarımıyla doğayı güçlendir.",
+	"quality": "Park, toplu taşıma ve serinleme merkezi gibi insanların günlük hayatını iyileştiren yatırımlar yap.",
+	"preparedness": "Uyarı gelince, kriz gelmeden önce koruyucu yatırımı yap.",
 }
 const GRADES := [
 	[80, "İklim Lideri", "Şehrin 2052'ye dengeli ve dayanıklı ulaştı. Kararların ekonomi, doğa ve halkın güvenliği arasında iyi bir denge kurdu."],
@@ -39,29 +39,29 @@ static func evaluate(start: Dictionary, final: Dictionary, history: Array, repor
 	var debt_years := history.filter(func(s): return _num(s, "credits") < 0.0).size()
 	var credits := _num(final, "credits")
 	dims["economy"] = [60.0 * (1.0 - float(debt_years) / years) + 40.0 * clampf(credits / 500.0, 0.0, 1.0),
-			"%d yılın %d'inde borç, final kasa %d kredi" % [history.size(), debt_years, roundi(credits)]]
+			"%d yıldan %d tanesinde borçtaydın, sonunda %d kredin vardı" % [history.size(), debt_years, roundi(credits)]]
 
 	# Su: su güvenliği (%70) + arzın talebi karşılama oranı (%30; geri kazanılmış su yalnızca içme dışı kısmı).
 	var demand := _num(final, "water_demand")
 	var supply := _num(final, "water_supply") + _num(final, "recycled_water_used")
 	var coverage := clampf(supply / demand, 0.0, 1.0) if demand > 0.0 else 1.0
 	dims["water"] = [0.7 * _num(final, "water_security") + 30.0 * coverage,
-			"su güvenliği %d, arz talebin %%%d'ini karşılıyor" % [roundi(_num(final, "water_security")), roundi(coverage * 100)]]
+			"su puanı %d, su ihtiyacı karşılama oranı %%%d" % [roundi(_num(final, "water_security")), roundi(coverage * 100)]]
 
 	# Enerji: enerji güvenliği (%40) + yenilenebilir payı (%30) + kişi başı emisyon azalması (%30; %50 azalma tam puan).
 	var pc_cut := emission_reduction(start, final)
 	dims["energy"] = [0.4 * _num(final, "energy_security") + 30.0 * clampf(_num(final, "renewable_share"), 0.0, 1.0) + 30.0 * clampf(pc_cut / 50.0, 0.0, 1.0),
-			"yenilenebilir pay %%%d, kişi başı emisyon %%%d azaldı" % [roundi(_num(final, "renewable_share") * 100), roundi(pc_cut)]]
+			"temiz elektrik payı %%%d, kişi başına karbon %%%d azaldı" % [roundi(_num(final, "renewable_share") * 100), roundi(pc_cut)]]
 
 	# Uyum: üç risk için ortalama yatırım koruması, en yüksek korumaya göre.
 	var resilience := _num(final, "climate_resilience")
-	dims["adaptation"] = [100.0 * resilience / max_mit, "üç riske karşı ortalama koruma %%%d" % roundi(resilience * 100)]
-	dims["ecosystem"] = [_num(final, "ecosystem_health"), "ekosistem sağlığı %d/100" % roundi(_num(final, "ecosystem_health"))]
+	dims["adaptation"] = [100.0 * resilience / max_mit, "üç tehlikeye karşı ortalama koruma %%%d" % roundi(resilience * 100)]
+	dims["ecosystem"] = [_num(final, "ecosystem_health"), "doğa puanı %d/100" % roundi(_num(final, "ecosystem_health"))]
 	dims["quality"] = [_num(final, "quality_of_life"), "yaşam kalitesi %d/100" % roundi(_num(final, "quality_of_life"))]
 
 	# Hazırlık: krizler anındaki ortalama koruma; kriz yoksa uyum puanı kullanılır.
 	if crises.is_empty():
-		dims["preparedness"] = [dims["adaptation"][0], "kriz yaşanmadı; uyum düzeyi esas alındı"]
+		dims["preparedness"] = [dims["adaptation"][0], "kriz olmadı; tehlikelere karşı koruman esas alındı"]
 	else:
 		var mit_sum := 0.0
 		for c in crises:
@@ -111,14 +111,14 @@ static func compare(start: Dictionary, final: Dictionary) -> Array:
 	var rows := [
 		["credits", "Bütçe (kredi)", &"neutral", 1.0],
 		["population", "Nüfus", &"neutral", 1.0],
-		["water_security", "Su güvenliği", &"up", 1.0],
-		["energy_balance", "Enerji dengesi (yenilenebilir − tüketim)", &"up", 1.0],
-		["renewable_share", "Yenilenebilir enerji payı (%)", &"up", 100.0],
+		["water_security", "Su puanı", &"up", 1.0],
+		["energy_balance", "Temiz elektrik − ihtiyaç", &"up", 1.0],
+		["renewable_share", "Temiz elektrik payı (%)", &"up", 100.0],
 		["quality_of_life", "Yaşam kalitesi", &"up", 1.0],
-		["ecosystem_health", "Ekosistem sağlığı", &"up", 1.0],
-		["emissions_total", "Yerel emisyon endeksi", &"down", 1.0],
-		["waste_recovery", "Atık geri kazanımı (%)", &"up", 100.0],
-		["climate_resilience", "İklim dayanıklılığı (%)", &"up", 100.0],
+		["ecosystem_health", "Doğa", &"up", 1.0],
+		["emissions_total", "Karbon salımı", &"down", 1.0],
+		["waste_recovery", "Çöp azaltma (%)", &"up", 100.0],
+		["climate_resilience", "Tehlikelere karşı koruma (%)", &"up", 100.0],
 	]
 	var out := []
 	for r in rows:

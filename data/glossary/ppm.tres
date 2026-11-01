@@ -6,7 +6,7 @@
 script = ExtResource("1_ypwmr")
 id = &"ppm"
 title = "PPM (milyonda bir)"
-definition = "Atmosferdeki CO₂ miktarını anlatan birim. NOAA'ya göre 0.000400 oranı 400 ppm olarak yazılır."
+definition = "Havadaki karbondioksidin ne kadar olduğunu anlatan ölçü. 400 ppm, havanın her bir milyon parçasından 400'ünün karbondioksit olması demektir (NOAA)."
 example = "Grafikteki her değer o yılın ortalama CO₂ yoğunluğudur."
-game_link = "Küresel CO₂ grafiğinin birimi ppm'dir; şehrin emisyon endeksiyle aynı ölçek değildir."
+game_link = "\"Dünyanın havası\" grafiği ppm ile ölçülür; şehrinin karbon puanıyla aynı ölçü değildir."
 sources = Array[String](["NOAA Global Monitoring Laboratory, Trends in Atmospheric Carbon Dioxide (web sayfası), https://gml.noaa.gov/ccgg/trends/, erişim 2026-10-31"])

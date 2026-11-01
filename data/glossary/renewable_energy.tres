@@ -6,7 +6,7 @@
 script = ExtResource("1_u465v")
 id = &"renewable_energy"
 title = "Yenilenebilir enerji"
-definition = "Güneş, rüzgâr ve su gibi kendini yenileyen kaynaklardan üretilen enerji."
+definition = "Güneş, rüzgâr ve akan su gibi tükenmeyen kaynaklardan üretilen enerji. Oyunda \"temiz elektrik\" diye geçer."
 example = "Güneş paneli tesisi."
-game_link = "Güneş tesisi yenilenebilir üretimi ve yenilenebilir payını artırır."
+game_link = "Güneş tesisi temiz elektriği ve temiz elektrik payını artırır."
 sources = Array[String](["IEA, Renewables (web sayfası), https://www.iea.org/energy-system/renewables, erişim 2026-10-31"])

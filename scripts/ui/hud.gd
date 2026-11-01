@@ -5,10 +5,10 @@ extends Control
 const MAIN_MENU := "res://scenes/main/MainMenu.tscn"
 ## [anahtar, başlık, ikon]
 const RESOURCES := [
-	["water_security", "Su güvenliği", "water"],
-	["energy_security", "Enerji dengesi", "energy"],
+	["water_security", "Su", "water"],
+	["energy_security", "Elektrik", "energy"],
 	["quality_of_life", "Yaşam kalitesi", "quality"],
-	["ecosystem_health", "Ekosistem sağlığı", "ecosystem"],
+	["ecosystem_health", "Doğa", "ecosystem"],
 ]
 
 var _cards: Dictionary = {}  # anahtar -> {"value": Label, "status": Label, "bar": ProgressBar, "detail": Label}
@@ -132,8 +132,8 @@ func _toggle_resources() -> void:
 func _build_resource_cards() -> void:
 	for r in RESOURCES:
 		_cards[r[0]] = _make_card(r[1], r[2])
-	_cards["economy"] = _make_card("Ekonomik durum", "economy")
-	_cards["emissions_total"] = _make_card("Yerel emisyon", "emission")
+	_cards["economy"] = _make_card("Para", "economy")
+	_cards["emissions_total"] = _make_card("Karbon salımı", "emission")
 
 
 func _make_card(title: String, icon_name: String) -> Dictionary:
@@ -198,19 +198,21 @@ func _on_stats_changed(stats: Dictionary) -> void:
 	for r in RESOURCES:
 		var detail := ""
 		if r[0] == "energy_security":
-			detail = "Üretim %d / tüketim %d · denge %+d · yenilenebilir %%%d" % [roundi(stats.renewable_energy), roundi(stats.energy_demand),
-					roundi(stats.renewable_energy - stats.energy_demand), roundi(stats.renewable_share * 100)]
+			var need := roundi(stats.energy_demand)
+			var clean := roundi(stats.renewable_energy)
+			detail = "İhtiyaç %d · temiz enerji %d" % [need, clean] + (" · hepsi temiz" if clean >= need else " · %d kömür ve doğalgazdan" % (need - clean))
 		elif r[0] == "water_security":
-			detail = "Su arzı %d%s / talep %d · denge %+d" % [roundi(stats.water_supply),
-					" + %d geri kazanılmış" % roundi(stats.recycled_water_used) if stats.recycled_water_used > 0.0 else "", roundi(stats.water_demand),
-					roundi(stats.water_supply + stats.recycled_water_used - stats.water_demand)]
+			var have := roundi(stats.water_supply + stats.recycled_water_used)
+			var want := roundi(stats.water_demand)
+			detail = "Su %d%s · ihtiyaç %d · %s" % [have, " (%d geri kazanılmış)" % roundi(stats.recycled_water_used) if stats.recycled_water_used > 0.0 else "",
+					want, "%d fazla" % (have - want) if have >= want else "%d eksik" % (want - have)]
 		_set_card(r[0], stats[r[0]], str(roundi(stats[r[0]])), detail)
 
 	# Ekonomik durum: kasanın en ucuz yatırıma yetmesi ve son yılın net bakiyesi.
 	var cheapest := _cheapest_available_cost()
 	var econ := 80.0 if stats.credits >= cheapest else (40.0 if stats.credits >= 0 else 10.0)
 	_set_card("economy", econ, UiText.thousands(stats.credits),
-			("Geçen yıl net %s · " % UiText.format_delta(_last_net) if _has_report else "") + ("en ucuz yatırım %d" % cheapest if cheapest > 0 else "bütün yatırımlar yapıldı"))
+			("Geçen yıl %s kredi · " % UiText.format_delta(_last_net) if _has_report else "") + ("en ucuz yatırım %d kredi" % cheapest if cheapest > 0 else "bütün yatırımlar yapıldı"))
 
 
 	# Emisyonda düşük iyidir: 80 ve altı iyi, 120 üstü kritik olacak şekilde 0-100 ölçeğine çevrilip durum rengi alınır.
@@ -219,7 +221,8 @@ func _on_stats_changed(stats: Dictionary) -> void:
 		start_total += v
 	var em: float = stats.emissions_total
 	_set_card("emissions_total", clampf(150.0 - em, 0.0, 100.0), str(roundi(em)),
-			"Başlangıç %d · fark %+d (oyun birimi)" % [roundi(start_total), roundi(em - start_total)])
+			"Başta %d · %s · az olması iyi" % [roundi(start_total), "%d azaldı" % roundi(start_total - em) if em < start_total - 0.5
+					else ("%d arttı" % roundi(em - start_total) if em > start_total + 0.5 else "değişmedi")])
 
 
 func _cheapest_available_cost() -> int:

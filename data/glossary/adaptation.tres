@@ -8,5 +8,5 @@ id = &"adaptation"
 title = "İklim değişikliğine uyum"
 definition = "Değişen iklimin etkilerine hazırlanmak ve zararı azaltmak için yapılan düzenlemeler."
 example = "Sıcak günler için serinleme merkezi açmak."
-game_link = "Park, su deposu, serinleme merkezi ve kıyı restorasyonu kriz hasarını azaltır."
+game_link = "Park, su deposu, serinleme merkezi ve kıyı onarımı krizlerde zararı azaltır."
 sources = Array[String](["NASA Science, Mitigation and Adaptation (web sayfası), https://science.nasa.gov/climate-change/adaptation-mitigation/, erişim 2026-10-31"])

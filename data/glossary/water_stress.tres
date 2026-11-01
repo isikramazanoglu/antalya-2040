@@ -6,7 +6,7 @@
 script = ExtResource("1_u65ef")
 id = &"water_stress"
 title = "Su stresi"
-definition = "Tatlı su talebinin belirli bir bölge ve dönemde mevcut arzı aşması durumu."
+definition = "Bir yerde insanların ihtiyaç duyduğu tatlı suyun, eldeki sudan fazla olması."
 example = "Yazın nüfus artarken barajların çekilmesi."
-game_link = "C bölümünde su arzı ve talebi karşılaştırılır."
+game_link = "\"Su ve elektrik\" sayfasında şehrin suyu ve ihtiyacı karşılaştırılır."
 sources = Array[String](["FAO, Water scarcity (web sayfası), https://www.fao.org/land-water/water/water-scarcity/en/, erişim 2026-10-31"])

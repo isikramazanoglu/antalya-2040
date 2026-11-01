@@ -26,7 +26,7 @@ extra_effects = {
 [sub_resource type="Resource" id="Resource_h6vr7"]
 script = ExtResource("2_o58cd")
 id = &"use_coastal_buffer"
-label = "Restore edilmiş kıyı ekosistemine güven"
+label = "Onarılmış kıyıya güven"
 description = "Kumullar ve kıyı bitkileri dalgayı yavaşlatır; ek önlem az."
 damage_multiplier = 0.5
 required_building = &"coastal_restoration"
@@ -34,7 +34,7 @@ required_building = &"coastal_restoration"
 [sub_resource type="Resource" id="Resource_7js6r"]
 script = ExtResource("2_o58cd")
 id = &"early_warning"
-label = "Erken uyarı ve koordinasyon merkezini çalıştır"
+label = "Erken uyarı merkezini çalıştır"
 description = "Uyarı sistemi zamanında tahliye ve koruma sağlar."
 cost = 30
 damage_multiplier = 0.35
@@ -43,7 +43,7 @@ required_building = &"coastal_restoration"
 [sub_resource type="Resource" id="Resource_7jki5"]
 script = ExtResource("2_o58cd")
 id = &"do_nothing"
-label = "Müdahale etme"
+label = "Hiçbir şey yapma"
 description = "Fırtınanın geçmesini beklersin."
 
 [resource]
@@ -61,7 +61,7 @@ base_damage = {
 "quality_of_life": -5.0
 }
 responses = Array[ExtResource("2_o58cd")]([SubResource("Resource_2cwen"), SubResource("Resource_o58cd"), SubResource("Resource_h6vr7"), SubResource("Resource_7js6r"), SubResource("Resource_7jki5")])
-warning_text = "Kıyı taşkını riski yükseliyor. Kıyı altyapınızın ve hassas bölgelerin güvenliğini kontrol edin."
+warning_text = "Kıyıda fırtına ve taşkın tehlikesi büyüyor. Sahili korumayı düşün."
 vulnerability_stats = {
 "ecosystem_health": 1.0
 }

@@ -134,11 +134,11 @@ func _run() -> void:
 	var hud_texts: Array = ui.get_node("HUD").find_child("ResourceList", true, false).find_children("*", "Label", true, false).map(func(l): return l.text)
 	_check(hud_texts.any(func(t): return t.contains("geri kazanılmış")) and hud_texts.has(str(roundi(gs.stats.emissions_total))), "17) HUD geri kazanılmış suyu ve güncel emisyonu gösteriyor")
 	var lab := ui.get_node("ClimateLab")
-	lab.open_tab("C · Kaynaklar")
+	lab.open_tab("Su ve elektrik")
 	var lab_text := ""
 	for r in lab.find_children("*", "RichTextLabel", true, false):
 		lab_text += r.get_parsed_text()
-	_check(lab_text.contains("Geri kazanılmış su: 20") and lab_text.contains("Gıda kurtarma merkezi") and lab_text.contains("Etkin Toplu taşıma") == false and lab_text.contains("Etkin Düşük emisyonlu toplu taşıma merkezi + Kamu binalarında enerji verimliliği"),
+	_check(lab_text.contains("Temizlenip yeniden kullanılan su: 20") and lab_text.contains("Gıda kurtarma merkezi") and lab_text.contains("Çalışıyor Toplu taşıma") == false and lab_text.contains("Çalışıyor Temiz toplu taşıma merkezi + Kamu binalarında enerji verimliliği"),
 			"15) İklim Laboratuvarı yeni yatırımları ve etkin kombinasyonları tanıyor")
 	lab.close()
 

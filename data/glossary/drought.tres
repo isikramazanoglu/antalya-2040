@@ -8,5 +8,5 @@ id = &"drought"
 title = "Kuraklık"
 definition = "Yağışın uzun süre normalin altında kalmasıyla suyun yetersiz kalması."
 example = "Birkaç kurak yıl üst üste geldiğinde tarımın zarar görmesi."
-game_link = "2046'daki kuraklık krizi su güvenliğini düşürür; su deposu hasarı azaltır."
+game_link = "2046'daki kuraklık şehrin suyunu azaltır; su deposu zararı azaltır."
 sources = Array[String](["UNCCD, Drought (web sayfası), https://www.unccd.int/land-and-life/drought/overview, erişim 2026-10-31"])
