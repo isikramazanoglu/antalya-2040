@@ -40,3 +40,44 @@ extends Resource
 @export var start_risks: Dictionary = {"drought": 40.0, "heat": 45.0, "coastal_flood": 30.0}
 @export var risk_growth_per_year: Dictionary = {"drought": 2.0, "heat": 2.0, "coastal_flood": 1.5}
 @export var max_mitigation: float = 0.8
+
+@export_group("İşletmeler ve çevre denetimi (Prompt 13)")
+## Sanayi bölgesindeki yerler. Görsel konumları Ekip A belirler (docs/BUSINESS_SYSTEM.md).
+@export var industrial_sites: Array[StringName] = [&"I01", &"I02", &"I03", &"I04", &"I05", &"I06", &"I07", &"I08"]
+@export var max_businesses: int = 8
+## Uygun koşullarda her ay yeni işletme gelme olasılığı (nüfus, boş yer ve doluluğa göre ölçeklenir).
+@export var business_spawn_chance: float = 0.08
+## Hava kirliliği endeksi bunu aşarsa çok kirleten türlerin gelme olasılığı düşer.
+@export var air_pollution_soft_cap: float = 50.0
+## İşletmelerin hava ve atık yükünün 0–100 endekslere çevrilmesi.
+@export var air_index_per_unit: float = 2.5
+@export var waste_index_per_unit: float = 2.0
+## Endekslerin yıllık etkisi (endeks puanı başına).
+@export var air_quality_of_life_per_point: float = 0.03
+@export var waste_ecosystem_per_point: float = 0.03
+## Denetim kapasitesi: her ay ücretsiz hak, ek denetim bedeli, aynı işletmeyi yeniden denetleme aralığı (ay).
+@export var inspections_per_month: int = 3
+@export var extra_inspection_cost: int = 20
+@export var inspection_cooldown_months: int = 3
+## Oyun standartları (gerçek mevzuat değil): hava ve atık yükü bunları aşarsa ihlal.
+@export var air_standard: float = 4.0
+@export var waste_standard: float = 4.0
+## Ceza = taban × büyüklük × seviye çarpanı × (1 + önceki cezalar × tekrar katsayısı), en çok tavan.
+@export var fine_base: int = 5
+@export var fine_level_multipliers: Array[float] = [0.0, 1.0, 2.0, 3.0, 5.0]
+@export var fine_repeat_factor: float = 0.5
+@export var fine_cap: int = 120
+## Aynı işletmeye bir takvim yılında en çok bu kadar ceza (ceza bir gelir kaynağına dönüşmesin).
+@export var fines_per_business_per_year: int = 1
+## Kararların süresi (ay) ve etkisi (ilgili kirleticiyi bu oranda azaltır; sıfırlamaz).
+@export var order_months: Dictionary = {"filter": 4, "clean_energy": 6, "treatment": 4, "grace": 3}
+@export var order_reduction: Dictionary = {"filter": 0.6, "clean_energy": 0.6, "treatment": 0.6}
+## Dönüşüm sürerken işletmenin belediyeye katkısındaki düşüş (yatırım maliyetini işletme öder).
+@export var order_contribution_cut: float = 0.3
+## Faaliyeti durdurulan işletmenin kalan emisyon payı ve çalışan başına yaşam kalitesi kaybı.
+@export var suspended_emission_share: float = 0.1
+@export var quality_loss_per_100_employees: float = 2.0
+## Durdurulmuş işletme bu kadar ay sonra kapanır.
+@export var closure_after_suspended_months: int = 12
+## Yıllık üretim dalgalanması (±).
+@export var production_drift: float = 0.1

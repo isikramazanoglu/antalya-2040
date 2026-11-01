@@ -7,11 +7,13 @@ const GAME_SCENE := "res://scenes/main/Game.tscn"
 
 func _ready() -> void:
 	%NewGameButton.pressed.connect(_on_new_game_pressed)
+	%ContinueButton.visible = SaveGame.exists()
+	%ContinueButton.pressed.connect(_on_continue_pressed)
 	%AboutButton.pressed.connect(%About.show)
 	%AboutCloseButton.pressed.connect(%About.hide)
 	%QuitButton.pressed.connect(get_tree().quit)
 	%About.hide()
-	%NewGameButton.grab_focus()
+	(%ContinueButton if %ContinueButton.visible else %NewGameButton).grab_focus()
 	_play_intro()
 
 
@@ -30,6 +32,14 @@ func _play_intro() -> void:
 	var tween := create_tween().set_parallel().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.tween_property(panel, "modulate:a", 1.0, 0.8)
 	tween.tween_property(panel, "position:x", target_x, 0.8)
+
+
+func _on_continue_pressed() -> void:
+	if SaveGame.load_into_state():
+		get_tree().change_scene_to_file(GAME_SCENE)
+	else:
+		%ContinueButton.disabled = true
+		%ContinueButton.text = "KAYIT OKUNAMADI"
 
 
 func _on_new_game_pressed() -> void:

@@ -4,7 +4,8 @@ extends PanelContainer
 ## İçerik panel açılınca ve sekme değişince yeniden kurulur; arka planda güncellenmez.
 
 const SECTORS := {"energy": ["Elektrik", Color(0.98, 0.75, 0.25)], "transport": ["Ulaşım", Color(0.45, 0.72, 1.0)],
-		"buildings": ["Binalar", Color(0.85, 0.45, 0.35)], "waste": ["Çöp", Color(0.55, 0.85, 0.5)]}
+		"buildings": ["Binalar", Color(0.85, 0.45, 0.35)], "waste": ["Çöp", Color(0.55, 0.85, 0.5)],
+		"industry": ["Sanayi", Color(0.7, 0.62, 0.9)]}  # v1.10: kendiliğinden kurulan işletmeler
 const RISKS := {"drought": "Kuraklık", "heat": "Sıcak hava dalgası", "coastal_flood": "Kıyı taşkını"}
 const SECTIONS := ["Karbon", "Dünyanın havası", "Su ve elektrik", "Tehlikeler", "Sözlük", "Öğrendiklerim"]
 ## Her sayfanın başında hiç bilmeyen birinin de anlayacağı tek cümle.
@@ -195,7 +196,7 @@ func _build_emissions(page: VBoxContainer) -> void:
 	for sector in SECTORS:
 		var values := PackedFloat32Array()
 		for s in timeline:
-			values.append(s.emissions_by_sector[sector])
+			values.append(s.emissions_by_sector.get(sector, 0.0))
 		series.append({"name": SECTORS[sector][0], "color": SECTORS[sector][1], "values": values})
 	var chart := LineChart.new()
 	chart.set_data(series, _years(timeline))
@@ -203,7 +204,7 @@ func _build_emissions(page: VBoxContainer) -> void:
 			"Bu sayılar oyun puanıdır; gerçek ton ölçümü (tCO₂e) değildir.", "EmissionChart")
 	var bars := []
 	for sector in SECTORS:
-		bars.append({"label": SECTORS[sector][0], "value": now.emissions_by_sector[sector] / now.emissions_total * 100.0, "color": SECTORS[sector][1]})
+		bars.append({"label": SECTORS[sector][0], "value": now.emissions_by_sector.get(sector, 0.0) / now.emissions_total * 100.0, "color": SECTORS[sector][1]})
 	var bar := BarChart.new()
 	bar.set_data(bars, "%")
 	_chart_card(page, "Karbonun yüzde kaçı nereden?", "%d · %s" % [now.year, TAG_SIM], bar)

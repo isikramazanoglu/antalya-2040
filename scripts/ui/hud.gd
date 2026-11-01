@@ -27,13 +27,16 @@ func _ready() -> void:
 	%BuildMenuButton.pressed.connect(_open_panel.bind("build_panel"))
 	%LabButton.pressed.connect(_open_panel.bind("climate_lab"))
 	%CityInfoButton.pressed.connect(_open_panel.bind("city_info"))
+	%BusinessButton.pressed.connect(_open_panel.bind("business_panel"))
 	%GlossaryButton.pressed.connect(func():
 		get_tree().call_group("ui_panel", "close")
 		get_tree().call_group("climate_lab", "open_tab", "Sözlük"))
 	%ReportButton.pressed.connect(_open_panel.bind("year_report"))
 	%SettingsButton.pressed.connect(_open_panel.bind("settings"))
 	%MenuButton.pressed.connect(%QuitConfirm.popup_centered)
-	%QuitConfirm.confirmed.connect(func(): get_tree().change_scene_to_file(MAIN_MENU))
+	%QuitConfirm.confirmed.connect(func():
+		get_tree().call_group("game_controller", "save_game")
+		get_tree().change_scene_to_file(MAIN_MENU))
 	%CollapseButton.pressed.connect(_toggle_resources)
 	_build_speed_buttons()
 	EventBus.stats_changed.connect(_on_stats_changed)

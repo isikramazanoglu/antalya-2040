@@ -9,5 +9,7 @@ extends Resource
 @export var missions: Array[MissionDefinition] = []
 @export var glossary: Array[GlossaryTerm] = []
 @export var synergies: Array[SynergyDefinition] = []
+## Prompt 13: kendiliğinden kurulan işletme türleri.
+@export var business_types: Array[BusinessType] = []
 @export var balance: BalanceConfig
 @export var co2: Co2Scenario

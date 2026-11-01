@@ -53,7 +53,7 @@ const CATEGORY_THEME := {
 	&"energy": "Temiz enerji", &"water": "Su", &"heat": "Sıcağa karşı", &"food": "Gıda ve çöp",
 	&"waste": "Çöp ve geri dönüşüm", &"transport": "Toplu taşıma", &"coast": "Kıyıyı koruma", &"synergy": "Birlikte daha güçlü",
 }
-const SECTOR_NAMES := {"energy": "Elektrik", "transport": "Ulaşım", "buildings": "Binalar", "waste": "Çöp"}
+const SECTOR_NAMES := {"energy": "Elektrik", "transport": "Ulaşım", "buildings": "Binalar", "waste": "Çöp", "industry": "Sanayi"}
 const RISK_NAMES := {"drought": "Kuraklık", "heat": "Sıcak hava dalgası", "coastal_flood": "Kıyı taşkını"}
 ## "…da/de" hâli: yatırım etkilerinde "Kuraklıkta %20 daha az zarar".
 const RISK_IN := {"drought": "Kuraklıkta", "heat": "Sıcak hava dalgasında", "coastal_flood": "Kıyı taşkınında"}

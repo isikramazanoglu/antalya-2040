@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BusinessType" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/business_type.gd" id="1_btype"]
+
+[resource]
+script = ExtResource("1_btype")
+id = &"waste_facility"
+display_name = "Atık işleme tesisi"
+visual_id = &"Industrial_WasteFacility"
+size = 2
+employees = 50
+yearly_contribution = 25
+energy_use = 2.0
+water_use = 2.0
+ghg = 3.0
+ghg_energy_share = 0.3
+air = 4.0
+waste = 6.0
+spawn_weight = 0.6
+min_population = 480
+logistics = false
+description = "Şehrin çöpünü ayırır ve işler. Koku ve atık su sorunu çıkarabilir."

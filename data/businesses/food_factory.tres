@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BusinessType" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/business_type.gd" id="1_btype"]
+
+[resource]
+script = ExtResource("1_btype")
+id = &"food_factory"
+display_name = "Gıda fabrikası"
+visual_id = &"Industrial_FoodFactory"
+size = 2
+employees = 80
+yearly_contribution = 30
+energy_use = 3.0
+water_use = 4.0
+ghg = 2.5
+ghg_energy_share = 0.7
+air = 2.0
+waste = 5.0
+spawn_weight = 0.9
+min_population = 470
+logistics = false
+description = "Meyve, sebze ve zeytinyağı işler. Çok su harcar."

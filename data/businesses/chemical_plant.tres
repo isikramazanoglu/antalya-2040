@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BusinessType" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/business_type.gd" id="1_btype"]
+
+[resource]
+script = ExtResource("1_btype")
+id = &"chemical_plant"
+display_name = "Kimya fabrikası"
+visual_id = &"Industrial_ChemicalPlant"
+size = 3
+employees = 90
+yearly_contribution = 50
+energy_use = 5.0
+water_use = 4.0
+ghg = 5.0
+ghg_energy_share = 0.5
+air = 6.0
+waste = 8.0
+spawn_weight = 0.35
+min_population = 580
+logistics = false
+description = "Boya ve temizlik ürünleri üretir. Atık suyu tehlikeli olabilir."
