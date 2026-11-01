@@ -67,6 +67,10 @@ func _hud_value(title: String) -> String:
 
 
 func _process(_d: float) -> bool:
+	# Ekip A12: inşaattan sonra kamera yeni binayı gösterirken arsa tıklamaları ıskalar; gösterim bitene kadar bekle.
+	var rig = current_scene.find_child("CameraRig", true, false) if current_scene else null
+	if rig and rig.has_method("is_showcasing") and rig.is_showcasing():
+		return false
 	f += 1
 	match f:
 		5:

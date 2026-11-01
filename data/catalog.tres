@@ -58,6 +58,17 @@
 [ext_resource type="Resource" path="res://data/synergies/syn_zero_food_waste.tres" id="56_dxta2"]
 [ext_resource type="Resource" path="res://data/synergies/syn_low_carbon_growth.tres" id="57_v70pv"]
 
+[ext_resource type="Script" path="res://scripts/data/business_type.gd" id="90_btype"]
+[ext_resource type="Resource" path="res://data/businesses/small_factory.tres" id="91_bus"]
+[ext_resource type="Resource" path="res://data/businesses/heavy_factory.tres" id="92_bus"]
+[ext_resource type="Resource" path="res://data/businesses/logistics_warehouse.tres" id="93_bus"]
+[ext_resource type="Resource" path="res://data/businesses/concrete_plant.tres" id="94_bus"]
+[ext_resource type="Resource" path="res://data/businesses/waste_facility.tres" id="95_bus"]
+[ext_resource type="Resource" path="res://data/businesses/chemical_plant.tres" id="96_bus"]
+[ext_resource type="Resource" path="res://data/businesses/food_factory.tres" id="97_bus"]
+[ext_resource type="Resource" path="res://data/businesses/textile_plant.tres" id="98_bus"]
+[ext_resource type="Resource" path="res://data/businesses/energy_intensive_commerce.tres" id="99_bus"]
+[ext_resource type="Resource" path="res://data/businesses/small_workshop.tres" id="100_bus"]
 [resource]
 script = ExtResource("1_catalog")
 buildings = Array[ExtResource("2_glnki")]([ExtResource("3_8yuay"), ExtResource("3_lou8d"), ExtResource("5_sq7co"), ExtResource("4_8ik4w"), ExtResource("7_gpcun"), ExtResource("5_yp22b"), ExtResource("9_ri6n3"), ExtResource("10_n75ka"), ExtResource("11_wvss8"), ExtResource("12_0uqn3"), ExtResource("13_5q4dk"), ExtResource("14_l2ssu")])
@@ -66,5 +77,6 @@ lab_cards = Array[ExtResource("7_885by")]([ExtResource("21_vx4vr")])
 missions = Array[ExtResource("22_wvss8")]([ExtResource("23_0uqn3"), ExtResource("24_5q4dk"), ExtResource("25_l2ssu"), ExtResource("26_kruv5"), ExtResource("45_fmj7f"), ExtResource("46_hvkc2"), ExtResource("47_0rtos"), ExtResource("48_ca5rl"), ExtResource("49_2f5p7")])
 glossary = Array[ExtResource("20_hop4q")]([ExtResource("21_mh6wi"), ExtResource("22_t4alv"), ExtResource("23_nr6ma"), ExtResource("24_fm0ko"), ExtResource("25_jw1ee"), ExtResource("26_7lq7g"), ExtResource("27_li7eu"), ExtResource("28_6lk3i"), ExtResource("29_r6own"), ExtResource("30_xkmi7"), ExtResource("31_b8vgd"), ExtResource("32_dxta2"), ExtResource("33_v70pv"), ExtResource("34_ulwcb"), ExtResource("35_ok07u"), ExtResource("36_j7fk3"), ExtResource("37_kkrt3")])
 synergies = Array[ExtResource("51_li7eu")]([ExtResource("52_6lk3i"), ExtResource("53_r6own"), ExtResource("54_xkmi7"), ExtResource("55_b8vgd"), ExtResource("56_dxta2"), ExtResource("57_v70pv")])
+business_types = Array[ExtResource("90_btype")]([ExtResource("91_bus"), ExtResource("92_bus"), ExtResource("93_bus"), ExtResource("94_bus"), ExtResource("95_bus"), ExtResource("96_bus"), ExtResource("97_bus"), ExtResource("98_bus"), ExtResource("99_bus"), ExtResource("100_bus")])
 balance = ExtResource("2_balance")
 co2 = ExtResource("15_kruv5")

@@ -11,7 +11,17 @@ var viewed_sections: Dictionary = {}  # Laboratuvar bölümü adı -> true
 var _hide_timer: SceneTreeTimer
 
 
+func save_state() -> Dictionary:
+	return {"seen_cards": seen_cards.duplicate(), "viewed_terms": viewed_terms.duplicate(), "viewed_sections": viewed_sections.duplicate()}
+
+
 func _ready() -> void:
+	if not GameState.restored_education.is_empty():
+		var e: Dictionary = GameState.restored_education
+		seen_cards = e.get("seen_cards", {})
+		viewed_terms = e.get("viewed_terms", {})
+		viewed_sections = e.get("viewed_sections", {})
+		GameState.restored_education = {}
 	add_to_group("education")
 	hide()
 	%EduClose.pressed.connect(hide)

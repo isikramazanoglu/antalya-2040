@@ -12,6 +12,16 @@ var build_log: Array = []  # Prompt 10A: {"plot_id", "building_id", "year", "cos
 var year_reports: Array = []  # Prompt 10A: her yıl sonu raporunun kopyası (sözleşme §5.4)
 var phase: StringName = &"build"
 var month: int = 1  # takvim ayı 1–12; yıllık hesapları etkilemez
+## Prompt 13: kendiliğinden kurulan işletmeler (docs/BUSINESS_SYSTEM.md §3). Kimlik sayacı ve bu ayki denetim sayısı.
+var businesses: Array = []
+var business_seq: int = 0
+var inspections_used: int = 0
+## Kayıttan yüklenen oyunda TurnManager'ın iç durumu (start_game bunu kullanır, sonra boşaltır).
+var restored_turn: Dictionary = {}
+var restored_education: Dictionary = {}
+
+const SNAPSHOT_KEYS := ["stats", "plots", "pending_crises", "history", "missions", "crisis_log", "build_log",
+		"year_reports", "month", "rng_seed", "businesses", "business_seq", "inspections_used"]
 var rng_seed: int = 0
 
 
@@ -30,7 +40,7 @@ func reset() -> void:
 		"quality_of_life": b.start_quality_of_life,
 		"ecosystem_health": b.start_ecosystem_health,
 		"emissions_total": 0.0,
-		"emissions_by_sector": b.base_emissions.duplicate(),
+		"emissions_by_sector": b.base_emissions.merged({"industry": 0.0}),  # v1.10: işletmelerin sera gazı
 		"risks": b.start_risks.duplicate(),
 		"global_co2_ppm": -1.0,
 		# v1.2 kaynak akışları; değerleri TurnManager.start_game ve her inşaat sonrası EconomySimulator hesaplar.
@@ -43,6 +53,8 @@ func reset() -> void:
 		"recycled_water_used": 0.0,
 		"waste_recovery": 0.0,  # v1.9: atık azaltma oranı 0..1
 		"climate_resilience": 0.0,  # v1.9: üç risk için ortalama koruma 0..0.8
+		"air_pollution": 0.0,  # v1.10: işletmelerden yerel hava kirliliği 0..100 (sera gazından ayrı)
+		"waste_pollution": 0.0,  # v1.10: işletmelerden atık ve atık su yükü 0..100
 	}
 	var total := 0.0
 	for value in b.base_emissions.values():
@@ -57,7 +69,35 @@ func reset() -> void:
 	year_reports.clear()
 	phase = &"build"
 	month = 1
+	businesses.clear()
+	business_seq = 0
+	inspections_used = 0
+	restored_turn = {}
+	restored_education = {}
 	rng_seed = randi()
+	EventBus.stats_changed.emit(get_stats())
+
+
+## Kayıt (SaveGame): oyun verisinin tam kopyası.
+func to_snapshot() -> Dictionary:
+	var d := {}
+	for key in SNAPSHOT_KEYS:
+		var v = get(key)
+		d[key] = v.duplicate(true) if (v is Dictionary or v is Array) else v
+	return d
+
+
+## Kayıttan yükleme: oyun sahnesi açılmadan önce SaveGame çağırır (GameController henüz yok).
+## Eksik anahtar (eski kayıt) varsayılan değerde kalır; yeni oyun gibi sıfırlanıp üstüne yazılır.
+func apply_snapshot(d: Dictionary, turn: Dictionary, education: Dictionary) -> void:
+	reset()
+	for key in SNAPSHOT_KEYS:
+		if d.has(key):
+			set(key, d[key])
+	stats.merge({"air_pollution": 0.0, "waste_pollution": 0.0}, false)
+	phase = &"build"
+	restored_turn = turn
+	restored_education = education
 	EventBus.stats_changed.emit(get_stats())
 
 
@@ -100,6 +140,31 @@ func set_phase(new_phase: StringName) -> void:
 
 func set_month(value: int) -> void:
 	month = value
+
+
+## İşletmeyi kimliğiyle günceller ya da ekler (aynı kimlik iki kez kaydedilmez).
+func set_business(b: Dictionary) -> void:
+	for i in businesses.size():
+		if businesses[i].business_id == b.business_id:
+			businesses[i] = b
+			return
+	businesses.append(b)
+
+
+func remove_business(business_id: StringName) -> void:
+	businesses = businesses.filter(func(b): return b.business_id != business_id)
+
+
+func set_business_counters(seq: int, used: int) -> void:
+	business_seq = seq
+	inspections_used = used
+
+
+func get_business(business_id: StringName) -> Dictionary:
+	for b in businesses:
+		if b.business_id == business_id:
+			return b.duplicate(true)
+	return {}
 
 
 func advance_year() -> void:

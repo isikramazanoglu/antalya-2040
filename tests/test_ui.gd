@@ -141,7 +141,7 @@ func _process(_d: float) -> bool:
 			_check(_ui("ClimateLab").visible and not _ui("BuildPanel").visible and _visible_panels().size() == 1, "16) İklim Laboratuvarı açıldı, BuildPanel kapandı (tek panel)")
 			var chart = _find("ClimateLab", "EmissionChart")
 			var expected: float = gs.stats.emissions_by_sector.energy
-			_check(chart.series.size() == 4 and is_equal_approx(chart.series[0].values[-1], expected), "14) emisyon grafiği gerçek veriyle (enerji %.1f)" % expected)
+			_check(chart.series.size() == 5 and is_equal_approx(chart.series[0].values[-1], expected), "14) emisyon grafiği gerçek veriyle, sanayi dahil 5 kalem (enerji %.1f)" % expected)
 			_ui("ClimateLab").open_tab("Su ve elektrik")
 			_check(_find("ClimateLab", "ResourceText").text.contains("temiz elektrik payı %40"), "13) Laboratuvar (C) güncel enerji verisini gösteriyor")
 			_esc()

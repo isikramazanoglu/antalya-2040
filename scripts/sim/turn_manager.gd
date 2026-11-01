@@ -15,6 +15,9 @@ var _crisis_results: Array = []
 var _stats_before: Dictionary = {}  # yıl başı (Ocak) değerleri; rapor bütün yılı (yatırım, aylık bütçe, kriz) anlatır
 var _ending_year := false  # kriz kuyruğu bitince yıl kapanır mı (yıl sonu) yoksa ay akmaya devam mı eder
 var _month_credits := 0  # bu yıl aylık olarak verilen bütçe; yıl sonunda yıllık hesaptan düşülür
+var _fines := 0  # Prompt 13: bu yıl kesilen çevre cezaları (kasaya girdi; raporda ayrı satır)
+var _inspection_costs := 0  # bu yıl ücretli ek denetimler
+var _biz_rng := RandomNumberGenerator.new()  # işletmeler için ayrı, tohumlu üreteç (kriz sırasını değiştirmez)
 var _rng := RandomNumberGenerator.new()
 
 
@@ -46,7 +49,16 @@ func start_game() -> void:
 	_start_stats = GameState.get_stats()
 	_start_plots = GameState.plots.duplicate()
 	_rng.seed = GameState.rng_seed
+	_biz_rng.seed = GameState.rng_seed + 1013
 	_reset_year()
+	if not GameState.restored_turn.is_empty():
+		_restore(GameState.restored_turn)
+		GameState.restored_turn = {}
+		controller.refresh_resources()
+		for b in GameState.businesses:
+			var info := BusinessSimulator.visual_info(b, BusinessSimulator.get_type(Catalog.data.business_types, b.business_type), Catalog.data.balance)
+			info["restored"] = true
+			EventBus.business_spawned.emit(info)
 	_set_phase(&"build")
 	EventBus.year_started.emit(GameState.stats.year)
 
@@ -55,6 +67,22 @@ func _reset_year() -> void:
 	_crisis_results.clear()
 	_stats_before = GameState.get_stats()
 	_month_credits = 0
+	_fines = 0
+	_inspection_costs = 0
+
+
+func note_fine(amount: int) -> void:
+	_fines += amount
+
+
+func note_inspection_cost(amount: int) -> void:
+	_inspection_costs += amount
+
+
+## Yıllık net (vergi − bakım + işletme katkısı); ay ay 1/12'si verilir.
+func _yearly_net() -> int:
+	var eco := EconomySimulator.compute_year(GameState.get_stats(), GameState.built_definitions(), Catalog.data.balance)
+	return eco.deltas.get("credits", 0) + roundi(controller.business_totals().contribution)
 
 
 ## Takvim bir ay ilerler (MonthClock). Aralık bitince yıl kapanır. Ay geçerken yıllık net bütçenin
@@ -65,11 +93,11 @@ func advance_month() -> void:
 	if GameState.month >= 12:
 		end_year()
 		return
-	var eco := EconomySimulator.compute_year(GameState.get_stats(), GameState.built_definitions(), Catalog.data.balance)
-	var monthly := roundi(eco.deltas.get("credits", 0) / 12.0)
+	var monthly := roundi(_yearly_net() / 12.0)
 	_month_credits += monthly
 	controller.apply_deltas({"credits": monthly})
 	controller.set_month(GameState.month + 1)
+	controller.business_month([_biz_rng.randf(), _biz_rng.randf(), _biz_rng.randf(), _biz_rng.randf(), _biz_rng.randf()])
 	var year: int = GameState.stats.year
 	_crisis_queue = GameState.pending_crises.filter(func(w): return w.due_year == year and _crisis_month(w) == GameState.month)
 	if not _crisis_queue.is_empty():
@@ -140,12 +168,19 @@ func _finish_year() -> void:
 	var buildings := GameState.built_definitions()
 
 	var eco := EconomySimulator.compute_year(GameState.get_stats(), buildings, balance)
+	var biz := controller.business_totals()
+	var business_income := roundi(biz.contribution)
+	eco.income += business_income
 	var deltas: Dictionary = eco.deltas.duplicate()
-	deltas["credits"] = deltas.get("credits", 0) - _month_credits  # ay ay verilen kısım tekrar verilmez
+	deltas["credits"] = deltas.get("credits", 0) + business_income - _month_credits  # ay ay verilen kısım tekrar verilmez
+	# Yerel kirlilik (sera gazından ayrı): hava kirliliği yaşam kalitesini, atık yükü doğayı düşürür.
+	deltas["quality_of_life"] = deltas.get("quality_of_life", 0.0) - biz.air_pollution * balance.air_quality_of_life_per_point
+	deltas["ecosystem_health"] = deltas.get("ecosystem_health", 0.0) - biz.waste_pollution * balance.waste_ecosystem_per_point
 	controller.apply_deltas(deltas)
 	controller.refresh_resources()  # nüfus değişti, talep de değişir
 
 	var climate := ClimateSimulator.compute_year(GameState.get_stats(), buildings, balance, Catalog.data.co2)
+	controller.add_business_load(climate)  # sanayi sera gazı "industry" kalemi; küresel ppm değişmez
 	controller.apply_climate(climate)
 	controller.apply_deltas(climate.deltas)
 
@@ -165,6 +200,10 @@ func _finish_year() -> void:
 	if missions.reward > 0:
 		controller.apply_deltas({"credits": missions.reward})
 
+	var yr := []
+	for i in GameState.businesses.size():
+		yr.append(_biz_rng.randf_range(-1.0, 1.0))
+	controller.business_year(yr)
 	controller.record_history()
 	var report := {
 		"year": before.year,
@@ -177,6 +216,9 @@ func _finish_year() -> void:
 		"new_warnings": warnings,
 		"missions": missions,
 		"investment_cost": GameState.build_log.filter(func(e): return e.year == before.year).reduce(func(acc, e): return acc + e.cost, 0),  # v1.9
+		"business_income": business_income,  # v1.10: income'a dahil
+		"fines": _fines,  # v1.10: kasaya girdi
+		"inspection_cost": _inspection_costs,  # v1.10: kasadan çıktı
 	}
 	controller.record_report(report)
 	_set_phase(&"report")
@@ -219,3 +261,27 @@ func close_report() -> void:
 func _set_phase(phase: StringName) -> void:
 	controller.apply_phase(phase)
 	EventBus.phase_changed.emit(phase)
+
+
+# --- Kayıt (Prompt 13) ---
+
+## Oyun yalnızca build fazında kaydedilir; yarım kalmış kriz/rapor işlemi kayda girmez (ödül/ceza çoğalmaz).
+func save_state() -> Dictionary:
+	return {
+		"start_stats": _start_stats.duplicate(true), "start_plots": _start_plots.duplicate(),
+		"built_this_year": _built_this_year.duplicate(), "stats_before": _stats_before.duplicate(true),
+		"month_credits": _month_credits, "fines": _fines, "inspection_costs": _inspection_costs,
+		"rng_state": _rng.state, "biz_rng_state": _biz_rng.state,
+	}
+
+
+func _restore(d: Dictionary) -> void:
+	_start_stats = d.start_stats
+	_start_plots = d.start_plots
+	_built_this_year = d.built_this_year
+	_stats_before = d.stats_before
+	_month_credits = d.month_credits
+	_fines = d.fines
+	_inspection_costs = d.inspection_costs
+	_rng.state = d.rng_state
+	_biz_rng.state = d.biz_rng_state

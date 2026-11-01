@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BusinessType" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/business_type.gd" id="1_btype"]
+
+[resource]
+script = ExtResource("1_btype")
+id = &"textile_plant"
+display_name = "Tekstil fabrikası"
+visual_id = &"Industrial_TextilePlant"
+size = 2
+employees = 100
+yearly_contribution = 30
+energy_use = 3.0
+water_use = 5.0
+ghg = 3.0
+ghg_energy_share = 0.7
+air = 3.0
+waste = 6.0
+spawn_weight = 0.7
+min_population = 500
+logistics = false
+description = "Kumaş ve giysi üretir. Boyalı atık su çıkarır."

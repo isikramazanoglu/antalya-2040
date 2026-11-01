@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/industrial/logistics_warehouse_body.tres" id="1_s3rlo"]
+[ext_resource type="ArrayMesh" path="res://assets/industrial/logistics_warehouse_windows.tres" id="2_qq3i8"]
+[ext_resource type="ArrayMesh" path="res://assets/industrial/logistics_warehouse_upgrade_clean_energy.tres" id="3_b35ni"]
+[ext_resource type="ArrayMesh" path="res://assets/industrial/logistics_warehouse_upgrade_treatment.tres" id="4_yceap"]
+
+[node name="LogisticsWarehouse" type="Node3D" unique_id=420089350]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=272539898]
+mesh = ExtResource("1_s3rlo")
+
+[node name="Windows" type="MeshInstance3D" parent="." unique_id=1947841581]
+mesh = ExtResource("2_qq3i8")
+
+[node name="Upgrade_clean_energy" type="MeshInstance3D" parent="." unique_id=1369708936]
+visible = false
+mesh = ExtResource("3_b35ni")
+
+[node name="Upgrade_treatment" type="MeshInstance3D" parent="." unique_id=915221090]
+visible = false
+mesh = ExtResource("4_yceap")
+
+[node name="Smoke_0" type="Marker3D" parent="." unique_id=605944005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 2.41, -2)

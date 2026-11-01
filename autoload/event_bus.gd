@@ -1,6 +1,6 @@
 extends Node
 ## ORTAK dosya. Sözleşme: docs/INTEGRATION_CONTRACT.md
-## Sürüm v1.9. Yalnızca sinyal bildirimleri. Değişken, fonksiyon, mantık eklenmez.
+## Sürüm v1.10. Yalnızca sinyal bildirimleri. Değişken, fonksiyon, mantık eklenmez.
 ## Değişiklik yalnızca sözleşme §11 süreciyle, yalnızca ekleme olarak.
 
 # Sinyaller başka script'lerden yayılır; bu dosyada kullanılmamaları normal.
@@ -36,3 +36,11 @@ signal crisis_stage_changed(event_id: StringName, stage: StringName, info: Dicti
 signal final_presentation_requested(summary: Dictionary)  # B: FinalReport → A: CityWorld
 ## A'nın 2040 → 2052 sunumu bitti (veya hiç başlamadı); final raporu yeniden görünür.
 signal final_presentation_finished  # A: CityWorld → B: FinalReport
+
+# --- 3.5 İşletmeler ve çevre denetimi (v1.10, docs/BUSINESS_SYSTEM.md) ---
+## Yeni işletme kuruldu ya da kayıttan geri yüklendi (info.restored). info: BusinessSimulator.visual_info sözlüğü.
+signal business_spawned(info: Dictionary)  # B: GameController → A: CityWorld (sanayi yerine model koyar)
+## Faaliyet durumu, ihlal seviyesi, duman yoğunluğu ya da yükseltmeler değişti. info: aynı sözlük.
+signal business_updated(info: Dictionary)  # B: GameController → A
+## İşletme kapandı; sanayi yeri boşaldı.
+signal business_removed(business_id: StringName, site_id: StringName)  # B: GameController → A

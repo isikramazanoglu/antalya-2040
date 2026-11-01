@@ -80,7 +80,7 @@ func _run() -> void:
 	var r: Dictionary = _reports[0]
 	var before: Dictionary = r.stats_before
 	var after: Dictionary = r.stats_after
-	var sum: int = before.credits + r.income - r.upkeep - r.investment_cost + r.missions.reward
+	var sum: int = before.credits + r.income - r.upkeep - r.investment_cost + r.missions.reward + r.get("fines", 0) - r.get("inspection_cost", 0)
 	for cr in r.crisis_results:
 		sum += int(cr.damage.get("credits", 0))
 	_check(sum == after.credits, "rapor bütçesi tutarlı: başlangıç %d + gelir − gider − yatırım + ödül = %d (yıl sonu %d)" % [before.credits, sum, after.credits])
