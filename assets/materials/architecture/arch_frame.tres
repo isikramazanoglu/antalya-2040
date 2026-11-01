@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "arch_frame"
+albedo_color = Color(0.5411765, 0.5764706, 0.56078434, 1)
+metallic = 0.2
+roughness = 0.6

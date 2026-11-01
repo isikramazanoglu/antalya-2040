@@ -38,19 +38,6 @@ const M_GLASS := preload("res://assets/materials/buildings/bld_glass.tres")
 const M_HEDGE := preload("res://assets/materials/buildings/bld_shrub.tres")
 const M_TYRE := preload("res://assets/materials/buildings/bld_asphalt.tres")
 const M_TAIL := preload("res://assets/materials/buildings/bld_terracotta.tres")
-const WALLS: Array[Material] = [
-	preload("res://assets/materials/buildings/bld_cream.tres"),
-	preload("res://assets/materials/buildings/bld_cream.tres"),
-	preload("res://assets/materials/plaster_white.tres"),
-	preload("res://assets/materials/city/wall_ochre.tres"),
-	preload("res://assets/materials/city/wall_rose.tres"),
-	preload("res://assets/materials/buildings/bld_stone.tres"),
-]
-const SHUTTERS: Array[Material] = [
-	preload("res://assets/materials/buildings/bld_turquoise.tres"),
-	preload("res://assets/materials/buildings/bld_green_accent.tres"),
-	preload("res://assets/materials/buildings/bld_wood.tres"),
-]
 const AWNINGS: Array[Material] = [
 	preload("res://assets/materials/buildings/bld_turquoise.tres"),
 	preload("res://assets/materials/buildings/bld_terracotta.tres"),
@@ -63,6 +50,30 @@ const SIDEWALK_TOP := 0.09
 const CURB := 0.1
 const PARKING := 1.0
 const FLOOR_H := 1.4
+## Görsel revizyon 7: Akdeniz bina kütüphanesi (scripts/world/dev/gen_building_library.gd üretir).
+## Yalnızca dekor; yatırım binaları (BuildingDefinition) ayrı sahnelerdir ve burada kullanılmaz.
+const LIBRARY := {
+	&"house_a": "residential/residential_house_a", &"house_b": "residential/residential_house_b",
+	&"house_c": "residential/mediterranean_house_c", &"apartment_a": "apartments/apartment_midrise_a",
+	&"apartment_b": "apartments/apartment_modern_b", &"apartment_c": "apartments/apartment_urban_c",
+	&"villa_a": "villas/villa_modern_a", &"villa_b": "villas/villa_mediterranean_b",
+	&"shop_a": "commercial/commercial_shop_a", &"shop_b": "commercial/commercial_shop_b",
+	&"public_a": "public/public_building_a", &"public_b": "public/public_building_b",
+}
+## Cephe rengi çeşitlemesi: kütüphane modelinin arch_facade yüzeyi bu tonlarla değiştirilmiş kopyalar.
+const FACADE_TINTS: Array[Material] = [
+	preload("res://assets/materials/architecture/arch_facade.tres"),
+	preload("res://assets/materials/architecture/arch_facade_ochre.tres"),
+	preload("res://assets/materials/architecture/arch_facade_rose.tres"),
+	preload("res://assets/materials/architecture/arch_facade_white.tres"),
+]
+## Arsaların önünü (kamera yönü +x+z) kapatmasın diye yüksek modeller yalnızca bu x aralığının dışında.
+## İnce bina ayrıntılarının (korkuluk, klima, bitki) görünür kaldığı kamera uzaklığı (zoom 22–105).
+const FINE_DETAIL_RANGE := 80.0
+const TALL_WEST_X := -28.0
+const TALL_EAST_X := 36.0
+## Kamu yapıları: belirli mahallelerde, hedef noktaya en yakın boş yere.
+const LANDMARKS: Array = [[&"public_a", Vector2(-29, 0.5)], [&"public_b", Vector2(25, 0.5)]]
 const M_POT := preload("res://assets/materials/buildings/bld_terracotta.tres")
 const M_PLANTER := preload("res://assets/materials/buildings/bld_stone_dark.tres")
 const M_PAVING_LIGHT := preload("res://assets/materials/city/paving_light.tres")
@@ -151,6 +162,9 @@ const LANES: Array = [[-4.85, -1.0, -56.0, 56.0], [-3.15, 1.0, -56.0, 56.0], [-1
 @export var car_count := 10
 
 var _rng := RandomNumberGenerator.new()
+var _library := {}
+## Mahalle başına birleşik bina mesh'i: alan anahtarı → {materyal: SurfaceTool}.
+var _building_tools := {}
 var _blocked: Array[Rect2] = []
 var _batches := {}
 var _cars: Array = []
@@ -204,6 +218,7 @@ func _ready() -> void:
 	_build_seafront()
 	_build_mountains()
 	_flush_batches()
+	_flush_buildings()
 	_flush_people()
 	_build_traffic()
 
@@ -576,124 +591,112 @@ func _build_coast_square() -> void:
 
 func _build_houses() -> void:
 	var avenue: Rect2 = ROADS_EW[1]
-	for area in HOUSE_AREAS:
+	for landmark in LANDMARKS:
+		_place_landmark(landmark[0], landmark[1])
+	# Her sırada soldan sağa paketleme: model kendi tabanı kadar yer kaplar, aralarda 0,3–1,1 birim sokak/bahçe.
+	for i in HOUSE_AREAS.size():
+		var area := HOUSE_AREAS[i]
 		var z := area.position.y + 2.2
 		while z < area.end.y - 1.0:
-			var x := area.position.x + 2.2
-			while x < area.end.x - 1.0:
-				if _rng.randf() < 0.85:
-					var w := _rng.randf_range(2.4, 3.6)
-					var d := _rng.randf_range(2.4, 3.4)
-					var hx := x + _rng.randf_range(-0.5, 0.5)
-					var hz := z + _rng.randf_range(-0.4, 0.4)
-					var footprint := Rect2(hx - w * 0.5, hz - d * 0.5, w, d)
-					if area.encloses(footprint) and _is_free(footprint):
-						# Ana caddeye bakan sıra (caddenin kuzeyi, ön cephe kameraya ve caddeye dönük): dükkân.
-						var shop := hz < avenue.position.y and hz + d * 0.5 > avenue.position.y - SIDEWALK - 3.4
-						_house(hx, hz, w, d, shop)
-						_blocked.append(footprint.grow(0.3))
-				x += 4.6
+			var x := area.position.x + 0.3
+			while x < area.end.x - 2.0:
+				if _rng.randf() < 0.08:
+					x += 2.5  # boş bahçe / ara sokak
+					continue
+				var hz := z + _rng.randf_range(-0.4, 0.4)
+				# Ana caddeye bakan sıra (caddenin kuzeyi, ön cephe caddeye dönük): dükkânlar.
+				var shop := hz < avenue.position.y and hz + 2.0 > avenue.position.y - SIDEWALK - 3.4
+				var placed := Rect2()
+				for key in [_pick_model(i, x, hz, shop), &"house_c", &"house_a"]:
+					placed = _try_place(key, x, hz, area)
+					if placed.has_area():
+						break
+				x = placed.end.x + _rng.randf_range(0.3, 1.1) if placed.has_area() else x + 1.0
 			z += 4.6
 
 
-## Akdeniz evi: 1–3 kat, kırma çatı ya da düz dam (güneş kolektörü, pergola ya da saksılı teras).
-## Kameranın gördüğü iki cephede (ön +z, yan +x) her katta pencere; bazılarında balkon, panjur, ön bahçe çiti.
-## Dükkânlarda zemin katta vitrin, tente ve boş tabela alanı (marka adı yok).
-func _house(x: float, z: float, w: float, d: float, shop := false) -> void:
-	var roll := _rng.randf()
-	var floors := 1 if roll < 0.35 else (2 if roll < 0.8 else 3)
+## Mahalleye göre model seçimi: kıyıda villa ve alçak evler, kuzeyde apartmanlar, cadde cephesinde dükkânlar,
+## kenarlarda villalar. Yüksek modeller arsaların ve ana caddenin kamera tarafına (+x, +z) konmaz.
+func _pick_model(area_index: int, x: float, z: float, shop: bool) -> StringName:
+	var tall := (x < TALL_WEST_X or x > TALL_EAST_X) and z < ROADS_EW[1].position.y
+	var pool: Array
 	if shop:
-		floors = maxi(floors, 2)
-	var h := floors * FLOOR_H + _rng.randf_range(-0.1, 0.15)
-	var wall: Material = WALLS[_rng.randi() % WALLS.size()]
-	_add(_box, wall, Vector3(x, h * 0.5, z), Vector3(w, h, d))
-	var front := z + d * 0.5 + 0.01
-	var side := x + w * 0.5 + 0.01
-	var shutters: Material = SHUTTERS[_rng.randi() % SHUTTERS.size()] if _rng.randf() < 0.45 else null
-	var balcony := floors >= 2 and _rng.randf() < 0.55
-	var cols := maxi(1, int(w / 1.05))
-	var side_cols := maxi(1, int(d / 1.15))
-	for f in floors:
-		var wy := f * FLOOR_H + FLOOR_H * 0.55
-		for c in cols:
-			var wx := x - w * 0.5 + (c + 0.5) * w / cols
-			if f == 0 and shop:
-				continue
-			if f == 0 and c == 0:
-				_add(_box, ACCENTS[_rng.randi() % ACCENTS.size()], Vector3(wx, 0.45, front + 0.01), Vector3(0.38, 0.85, 0.04), Vector3.ZERO, false)
-				continue
-			_add(_box, M_WINDOW, Vector3(wx, wy, front), Vector3(0.36, 0.5, 0.04), Vector3.ZERO, false)
-			if shutters:
-				for sx in [-1.0, 1.0]:
-					_add(_box, shutters, Vector3(wx + sx * 0.25, wy, front + 0.01), Vector3(0.11, 0.5, 0.05), Vector3.ZERO, false)
-		for c in side_cols:
-			var wz := z - d * 0.5 + (c + 0.5) * d / side_cols
-			_add(_box, M_WINDOW, Vector3(side, wy, wz), Vector3(0.04, 0.5, 0.34), Vector3.ZERO, false)
-		if balcony and f >= 1:
-			var bw := minf(w * 0.7, 2.2)
-			_add(_box, M_STONE, Vector3(x, f * FLOOR_H + 0.03, front + 0.2), Vector3(bw, 0.06, 0.4))
-			_add(_box, M_RAIL, Vector3(x, f * FLOOR_H + 0.2, front + 0.39), Vector3(bw, 0.28, 0.03), Vector3.ZERO, false)
-	if shop:
-		var awning: Material = AWNINGS[_rng.randi() % AWNINGS.size()]
-		_add(_box, M_GLASS, Vector3(x, FLOOR_H * 0.42, front), Vector3(w * 0.8, FLOOR_H * 0.6, 0.04), Vector3.ZERO, false)
-		_add(_box, M_WINDOW, Vector3(x - w * 0.3, FLOOR_H * 0.36, front + 0.01), Vector3(0.36, FLOOR_H * 0.7, 0.04), Vector3.ZERO, false)
-		_add(_box, awning, Vector3(x, FLOOR_H * 0.86, front + 0.28), Vector3(w * 0.86, 0.05, 0.55), Vector3(deg_to_rad(14), 0, 0))
-		_add(_box, M_STONE, Vector3(x, FLOOR_H * 0.98, front + 0.01), Vector3(w * 0.6, 0.18, 0.03), Vector3.ZERO, false)
-	_roof(x, z, w, d, h, floors, wall)
-	# Giriş saksısı (kapının yanında) ya da dükkân önünde iki saksı.
-	if shop:
-		for sx in [-0.42, 0.42]:
-			if _is_free(Rect2(x + sx * w - 0.2, front + 0.1, 0.4, 0.4)):
-				_pot(Vector3(x + sx * w, 0.0, front + 0.3), 0.85)
-	elif _rng.randf() < 0.5:
-		var door_x := x - w * 0.5 + 0.5 * w / cols
-		if _is_free(Rect2(door_x + 0.15, front + 0.05, 0.4, 0.4)):
-			_pot(Vector3(door_x + 0.38, 0.0, front + 0.22), 0.7)
-	# Giriş taşı (kapı önü) ve bazı evlerde alçak taş bahçe duvarı + yan ağaç.
-	if not shop:
-		var door := x - w * 0.5 + 0.5 * w / cols
-		if _is_free(Rect2(door - 0.3, front, 0.6, 0.35)):
-			_add(_box, M_PAVING_LIGHT, Vector3(door, 0.02, front + 0.17), Vector3(0.6, 0.04, 0.35), Vector3.ZERO, false)
-		if floors <= 2 and _rng.randf() < 0.25 and _is_free(Rect2(x - w * 0.5, front + 0.5, w, 0.25)):
-			_add(_box, M_POT_STONE, Vector3(x + w * 0.12, 0.13, front + 0.62), Vector3(w * 0.76, 0.26, 0.14))
-		if _rng.randf() < 0.2 and _is_free(Rect2(side + 0.3, z - 0.5, 1.0, 1.0)):
-			_olive(side + 0.7, z, 0.65)
-	if floors == 1 and _rng.randf() < 0.4:
-		var garden := Rect2(x - w * 0.5, z + d * 0.5 + 0.15, w, 0.35)
-		if _is_free(garden):
-			_add(_box, M_HEDGE, Vector3(x, 0.17, z + d * 0.5 + 0.32), Vector3(w, 0.34, 0.3))
-
-
-func _roof(x: float, z: float, w: float, d: float, h: float, floors: int, wall: Material) -> void:
-	if floors < 3 and _rng.randf() < 0.65:
-		if _rng.randf() < 0.5:
-			_add(_prism, M_TERRACOTTA, Vector3(x, h + 0.45, z), Vector3(w + 0.3, 0.9, d + 0.3))
-		else:
-			_add(_prism, M_TERRACOTTA, Vector3(x, h + 0.45, z), Vector3(d + 0.3, 0.9, w + 0.3), Vector3(0, PI * 0.5, 0))
-		return
-	# Düz dam: parapet bandı ve üç tür dam.
-	_add(_box, wall, Vector3(x, h + 0.09, z), Vector3(w + 0.06, 0.18, d + 0.06))
-	var kind := _rng.randf()
-	if kind < 0.45:
-		# Merdiven odası ve güneş enerjili su ısıtıcısı (Akdeniz kentlerinde yaygın).
-		_add(_box, wall, Vector3(x - w * 0.2, h + 0.35, z - d * 0.15), Vector3(w * 0.35, 0.7, d * 0.4))
-		_add(_box, M_SOLAR, Vector3(x + w * 0.2, h + 0.3, z + d * 0.15), Vector3(0.9, 0.05, 0.6), Vector3(deg_to_rad(30), 0, 0))
-		_add(_cylinder, M_TANK, Vector3(x + w * 0.2, h + 0.55, z - d * 0.1), Vector3(0.32, 0.9, 0.32), Vector3(0, 0, PI * 0.5))
-	elif kind < 0.75:
-		# Teras pergolası.
-		var px := w * 0.3
-		var pz := d * 0.25
-		for sx in [-1.0, 1.0]:
-			for sz in [-1.0, 1.0]:
-				_add(_box, M_WOOD, Vector3(x + sx * px, h + 0.45, z + sz * pz), Vector3(0.07, 0.9, 0.07))
-		for k in 4:
-			_add(_box, M_WOOD, Vector3(x, h + 0.92, z - pz + k * pz * 2.0 / 3.0), Vector3(px * 2.2, 0.05, 0.08))
-		_add(_sphere, M_HEDGE, Vector3(x - w * 0.32, h + 0.3, z + d * 0.32), Vector3(0.4, 0.35, 0.4))
+		pool = [&"shop_a", &"shop_a", &"shop_b", &"apartment_c"] if tall else [&"shop_a", &"shop_a", &"shop_b"]
+	elif area_index >= 4:
+		pool = [&"villa_a", &"villa_b", &"house_b", &"house_a"]
+	elif area_index >= 2:
+		pool = [&"apartment_a", &"apartment_b", &"apartment_c", &"apartment_a", &"house_a"] if tall else [&"house_a", &"house_c", &"house_b"]
+	elif absf(x) > 48.0:
+		pool = [&"villa_a", &"villa_b", &"house_b", &"house_c"]
+	elif tall:
+		pool = [&"house_a", &"house_c", &"house_b", &"apartment_a", &"apartment_b", &"house_c", &"apartment_c"]
 	else:
-		# Saksılı teras ve korkuluk.
-		_add(_box, M_RAIL, Vector3(x, h + 0.32, z + d * 0.5 - 0.02), Vector3(w, 0.22, 0.03), Vector3.ZERO, false)
-		for k in 3:
-			_add(_sphere, M_HEDGE, Vector3(x - w * 0.3 + k * w * 0.3, h + 0.3, z - d * 0.3), Vector3(0.35, 0.32, 0.35))
+		pool = [&"house_a", &"house_b", &"house_c", &"villa_a", &"villa_b", &"house_b"]
+	return pool[_rng.randi() % pool.size()]
+
+
+## Model alana sığar ve boşsa yerleştirir (left: tabanın sol kenarı, z: pivot; ön cephe +z) ve tabanı döndürür;
+## sığmazsa boş Rect2. Yerleşen taban komşu evlerle arayı korumak için bloklanır.
+func _try_place(key: StringName, left: float, z: float, area: Rect2) -> Rect2:
+	var variants: Array = _library_mesh(key)
+	var aabb: AABB = variants[0].get_aabb()
+	var x := left - aabb.position.x
+	# Alan kenarına taşan modeli (ör. kıyı şeridinde bahçe duvarlı villa) alanın içine kaydır.
+	x = clampf(x, area.position.x - aabb.position.x, area.end.x - aabb.end.x)
+	z = clampf(z, area.position.y - aabb.position.z, area.end.y - aabb.end.z)
+	var footprint := Rect2(x + aabb.position.x, z + aabb.position.z, aabb.size.x, aabb.size.z)
+	if not (area.encloses(footprint) and _is_free(footprint)):
+		return Rect2()
+	var mesh: ArrayMesh = variants[_rng.randi() % variants.size()]
+	var key_area := "%d_%d" % [area.position.x, area.position.y]
+	if not _building_tools.has(key_area):
+		_building_tools[key_area] = {}
+	var tools: Dictionary = _building_tools[key_area]
+	var xform := Transform3D(Basis.IDENTITY, Vector3(x, 0.0, z))
+	for s in mesh.get_surface_count():
+		var material := mesh.surface_get_material(s)
+		if not tools.has(material):
+			var st := SurfaceTool.new()
+			st.begin(Mesh.PRIMITIVE_TRIANGLES)
+			tools[material] = st
+		(tools[material] as SurfaceTool).append_from(mesh, s, xform)
+	_blocked.append(footprint.grow(0.2))
+	# Bazı evlerin yanında zeytin ağacı (dekor, yer varsa).
+	if key.begins_with("house") and _rng.randf() < 0.25 and _is_free(Rect2(footprint.end.x + 0.2, z - 0.5, 1.0, 1.0)):
+		_olive(footprint.end.x + 0.7, z, 0.65)
+	return footprint
+
+
+func _place_landmark(key: StringName, target: Vector2) -> void:
+	for r in 6:
+		for dx in range(-r, r + 1):
+			for dz in range(-r, r + 1):
+				if maxi(absi(dx), absi(dz)) != r:
+					continue
+				var x := target.x + dx * 1.0
+				var z := target.y + dz * 1.0
+				for area in HOUSE_AREAS:
+					if area.has_point(Vector2(x, z)) and _try_place(key, x, z, area).has_area():
+						return
+
+
+## Kütüphane modelini yükler; cephesi arch_facade olanlar için renk çeşitlemeli kopyalar üretir (önbellekli).
+func _library_mesh(key: StringName) -> Array:
+	if _library.has(key):
+		return _library[key]
+	var base: ArrayMesh = load("res://assets/buildings/%s.tres" % LIBRARY[key])
+	var variants: Array = [base]
+	var facade := -1
+	for s in base.get_surface_count():
+		if base.surface_get_material(s) == FACADE_TINTS[0]:
+			facade = s
+	if facade >= 0:
+		for tint in FACADE_TINTS.slice(1):
+			var copy: ArrayMesh = base.duplicate()
+			copy.surface_set_material(facade, tint)
+			variants.append(copy)
+	_library[key] = variants
+	return variants
 
 
 # --- Bitki örtüsü ---
@@ -1031,6 +1034,45 @@ func _person(base: Vector3, yaw: float, pose: StringName) -> void:
 			_people_tools[part[1]] = SurfaceTool.new()
 		(_people_tools[part[1]] as SurfaceTool).append_from(part[0], 0,
 				holder * Transform3D(Basis.from_euler(part[4]) * Basis.from_scale(part[3]), part[2]))
+
+
+## Kütüphane binaları: her mahalle tek MeshInstance3D, materyal başına bir yüzey (az draw call; mahalle
+## bazında görünüm dışı ayıklama sürer).
+func _flush_buildings() -> void:
+	for key_area in _building_tools:
+		var tools: Dictionary = _building_tools[key_area]
+		# Üç katman: ana kütleler (cephe, taş, çatı) gölge düşürür; cephe ayrıntıları (cam, çerçeve, panjur, korniş)
+		# gölgesiz; ince ayrıntılar (korkuluk babaları, klima, saksı bitkisi) gölgesiz ve uzakta gizlenir (LOD:
+		# en uzak zoom'da birkaç pikselden küçükler). Gölge geçişindeki üçgen yükü yarıdan aza iner.
+		for layer in ["mass", "detail", "fine"]:
+			var mesh := ArrayMesh.new()
+			for material in tools:
+				if _building_layer(material) != layer:
+					continue
+				(tools[material] as SurfaceTool).commit(mesh)
+				mesh.surface_set_material(mesh.get_surface_count() - 1, material)
+			if mesh.get_surface_count() == 0:
+				continue
+			var instance := MeshInstance3D.new()
+			instance.name = "Buildings_%s_%s" % [key_area, layer]
+			instance.mesh = mesh
+			if layer != "mass":
+				instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			if layer == "fine":
+				instance.visibility_range_end = FINE_DETAIL_RANGE
+				instance.visibility_range_end_margin = 8.0
+				instance.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+			add_child(instance)
+	_building_tools.clear()
+
+
+static func _building_layer(material: Material) -> String:
+	var name := material.resource_path.get_file().get_basename().trim_prefix("arch_")
+	if name.begins_with("facade") or name in ["stone", "roof", "wood"]:
+		return "mass"
+	if name in ["rail", "metal", "plant"]:
+		return "fine"
+	return "detail"
 
 
 func _flush_people() -> void:
