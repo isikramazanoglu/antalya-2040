@@ -127,6 +127,14 @@ Hedef akşam: menü → şehir → arsa seç → 3 yatırımdan birini inşa et 
   - FPS (gerçek Game.tscn, vsync kapalı, normal / 8 bina / kriz / final): Intel UHD 1080p 63 / 62 / 58 / 56 (önce 63 / 62 / 59 / 60), Intel UHD 720p 118 / 116 / 107 / 106 (önce 120 / 113 / 108 / 113). RTX 5060 değerleri güç durumuna göre oynadığı için karşılaştırma dışı (bu oturumda 1080p 455–464 normal, 720p kriz ~770). RTX 720p'de 7 ölçümün 2'sinde kriz/final sırasında ~0 FPS donma görüldü, sonraki 3 ölçümde (pencere durumu kaydıyla) tekrar etmedi; sebep kanıtlanamadı.
   - **B için (project.godot):** SSAO kalitesi/half size, yumuşak gölge filtre kalitesi ve 3D kenar yumuşatma (MSAA) varsayılanda; değişiklik istenirse B'nin dosyası.
   - Testler: A'nın 6 testi + B'nin day1, crises, final, menu, integration, playthrough testleri TAMAM. Önce/sonra: `build/visual_reference/prompt3/`.
+- Görsel revizyon 4 (A, 2026-11-01) · İzometrik kamera ve kompozisyon (kamera script'i değişmedi; yalnızca sahne/Inspector):
+  - Önce: perspektif, FOV 32, eğim -50°, yatay dönüş 0 (yollar ekran eksenlerine paralel), hedef (-6, 0, 0), açılış uzaklığı 74, zoom 22–95.
+  - Sonra: perspektif, FOV 38, eğim -43°, yatay dönüş 35° (`CityWorld.tscn` CameraRig dönüşü; script açılışta okur, Q/E ±30° bunun çevresinde), hedef (-6,9, 0, -2,6) (şehir sol panelin sağında), açılış 90, zoom 22–105 (`CameraRig.tscn`).
+  - Denenen: A ortografik -42°/35°, B ortografik -48°/45°, C perspektif -42°/35°/FOV 40, C2 -45°/40°/36, C3 -40°/30°/38. Ortografik temiz ama ufuk ve derinlik kayboluyor; ayrıca zoom script'te kamera uzaklığıyla yapıldığı için ortografikte zoom çalışmaz (script değişikliği gerekirdi). Perspektifte dağlar, zeytinlik, çapraz kıyı şeridi ve bina cepheleri birlikte görünüyor.
+  - DoF: normal oyunda yok. Yalnızca final sunumunun kendi kamerasında çok hafif uzak bulanıklık (`CameraAttributesPractical`, odak kameranın baktığı nokta, miktar 0,05). Intel UHD 1080p'de sunum 53 → 45 FPS (efektin maliyeti); kapatmak için `final_presentation.gd` → `DOF_AMOUNT`/`dof_blur_far_enabled`.
+  - FPS (Game.tscn, vsync kapalı; normal / 8 bina / kriz / sunum): Intel UHD 1080p 60 / 59 / 56 / 45, Intel UHD 720p 113 / 109 / 103 / 86, RTX 5060 1080p 438 / 419 / 388 / 291.
+  - Arsa seçimi yeni açıyla 3 zoom ve iki çözünürlükte ekrandaki her arsanın merkezinde doğru arsayı buluyor. `test_plot_visuals.gd` gerçek imleci de yapay olayın konumuna taşır (test sırasında fare kımıldarsa karışmasın).
+  - Testler: B'nin 12 testi iki çözünürlükte, A'nın 7 testi TAMAM. Önce/sonra: `build/visual_reference/prompt4/`.
 
 ### Ekip B
 - [x] 12 `BuildingDefinition` + bilgi kartları
