@@ -82,6 +82,7 @@ func _refresh() -> void:
 
 	for child in %List.get_children():
 		child.queue_free()
+	_vehicle_box(gc)
 	if GameState.businesses.is_empty():
 		var empty := Label.new()
 		empty.text = "Henüz işletme yok. Şehir büyüdükçe sanayi bölgesine fabrikalar ve depolar gelecek."
@@ -109,6 +110,41 @@ func _refresh() -> void:
 	if _selected == &"" and not GameState.businesses.is_empty():
 		_selected = GameState.businesses[0].business_id
 	_render_detail(gc)
+
+
+## Yol kenarı araç denetimi (teslim MVP): trafikten araç durdur, egzoz emisyonunu gör, yüksekse ceza kes.
+func _vehicle_box(gc: Node) -> void:
+	var box := VBoxContainer.new()
+	var title := Label.new()
+	title.text = "Yol kenarı araç denetimi"
+	title.add_theme_color_override("font_color", UiText.C_ACCENT)
+	box.add_child(title)
+	var v: Dictionary = GameState.vehicle_check
+	var info := Label.new()
+	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	info.add_theme_font_size_override("font_size", 14)
+	info.text = "Trafikten bir aracı durdurup egzozunu ölç." if v.is_empty() else "%s · %s · egzoz emisyonu: %s" % [v.plate, v.model, gc.VEHICLE_LEVELS[v.level] if gc else ""]
+	box.add_child(info)
+	var row := HBoxContainer.new()
+	var stop := Button.new()
+	stop.text = "Araç durdur"
+	stop.add_theme_font_size_override("font_size", 14)
+	stop.disabled = gc == null or GameState.phase != &"build"
+	stop.pressed.connect(func(): gc.inspect_vehicle(); %Status.text = ""; _refresh())
+	row.add_child(stop)
+	var fine := Button.new()
+	fine.text = "Egzoz cezası (+%d kredi)" % (gc.VEHICLE_FINE if gc else 0)
+	fine.add_theme_font_size_override("font_size", 14)
+	fine.disabled = gc == null or v.is_empty() or v.level < 2
+	fine.tooltip_text = "Yalnızca yüksek emisyonlu araca; aynı araca aynı ay bir kez."
+	fine.pressed.connect(func():
+		var r: StringName = gc.fine_vehicle()
+		%Status.text = REASONS.get(r, "") if r != &"" else ""
+		_refresh())
+	row.add_child(fine)
+	box.add_child(row)
+	%List.add_child(box)
+	%List.add_child(HSeparator.new())
 
 
 func _status_text(b: Dictionary, level: int) -> String:

@@ -24,6 +24,44 @@ func _ready() -> void:
 	turn_manager.start_game.call_deferred()
 
 
+## Yol kenarı araç denetimi (teslim MVP): trafikten bir araç durdurulur; emisyon seviyesi araç verisinden (görselden değil).
+const VEHICLE_MODELS := ["Otomobil", "Kamyonet", "Minibüs", "Otobüs", "Elektrikli otomobil"]
+const VEHICLE_LEVELS := ["Düşük", "Orta", "Yüksek"]
+const VEHICLE_FINE := 10
+
+
+var _vehicle_seq := 0
+
+
+func inspect_vehicle() -> Dictionary:
+	_vehicle_seq += 1
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash([GameState.rng_seed, GameState.stats.year, GameState.month, _vehicle_seq])
+	var model: String = VEHICLE_MODELS[rng.randi() % VEHICLE_MODELS.size()]
+	var roll := rng.randf()
+	var level := 0 if model == "Elektrikli otomobil" else (2 if roll < 0.3 else (1 if roll < 0.65 else 0))
+	GameState.vehicle_check = {"plate": "07 %s %03d" % [["AB", "KL", "MN", "TR", "ZS", "DE"][rng.randi() % 6], rng.randi_range(100, 999)],
+			"model": model, "level": level}
+	return GameState.vehicle_check
+
+
+## Yalnızca yüksek emisyonda; aynı araca aynı ay bir kez. Ceza ortak kredi bakiyesine girer.
+func fine_vehicle() -> StringName:
+	var v: Dictionary = GameState.vehicle_check
+	if v.is_empty():
+		return &"no_inspection"
+	if v.level < 2:
+		return &"no_violation"
+	var key: int = GameState.stats.year * 12 + GameState.month
+	if GameState.vehicle_fines.get(v.plate, -1) == key:
+		return &"already_fined"
+	GameState.vehicle_fines[v.plate] = key
+	GameState.apply_deltas({"credits": VEHICLE_FINE})
+	turn_manager.note_fine(VEHICLE_FINE)
+	_toast("%s plakalı araca %d kredi egzoz cezası kesildi." % [v.plate, VEHICLE_FINE], UiText.C_ACCENT, "coin")
+	return &""
+
+
 ## Zorunlu iklim sorusu doğru cevaplandı: bu ay bir daha sorulmaz, sıradaki soru hazırlanır.
 func quiz_passed() -> void:
 	GameState.quiz_done_key = GameState.stats.year * 12 + GameState.month
