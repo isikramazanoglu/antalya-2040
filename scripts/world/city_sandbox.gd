@@ -3,6 +3,7 @@ extends Node
 ## B = sıradaki binayı kur · N = kalanların hepsini kur · P = fazı build / report arasında değiştir
 ## 1 / 2 / 3 = sıcak hava / kuraklık / kıyı taşkını: her basış krizi bir sonraki aşamaya geçirir
 ##   (uyarı → hazırlık → kriz → çözüldü → bitti), B'nin TurnManager'ı ile aynı sırada sinyal yayar.
+## F3 = geliştirici katmanı (arsa kimliği etiketleri) aç/kapa
 ## R = açık bütün krizleri bitir · M = koruma oranı 0 / 0.4 / 0.8 (sözleşme v1.6 mitigation, bir sonraki aşamada).
 ## Seçim sinyalleri konsola yazılır.
 
@@ -52,6 +53,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			end_all_crises()
 		KEY_P:
 			set_phase(&"report" if _phase == &"build" else &"build")
+		KEY_F3:
+			var city := get_parent().get_node("CityWorld")
+			city.show_debug_overlay = not city.show_debug_overlay
 		KEY_M:
 			mitigation = MITIGATION_STEPS[(MITIGATION_STEPS.find(mitigation) + 1) % MITIGATION_STEPS.size()]
 			print("[city] mitigation ", mitigation)

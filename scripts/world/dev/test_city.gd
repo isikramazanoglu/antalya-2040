@@ -70,7 +70,9 @@ func _run() -> void:
 			instances += c.multimesh.instance_count
 	check(mm_count > 10 and instances > 500, "dekor MultiMesh ile kuruldu (%d grup, %d parça)" % [mm_count, instances])
 	check(city.get_plot_kind(&"C01") == &"coastal" and city.get_plot_kind(&"X99") == &"", "get_plot_kind")
-	check(city.find_plot(&"O02").get_node("Label").text == "O02 · AÇIK ALAN", "etiket kimlik + tür: " + city.find_plot(&"O02").get_node("Label").text)
+	var label: Label3D = city.find_plot(&"O02").get_node("VisualOverlay/DebugOverlay/Label")
+	check(label.text == "O02 · AÇIK ALAN" and not city.find_plot(&"O02").is_debug_visible(),
+		"geliştirici etiketi kimlik + tür (%s), normal oyunda gizli" % label.text)
 	var car: Node3D = decor.get_node("Traffic").get_child(0)
 	var car_x := car.position.x
 	await create_timer(0.5).timeout
@@ -82,13 +84,13 @@ func _run() -> void:
 	_events.clear()
 	await click(screen_of(u01))
 	check(_events == [["sel", &"U01", &"urban", true]], "U01'e tıklama → plot_selected(U01, urban, true)  %s" % str(_events))
-	check(u01.get_node("Highlight").visible, "U01 vurgulu")
+	check(u01.highlight_state() == &"selected", "U01 vurgulu (seçili)")
 
 	var o01 = city.find_plot(&"O01")
 	_events.clear()
 	await click(screen_of(o01))
 	check(_events == [["sel", &"O01", &"open", true]], "O01'e tıklama → plot_selected(O01, open, true)")
-	check(not u01.get_node("Highlight").visible, "U01 vurgusu kalktı")
+	check(u01.highlight_state() != &"selected", "U01 seçim vurgusu kalktı")
 
 	_events.clear()
 	await click(root.get_visible_rect().size * Vector2(0.5, 0.97))
@@ -104,7 +106,7 @@ func _run() -> void:
 	_events.clear()
 	EB.plot_deselect_requested.emit()
 	await frames(1)
-	check(_events == [["desel"]] and not o01.get_node("Highlight").visible, "plot_deselect_requested → vurgu kalktı, plot_deselected yayıldı")
+	check(_events == [["desel"]] and o01.highlight_state() != &"selected", "plot_deselect_requested → vurgu kalktı, plot_deselected yayıldı")
 	_events.clear()
 	EB.plot_deselect_requested.emit()
 	await frames(1)
@@ -129,12 +131,15 @@ func _run() -> void:
 	check(not city.place_building(&"X99", &"solar_plant"), "place_building bilinmeyen arsada false döner")
 	check(city.is_plot_occupied(&"O01") and not city.is_plot_occupied(&"O05"), "is_plot_occupied")
 	var o05 = city.find_plot(&"O05")
+	EB.plot_deselect_requested.emit()  # seçili arsada "seçili" durumu fare üstünden önce gelir
+	await frames(1)
 	o05.set_hovered(true)
-	var empty_col: Color = o05._pad_material.emission
+	var empty_state: StringName = o05.highlight_state()
 	o05.set_hovered(false)
 	o01.set_hovered(true)
-	check(o01._pad_material.emission != empty_col, "dolu ve boş arsa farklı renkte parlar")
+	check(empty_state == &"hover" and o01.highlight_state() == &"invalid", "fare üstünde boş arsa turkuaz, dolu arsa turuncu (%s / %s)" % [empty_state, o01.highlight_state()])
 	o01.set_hovered(false)
+	await click(screen_of(o01))  # faz kilidi testi seçili bir arsa bekliyor
 
 	print("Faz kilidi")
 	_events.clear()

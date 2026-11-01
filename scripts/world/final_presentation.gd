@@ -203,7 +203,7 @@ func _run(summary: Dictionary, token: int) -> void:
 	# 2052 tarafında yatırım yapılan arsalar hafifçe parlar; göz değişimi hemen bulur.
 	for plot in _city.get_plots():
 		if plot.is_occupied():
-			plot.set_hovered(true)
+			plot.set_showcase(true)
 	var tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_interval(0.6)
 	tween.tween_method(func(v: float): wipe.set_shader_parameter("split", v), 1.0, 0.0, 2.8)
@@ -307,7 +307,7 @@ func _restore() -> void:
 		_fx.fade_out_time = _saved_fades.y
 	_city.restore_city_state()
 	for plot in _city.get_plots():
-		plot.set_hovered(false)
+		plot.set_showcase(false)
 	if _rig:
 		if not _saved_view.is_empty():
 			_rig.set_view(_saved_view, true)
