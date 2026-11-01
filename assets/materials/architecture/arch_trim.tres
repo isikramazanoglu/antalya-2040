@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "arch_trim"
+albedo_color = Color(0.97, 0.96, 0.93, 1)
+roughness = 0.85

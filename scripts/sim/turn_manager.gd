@@ -12,7 +12,9 @@ var _built_this_year: Array = []
 var _crisis_queue: Array = []
 var _current_crisis: Dictionary = {}
 var _crisis_results: Array = []
-var _stats_before: Dictionary = {}  # kriz hasarı da raporda görünsün diye yıl sonu başında alınır
+var _stats_before: Dictionary = {}  # yıl başı (Ocak) değerleri; rapor bütün yılı (yatırım, aylık bütçe, kriz) anlatır
+var _ending_year := false  # kriz kuyruğu bitince yıl kapanır mı (yıl sonu) yoksa ay akmaya devam mı eder
+var _month_credits := 0  # bu yıl aylık olarak verilen bütçe; yıl sonunda yıllık hesaptan düşülür
 var _rng := RandomNumberGenerator.new()
 
 
@@ -44,17 +46,49 @@ func start_game() -> void:
 	_start_stats = GameState.get_stats()
 	_start_plots = GameState.plots.duplicate()
 	_rng.seed = GameState.rng_seed
+	_reset_year()
 	_set_phase(&"build")
 	EventBus.year_started.emit(GameState.stats.year)
 
 
+func _reset_year() -> void:
+	_crisis_results.clear()
+	_stats_before = GameState.get_stats()
+	_month_credits = 0
+
+
+## Takvim bir ay ilerler (MonthClock). Aralık bitince yıl kapanır. Ay geçerken yıllık net bütçenin
+## 1/12'si verilir (yıl sonunda kalanı); o ay gelen krizler başlar, çözülünce takvim kaldığı yerden akar.
+func advance_month() -> void:
+	if GameState.phase != &"build":
+		return
+	if GameState.month >= 12:
+		end_year()
+		return
+	var eco := EconomySimulator.compute_year(GameState.get_stats(), GameState.built_definitions(), Catalog.data.balance)
+	var monthly := roundi(eco.deltas.get("credits", 0) / 12.0)
+	_month_credits += monthly
+	controller.apply_deltas({"credits": monthly})
+	controller.set_month(GameState.month + 1)
+	var year: int = GameState.stats.year
+	_crisis_queue = GameState.pending_crises.filter(func(w): return w.due_year == year and _crisis_month(w) == GameState.month)
+	if not _crisis_queue.is_empty():
+		_ending_year = false
+		_continue_year()
+
+
+func _crisis_month(warning: Dictionary) -> int:
+	var def := Catalog.get_event(warning.event_id)
+	return def.month if def else 12
+
+
+## Yıl sonuna atlar (HUD "Yıl sonuna atla" ya da Aralık bitişi): yılın kalan krizleri sırayla gelir, sonra rapor.
 func end_year() -> void:
 	if GameState.phase != &"build":
 		return
 	var year: int = GameState.stats.year
 	_crisis_queue = GameState.pending_crises.filter(func(w): return w.due_year == year)
-	_crisis_results.clear()
-	_stats_before = GameState.get_stats()
+	_ending_year = true
 	_continue_year()
 
 
@@ -68,7 +102,10 @@ func _continue_year() -> void:
 		_emit_stage(crisis, &"active")
 		EventBus.crisis_started.emit(crisis.event_id, crisis.risk_type, crisis.severity)
 		return
-	_finish_year()
+	if _ending_year:
+		_finish_year()
+	else:
+		_set_phase(&"build")  # yıl ortası kriz bitti; takvim akmaya devam eder
 
 
 func on_crisis_response(event_id: StringName, response_id: StringName) -> void:
@@ -103,7 +140,9 @@ func _finish_year() -> void:
 	var buildings := GameState.built_definitions()
 
 	var eco := EconomySimulator.compute_year(GameState.get_stats(), buildings, balance)
-	controller.apply_deltas(eco.deltas)
+	var deltas: Dictionary = eco.deltas.duplicate()
+	deltas["credits"] = deltas.get("credits", 0) - _month_credits  # ay ay verilen kısım tekrar verilmez
+	controller.apply_deltas(deltas)
 	controller.refresh_resources()  # nüfus değişti, talep de değişir
 
 	var climate := ClimateSimulator.compute_year(GameState.get_stats(), buildings, balance, Catalog.data.co2)
@@ -169,6 +208,7 @@ func close_report() -> void:
 		return
 	controller.advance_year()
 	_built_this_year.clear()
+	_reset_year()
 	_set_phase(&"build")
 	EventBus.year_started.emit(GameState.stats.year)
 	for w in GameState.pending_crises:

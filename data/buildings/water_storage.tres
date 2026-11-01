@@ -9,7 +9,7 @@
 script = ExtResource("2_55xmc")
 id = &"water_storage"
 display_name = "Su depolama ve kaçak azaltma"
-short_description = "Yağmur suyunu depolar, şebekedeki kaçakları onarır."
+short_description = "Yağmur suyunu biriktirir, su borularındaki kaçakları onarır."
 category = &"water"
 cost = 250
 upkeep_per_year = 10

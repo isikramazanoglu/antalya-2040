@@ -12,6 +12,8 @@ extends Resource
 @export var scripted_year: int = 0
 @export_range(0.0, 1.0) var base_probability: float = 0.2
 @export var lead_years: int = 1
+## Krizin geldiği ay (1–12). Oyun tasarımı seçimi: sıcak dalga yaz, taşkın kış.
+@export_range(1, 12) var month: int = 7
 ## Ör. {"credits": -150, "water_security": -20}
 @export var base_damage: Dictionary = {}
 @export var responses: Array[CrisisResponse] = []

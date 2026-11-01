@@ -46,14 +46,15 @@ required_building = &"urban_farming"
 [sub_resource type="Resource" id="Resource_1htna"]
 script = ExtResource("2_6hgnv")
 id = &"do_nothing"
-label = "Müdahale etme"
+label = "Hiçbir şey yapma"
 description = "Yağmurun yağmasını beklersin."
 
 [resource]
 script = ExtResource("3_m6xv3")
 id = &"drought"
 display_name = "Kuraklık"
-description = "Yağışların azaldığı bir yıl: barajlar düşük, yer altı suyu çekiliyor."
+description = "Yağmur az yağdı: barajlar boşalıyor, yer altındaki su azalıyor."
+month = 8
 risk_type = &"drought"
 earliest_year = 2044
 scripted_year = 2046
@@ -63,7 +64,7 @@ base_damage = {
 "water_security": -20.0
 }
 responses = Array[ExtResource("2_6hgnv")]([SubResource("Resource_pt2ig"), SubResource("Resource_6hgnv"), SubResource("Resource_m6xv3"), SubResource("Resource_j4il8"), SubResource("Resource_1htna")])
-warning_text = "Kuraklık riski yükseliyor. Şehrinizin su rezervlerini ve tüketim seviyesini kontrol edin."
+warning_text = "Kuraklık geliyor. Şehrin suyu yetecek mi, şimdiden bak."
 vulnerability_stats = {
 "water_security": 1.0
 }

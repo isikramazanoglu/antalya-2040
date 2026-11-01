@@ -135,18 +135,18 @@ text = "Oyun hakkında"
 layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
-text = "2040 yılındasın. Antalya kıyısından esinlenen küçük bir Akdeniz şehrinin yönetimi sana geçti. Her tur bir yıl; oyun 2052'de biter.
+text = "2040 yılındasın ve Antalya'dan esinlenen küçük bir Akdeniz şehrinin başkanısın. Zaman ay ay akar; oyun 2052'nin sonunda biter. Üstteki düğmelerle zamanı durdurabilir ya da hızlandırabilirsin.
 
 [b]Ne yaparsın?[/b]
-Şehirdeki arsalara tıkla, sınırlı bütçenle on iki sürdürülebilir yatırımdan birini seç: güneş enerjisi, su depolama, yeşil park, toplu taşıma, kıyı restorasyonu ve diğerleri. Her yatırımın bilgi kartını oku.
+Şehirdeki boş arsalara tıkla ve paranla on iki iklim dostu yatırımdan birini kur: güneş enerjisi, su deposu, park, toplu taşıma, kıyı onarımı ve diğerleri. Her yatırımın kısa bilgi kartını oku.
 
-[b]Krizler önceden haber verir.[/b]
-Kuraklık, sıcak hava dalgası ve kıyı taşkını gelmeden bir yıl önce uyarı alırsın. Doğru yatırımlar hasarı azaltır; kriz anında bir müdahale seçersin.
+[b]Tehlikeler önceden haber verir.[/b]
+Kuraklık, sıcak hava dalgası ve kıyı taşkını gelmeden aylar önce uyarı alırsın. Doğru yatırımı önceden yaparsan zarar azalır; kriz gelince ne yapacağını seçersin.
 
 [b]İklim Laboratuvarı[/b]
-Şehrinin emisyonlarını, yerel riskleri ve atmosferdeki CO2'nin gerçek ölçümünü (NOAA) karşılaştırırsın. Tek bir şehir küresel eğriyi değiştiremez; ama kendi emisyonunu ve risklerini yönetebilir.
+Şehrinin ne kadar karbon çıkardığını, hangi tehlikelerin beklediğini ve dünyanın havasındaki karbondioksidin gerçek ölçümünü (NOAA) görürsün. Tek bir şehir dünyayı tek başına değiştiremez; ama kendi payını azaltabilir ve tehlikelere hazırlanabilir.
 
-[i]Oyundaki bütçe, nüfus, gösterge ve risk değerleri gerçek Antalya ölçümleri değil, oyun dengeleme değerleridir.[/i]"
+[i]Oyundaki para, nüfus ve puanlar gerçek Antalya ölçümleri değil, oyunun kendi sayılarıdır.[/i]"
 
 [node name="AboutCloseButton" type="Button" parent="About/Panel/VBox"]
 unique_name_in_owner = true

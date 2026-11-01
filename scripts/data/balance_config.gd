@@ -5,6 +5,8 @@ extends Resource
 @export_group("Takvim")
 @export var start_year: int = 2040
 @export var end_year: int = 2052
+## Ayın gerçek zamanda süresi (sn, hız ×1). İklim ve ekonomi hesapları yıllık kalır; ay yalnızca takvimdir.
+@export var seconds_per_month: float = 4.0
 
 @export_group("Başlangıç")
 @export var start_credits: int = 1000

@@ -4,3 +4,4 @@
 
 [resource]
 script = ExtResource("1_balance")
+seconds_per_month = 78.0

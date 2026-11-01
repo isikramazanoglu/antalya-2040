@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/buildings/commercial/commercial_shop_a.tres" id="1_euj31"]
+
+[node name="CommercialShopA" type="MeshInstance3D" unique_id=686437157]
+mesh = ExtResource("1_euj31")

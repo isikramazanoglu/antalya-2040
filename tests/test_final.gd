@@ -115,9 +115,9 @@ func _run() -> void:
 	var text := ""
 	for r in final_ui.find_children("*", "RichTextLabel", true, false):
 		text += r.get_parsed_text()
-	_check(text.contains("Ekonomi") and text.contains("Enerji") and text.contains("Su") and text.contains("Ekosistem") and text.contains("İklim ve afetler") and text.contains("Yatırımlar"),
+	_check(text.contains("Para") and text.contains("Elektrik") and text.contains("Su") and text.contains("Doğa ve karbon") and text.contains("Krizler") and text.contains("Yatırımlar"),
 			"final raporunda bütün bölümler var")
-	_check(final_ui.find_children("*", "LineChart", true, false).size() >= 4 and text.contains("küresel atmosferik CO₂"), "grafikler var; yerel emisyon küresel CO₂'den ayrılmış")
+	_check(final_ui.find_children("*", "LineChart", true, false).size() >= 4 and text.contains("dünyanın havasındaki CO₂"), "grafikler var; yerel emisyon küresel CO₂'den ayrılmış")
 	_check(not final_ui.find_child("PresentButton", true, false).visible, "Ekip A dinlemiyorsa \"dönüşümü izle\" düğmesi gizli")
 	final_ui.find_child("ExportButton", true, false).pressed.emit()
 	var status: String = final_ui.find_child("ExportStatus", true, false).text

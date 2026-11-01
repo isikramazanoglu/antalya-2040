@@ -59,7 +59,7 @@ stretch_mode = 5
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.88, 0.87, 0.7)
 theme_override_font_sizes/font_size = 15
-text = "YIL"
+text = "TARİH"
 
 [node name="YearValue" type="Label" parent="TopBar/HBox"]
 unique_name_in_owner = true
@@ -267,7 +267,7 @@ custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 focus_mode = 2
 theme_override_constants/icon_max_width = 22
-text = "Yılı bitir"
+text = "Yıl sonuna atla"
 icon = ExtResource("i_next")
 theme_override_colors/font_color = Color(0.3, 0.85, 0.82, 1)
 theme_override_font_sizes/font_size = 20

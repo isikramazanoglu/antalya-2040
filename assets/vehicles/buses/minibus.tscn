@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/vehicles/buses/minibus_body.tres" id="1_u7oin"]
+[ext_resource type="ArrayMesh" path="res://assets/vehicles/wheels/wheel_car.tres" id="2_phhpb"]
+
+[node name="Minibus" type="Node3D" unique_id=664771793]
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=1625457256]
+mesh = ExtResource("1_u7oin")
+
+[node name="Wheel_0" type="MeshInstance3D" parent="." unique_id=1000607819]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.39, 0.135, -0.8)
+mesh = ExtResource("2_phhpb")
+
+[node name="Wheel_1" type="MeshInstance3D" parent="." unique_id=19578608]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.39, 0.135, -0.8)
+mesh = ExtResource("2_phhpb")
+
+[node name="Wheel_2" type="MeshInstance3D" parent="." unique_id=1399076282]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.39, 0.135, 0.85)
+mesh = ExtResource("2_phhpb")
+
+[node name="Wheel_3" type="MeshInstance3D" parent="." unique_id=1018401356]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.39, 0.135, 0.85)
+mesh = ExtResource("2_phhpb")

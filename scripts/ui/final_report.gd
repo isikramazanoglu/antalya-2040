@@ -108,7 +108,7 @@ func _build(summary: Dictionary) -> void:
 	var bar := BarChart.new()
 	bar.label_width = 250.0
 	bar.set_data(bars, "")
-	%Content.add_child(_rich("[b]Alt puanlar[/b]  [font_size=13][color=#b8c4c2]0–100 · ağırlıklar: ekonomi, su, enerji, uyum, ekosistem, yaşam %15; afetlere hazırlık %10[/color][/font_size]"))
+	%Content.add_child(_rich("[b]Alt puanlar[/b]  [font_size=13][color=#b8c4c2]0–100 · krizlere hazırlık %10, diğer altısı %15 sayılır[/color][/font_size]"))
 	%Content.add_child(bar)
 	var why := ""
 	for d in ev.dimensions:
@@ -122,7 +122,7 @@ func _build(summary: Dictionary) -> void:
 		var pct: String = "—" if row.pct == null else "%+d%%" % roundi(row.pct)
 		c += "[cell]%s      [/cell][cell]%s      [/cell][cell]%s      [/cell][cell][color=#%s]%s[/color]      [/cell][cell]%s[/cell]" % [
 			row.title, UiText.thousands(roundi(row.start)), UiText.thousands(roundi(row.final)), color.to_html(false), UiText.format_delta(row.delta), pct]
-	c += "[/table]\n[font_size=13][color=#b8c4c2]Bütçe ve nüfustaki değişim tek başına başarı ya da başarısızlık değildir; gri gösterilir. Emisyonda düşüş iyidir. Başlangıcı 0 olan göstergede yüzde hesaplanmaz (—).[/color][/font_size]"
+	c += "[/table]\n[font_size=13][color=#b8c4c2]Bütçe ve nüfustaki değişim tek başına başarı ya da başarısızlık değildir; gri gösterilir. Karbonda düşüş iyidir. Başta 0 olan satırda yüzde hesaplanmaz (—).[/color][/font_size]"
 	_section("2040 ve %d karşılaştırması" % int(final.get("year", 2052)), c)
 
 	var years := PackedStringArray()
@@ -131,19 +131,19 @@ func _build(summary: Dictionary) -> void:
 	var tot: Dictionary = ev.totals
 
 	# Ekonomi
-	_section("Ekonomi", "Toplam yatırım: %s kredi (%d yapı) · toplam işletme gideri: %s · toplam gelir: %s\nBaşlangıç bütçesi %s → final bütçe %s" % [
+	_section("Para", "Yatırımlara harcanan: %s kredi (%d yapı) · bakım masrafları: %s · vergi geliri: %s\nBaşta %s kredi → sonunda %s kredi" % [
 		UiText.thousands(tot.investment_cost), tot.buildings, UiText.thousands(tot.upkeep), UiText.thousands(tot.income),
 		UiText.thousands(int(start.get("credits", 0))), UiText.thousands(int(final.get("credits", 0)))])
 	if history.size() > 0:
-		_chart("Bütçe", "kredi · yıl sonları · OYUN SİMÜLASYONU", [{"name": "Bütçe", "color": Color(0.98, 0.82, 0.35), "values": _series(history, "credits")}], years)
+		_chart("Bütçe", "kredi · yıl sonları · OYUN HESABI", [{"name": "Bütçe", "color": Color(0.98, 0.82, 0.35), "values": _series(history, "credits")}], years)
 
 	# Enerji
-	_section("Enerji", "Final yenilenebilir üretim %d · tüketim %d · yenilenebilir payı %%%d" % [
+	_section("Elektrik", "Sonunda temiz elektrik %d · ihtiyaç %d · temiz elektrik payı %%%d" % [
 		roundi(final.get("renewable_energy", 0.0)), roundi(final.get("energy_demand", 0.0)), roundi(float(final.get("renewable_share", 0.0)) * 100)])
 	if history.size() > 0:
-		_chart("Enerji üretimi ve tüketimi", "oyun birimi/yıl · OYUN SİMÜLASYONU", [
-			{"name": "Tüketim", "color": Color(0.98, 0.75, 0.25), "values": _series(history, "energy_demand")},
-			{"name": "Yenilenebilir üretim", "color": Color(0.42, 0.82, 0.52), "values": _series(history, "renewable_energy")}], years)
+		_chart("Elektrik: ihtiyaç ve temiz üretim", "OYUN HESABI", [
+			{"name": "İhtiyaç", "color": Color(0.98, 0.75, 0.25), "values": _series(history, "energy_demand")},
+			{"name": "Temiz elektrik", "color": Color(0.42, 0.82, 0.52), "values": _series(history, "renewable_energy")}], years)
 
 	# Su
 	var builds: Array = summary.get("city_2052", {}).get("builds", [])
@@ -155,21 +155,21 @@ func _build(summary: Dictionary) -> void:
 			water_names.append(def.display_name)
 		if def and def.category in [&"heat", &"food", &"waste", &"coast"]:
 			green_names.append(def.display_name)
-	_section("Su", "Su güvenliği %d → %d · final arz %d (+%d geri kazanılmış) / talep %d\nSu yatırımları: %s" % [
+	_section("Su", "Su puanı %d → %d · sonunda şehrin suyu %d (+%d yeniden kullanılan) / ihtiyaç %d\nSu yatırımları: %s" % [
 		roundi(start.get("water_security", 0.0)), roundi(final.get("water_security", 0.0)), roundi(final.get("water_supply", 0.0)),
 		roundi(final.get("recycled_water_used", 0.0)), roundi(final.get("water_demand", 0.0)), ", ".join(water_names) if water_names.size() > 0 else "yok"])
 	if history.size() > 0:
-		_chart("Su güvenliği", "0–100 · OYUN SİMÜLASYONU", [{"name": "Su güvenliği", "color": Color(0.3, 0.85, 0.82), "values": _series(history, "water_security")}], years)
+		_chart("Su puanı", "0–100 · OYUN HESABI", [{"name": "Su puanı", "color": Color(0.3, 0.85, 0.82), "values": _series(history, "water_security")}], years)
 
 	# Ekosistem
-	_section("Ekosistem", "Ekosistem sağlığı %d → %d · atık geri kazanımı %%%d → %%%d\nDoğa, gıda ve atık yatırımları: %s" % [
+	_section("Doğa ve karbon", "Doğa puanı %d → %d · çöp azaltma %%%d → %%%d\nDoğa, gıda ve çöp yatırımları: %s" % [
 		roundi(start.get("ecosystem_health", 0.0)), roundi(final.get("ecosystem_health", 0.0)), roundi(float(start.get("waste_recovery", 0.0)) * 100),
 		roundi(float(final.get("waste_recovery", 0.0)) * 100), ", ".join(green_names) if green_names.size() > 0 else "yok"])
 	if history.size() > 0:
-		_chart("Ekosistem sağlığı ve yerel emisyon", "0–100 ve oyun birimi · OYUN SİMÜLASYONU", [
-			{"name": "Ekosistem sağlığı", "color": Color(0.42, 0.82, 0.52), "values": _series(history, "ecosystem_health")},
-			{"name": "Yerel emisyon endeksi", "color": Color(0.85, 0.45, 0.35), "values": _series(history, "emissions_total")}], years,
-			"Yerel emisyon şehrin göreli endeksidir; küresel atmosferik CO₂ (ppm) değildir ve şehir yatırımları küresel değeri doğrudan değiştirmez.")
+		_chart("Doğa ve karbon salımı", "OYUN HESABI", [
+			{"name": "Doğa", "color": Color(0.42, 0.82, 0.52), "values": _series(history, "ecosystem_health")},
+			{"name": "Karbon salımı", "color": Color(0.85, 0.45, 0.35), "values": _series(history, "emissions_total")}], years,
+			"Karbon salımı yalnızca senin şehrinin oyun puanıdır; dünyanın havasındaki CO₂ (ppm) ölçümü değildir. Tek bir şehir dünya değerini hemen değiştiremez.")
 
 	# İklim ve afetler
 	var crises: Array = GameState.crisis_log
@@ -177,9 +177,9 @@ func _build(summary: Dictionary) -> void:
 	for r in crises:
 		var event := Catalog.get_event(r.event_id)
 		var response := EventManager.find_response(event, r.response_id) if event else null
-		ct += "• %d · %s · müdahale: %s · kredi %s · yatırım koruması %%%d\n" % [r.get("year", 0), event.display_name if event else str(r.event_id),
+		ct += "• %d · %s · ne yaptın: %s · para %s · yatırımların koruması %%%d\n" % [r.get("year", 0), event.display_name if event else str(r.event_id),
 				response.label if response else str(r.response_id), UiText.format_delta(float(r.damage.get("credits", 0.0))), roundi(float(r.mitigation) * 100)]
-	_section("İklim ve afetler", (ct if ct != "" else "Kriz yaşanmadı.\n") + "Krizlerden toplam kredi kaybı (müdahale maliyeti dahil): %s · final iklim dayanıklılığı %%%d" % [
+	_section("Krizler", (ct if ct != "" else "Kriz olmadı.\n") + "Krizlerde kaybedilen toplam para: %s · sonunda tehlikelere karşı koruma %%%d" % [
 		UiText.format_delta(tot.crisis_loss), roundi(float(final.get("climate_resilience", 0.0)) * 100)])
 
 	# Yatırımlar

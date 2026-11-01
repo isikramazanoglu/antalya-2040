@@ -6,7 +6,7 @@
 script = ExtResource("1_87j6y")
 id = &"greenhouse_gases"
 title = "Sera gazları"
-definition = "Atmosferde ısıyı tutan gazlar. Karbondioksit, metan ve diazot monoksit başlıcalarıdır."
+definition = "Havada ısıyı tutan gazlar. En önemlileri karbondioksit, metan ve diazot monoksittir."
 example = "Çöplükte çürüyen gıda atığı metan çıkarır."
-game_link = "Yerel emisyon endeksi şehrin sera gazı salımını göreli olarak gösterir."
+game_link = "Ekrandaki \"Karbon salımı\" şehrinin bu gazlardan ne kadar çıkardığını oyun puanıyla gösterir."
 sources = Array[String](["US EPA, Overview of Greenhouse Gases (web sayfası), https://www.epa.gov/ghgemissions/overview-greenhouse-gases, erişim 2026-10-31"])

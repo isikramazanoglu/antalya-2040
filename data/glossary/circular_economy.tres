@@ -6,7 +6,7 @@
 script = ExtResource("1_qxpub")
 id = &"circular_economy"
 title = "Döngüsel ekonomi"
-definition = "Malzemelerin atığa dönüşmediği, ürünlerin ve malzemelerin olabildiğince uzun süre kullanımda tutulduğu ve doğanın yenilendiği ekonomik sistem."
+definition = "Eşyaları ve malzemeleri çöpe atmak yerine olabildiğince uzun süre kullanmak, tamir etmek ve yeniden kullanmak; böylece doğanın da kendini yenilemesine izin vermek."
 example = "Gıda kurtarma ile yenilebilir gıdanın çöpe gitmemesi."
 game_link = "Gıda kurtarma merkezi ve kompost tesisi bu yaklaşımı temsil eder."
 sources = Array[String](["Ellen MacArthur Foundation, Circular economy introduction (web sayfası), https://www.ellenmacarthurfoundation.org/topics/circular-economy-introduction/overview, erişim 2026-10-31"])

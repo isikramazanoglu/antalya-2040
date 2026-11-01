@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_3gdn8")
 id = &"water_75"
-title = "Su güvenliğini 75'e çıkar"
+title = "Su puanını 75'e çıkar"
 description = "Kurak yıllar gelmeden şehrin suyunu güvenceye al."
 stat = "water_security"
 target = 75.0

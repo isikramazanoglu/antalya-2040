@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/buildings/apartments/apartment_midrise_a.tres" id="1_xrene"]
+
+[node name="ApartmentMidriseA" type="MeshInstance3D" unique_id=2135014465]
+mesh = ExtResource("1_xrene")

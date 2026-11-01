@@ -6,7 +6,7 @@
 script = ExtResource("1_7ts6m")
 id = &"carbon_dioxide"
 title = "Karbondioksit (CO₂)"
-definition = "Fosil yakıtlar yakıldığında açığa çıkan, atmosferde uzun süre kalan başlıca sera gazı."
+definition = "Kömür, petrol ve doğalgaz yakılınca havaya çıkan gaz. Havada uzun süre kalır ve Dünya'yı ısıtan gazların başında gelir."
 example = "Kömürle elektrik üretmek CO₂ salar; güneş paneli üretim sırasında salmaz."
-game_link = "Küresel CO₂ grafiği NOAA'nın Mauna Loa ölçümlerini gösterir."
+game_link = "\"Dünyanın havası\" sayfasındaki grafik, NOAA'nın Mauna Loa'da yaptığı gerçek ölçümleri gösterir."
 sources = Array[String](["US EPA, Overview of Greenhouse Gases (web sayfası), https://www.epa.gov/ghgemissions/overview-greenhouse-gases, erişim 2026-10-31", "NOAA Global Monitoring Laboratory, Trends in Atmospheric Carbon Dioxide (web sayfası), https://gml.noaa.gov/ccgg/trends/, erişim 2026-10-31"])

@@ -89,7 +89,7 @@ func _process(_d: float) -> bool:
 			_check(_pick_card("Güneş"), "3) açık alanda Güneş enerjisi tesisi listeleniyor")
 		85:
 			var detail: String = _panel("DetailSummary").text
-			_check(detail.contains("Enerji emisyonu") and detail.contains("Temel fayda"), "7a) seçilen yatırımın etkileri ve eğitim bilgisi gösteriliyor")
+			_check(detail.contains("Elektrik kaynaklı karbon") and detail.contains("Ne işe yarar?"), "7a) seçilen yatırımın etkileri ve eğitim bilgisi gösteriliyor")
 			_panel("BuildButton").pressed.emit()
 			_panel("BuildButton").pressed.emit()
 		110:
@@ -103,8 +103,8 @@ func _process(_d: float) -> bool:
 			var anchor: Node3D = _plot("O01").get_node("BuildingAnchor")
 			_check(building.global_position.distance_to(anchor.global_position) < 0.01 and building.global_position.y >= _plot("O01").global_position.y - 0.01,
 					"10) bina arsanın bağlantı noktasında, zeminin altında değil")
-			_check(_hud_value("Yerel emisyon") == str(roundi(gs.stats.emissions_total)) and _ui("HUD").find_child("CreditsValue", true, false).text == str(gs.stats.credits),
-					"11) HUD bütçe ve yerel emisyonu GameState'ten gösteriyor (emisyon %s)" % _hud_value("Yerel emisyon"))
+			_check(_hud_value("Karbon salımı") == str(roundi(gs.stats.emissions_total)) and _ui("HUD").find_child("CreditsValue", true, false).text == str(gs.stats.credits),
+					"11) HUD bütçe ve yerel emisyonu GameState'ten gösteriyor (emisyon %s)" % _hud_value("Karbon salımı"))
 			_click_plot("O01")
 		120:
 			_check(not _panel("BuildButton").visible, "2) dolu arsa seçilince inşa düğmesi yok")
@@ -134,7 +134,7 @@ func _process(_d: float) -> bool:
 			_panel("BuildButton").pressed.emit()
 		160:
 			_check(gs.stats.ecosystem_health > get_meta("eco") and gs.stats.quality_of_life > get_meta("qol")
-					and _hud_value("Ekosistem sağlığı") == str(roundi(gs.stats.ecosystem_health)) and _hud_value("Yaşam kalitesi") == str(roundi(gs.stats.quality_of_life)),
+					and _hud_value("Doğa") == str(roundi(gs.stats.ecosystem_health)) and _hud_value("Yaşam kalitesi") == str(roundi(gs.stats.quality_of_life)),
 					"8) park: ekosistem %d, yaşam %d; HUD aynı değerleri gösteriyor" % [gs.stats.ecosystem_health, gs.stats.quality_of_life])
 			_check(_plot("U01").get_building() != null, "9) park şehirde görünüyor")
 			_panel("CloseButton").pressed.emit()
@@ -147,7 +147,7 @@ func _process(_d: float) -> bool:
 			set_meta("supply", gs.stats.water_supply)
 			_panel("BuildButton").pressed.emit()
 		200:
-			_check(gs.stats.water_security > get_meta("water") and gs.stats.water_supply > get_meta("supply") and _hud_value("Su güvenliği") == str(roundi(gs.stats.water_security)),
+			_check(gs.stats.water_security > get_meta("water") and gs.stats.water_supply > get_meta("supply") and _hud_value("Su") == str(roundi(gs.stats.water_security)),
 					"7) su deposu: su güvenliği %d, su arzı %d; HUD güncel" % [gs.stats.water_security, gs.stats.water_supply])
 			_check(gs.stats.credits == 1000 - 400 - 150 - 250, "4/5) toplam harcama tam olarak 800 (%d kaldı)" % gs.stats.credits)
 			_click_plot("O03")

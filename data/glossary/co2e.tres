@@ -6,7 +6,7 @@
 script = ExtResource("1_gv80a")
 id = &"co2e"
 title = "CO₂ eşdeğeri (CO₂e)"
-definition = "Farklı sera gazlarını tek ölçüde toplamak için kullanılan birim. Her gaz, aynı miktar CO₂'ye göre ne kadar ısınmaya yol açtığına (küresel ısınma potansiyeli) göre çevrilir."
+definition = "Dünyayı ısıtan farklı gazları tek bir sayıda toplamak için kullanılan ölçü. Her gaz, aynı miktar karbondioksitten kaç kat fazla ısıttığına göre karbondioksit cinsine çevrilir."
 example = "Metanın etkisi CO₂ cinsinden ifade edilerek toplam hesaplanır."
-game_link = "Oyunun emisyon endeksi CO₂e değildir; gerçek bir envanter olmadığı için göreli oyun birimi kullanılır."
+game_link = "Oyundaki karbon sayıları CO₂e değildir; gerçek ölçüm olmadığı için oyun puanı kullanılır."
 sources = Array[String](["US EPA, Understanding Global Warming Potentials (web sayfası), https://www.epa.gov/ghgemissions/understanding-global-warming-potentials, erişim 2026-10-31"])
