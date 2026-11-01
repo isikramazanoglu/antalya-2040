@@ -21,6 +21,9 @@ cast_shadow = 0
 mesh = SubResource("BoxMesh_1")
 surface_material_override/0 = ExtResource("3_plot_urban")
 
+[node name="Edge" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+
 [node name="VisualOverlay" type="Node3D" parent="."]
 
 [node name="Highlight" type="MeshInstance3D" parent="VisualOverlay"]
