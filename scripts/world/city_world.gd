@@ -23,6 +23,8 @@ const BUILDING_SCENE_PATH := "res://scenes/buildings/b_%s.tscn"
 
 var _selected: BuildPlot
 var _hovered: BuildPlot
+## Sol tuş haritada basıldı; bırakılınca (sürükleme olmadıysa) tıklama olarak işlenir.
+var _click_pending := false
 var _selection_enabled := true
 ## Aşama sinyali bir kez geldiyse görseller onunla sürülür; crisis_started/resolved yalnızca yedektir.
 var _stage_driven := false
@@ -53,11 +55,19 @@ func _ready() -> void:
 			place_building(plot.plot_id, building_id, false)
 
 
+## Seçim sol tuş BIRAKILINCA yapılır (A11): basılıyken imleç sürükleme eşiğini aşarsa CameraRig haritayı sürükler ve
+## bu bırakma tıklama sayılmaz. CameraRig bu node'un çocuğu olduğu için olayı ondan önce alır.
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
-		_set_hovered(_plot_at(event.position) if _selection_enabled else null)
+		var dragging: bool = _camera_rig != null and _camera_rig.is_left_dragging()
+		_set_hovered(_plot_at(event.position) if _selection_enabled and not dragging else null)
 	elif event.is_action_pressed("select"):
-		if not _selection_enabled:
+		_click_pending = _selection_enabled
+	elif event.is_action_released("select"):
+		if not _click_pending:
+			return  # basış arayüzde başladı ya da seçim kapalıydı
+		_click_pending = false
+		if not _selection_enabled or (_camera_rig != null and _camera_rig.was_left_drag()):
 			return
 		var plot := _plot_at(event.position)
 		if plot:

@@ -3,6 +3,8 @@ extends Node3D
 ## Sahip: A. İzometrik kamera (mimari §2.4). Kök = bakılan nokta, Y ekseninde döner;
 ## Pitch sabit eğim; yakınlaştırma Camera3D'yi Pitch ekseninde ileri geri iter.
 ## WASD ve ok tuşlarıyla ekran yönünde kaydırma, tekerlek yakınlaştırma, orta tuşla zemini tutup sürükleme.
+## Sol tuşla sürükleme (A11): basılıyken imleç drag_threshold pikselden fazla giderse harita sürüklenir; kısa tıklama
+## arsa seçimi olarak kalır (CityWorld seçimi tuş bırakılınca yapar ve was_left_drag() ile sürüklemeyi ayırır).
 ## Q/E döndürme rotate_limit_deg ile sınırlanır (CameraRig.tscn'de 0: sabit açı).
 ## Fare girdisi _unhandled_input'tan gelir: arayüzün tükettiği tıklama/sürükleme haritayı oynatmaz.
 ## Sinematik modda (final sunumu) oyuncu girdisi yok sayılır; kamerayı glide_to / play_tour yönetir.
@@ -18,6 +20,9 @@ extends Node3D
 ## Yumuşatma hızı; büyüdükçe kamera hedefe daha çabuk varır.
 @export var smoothing := 8.0
 @export var drag_sensitivity := 0.0022
+## Sol tuşla sürüklemenin başlaması için basıldığı yerden en az bu kadar (viewport pikseli) gidilmeli;
+## altında kalan titreşimler tıklama sayılır.
+@export var drag_threshold := 8.0
 ## Ekranın arayüz panellerince kapatılmayan kısmı (oran olarak x, y, genişlik, yükseklik).
 ## Seçilen arsa bunun dışında kalırsa kamera onu içeri kaydırır.
 @export var safe_area := Rect2(0.23, 0.1, 0.48, 0.76)
@@ -29,6 +34,11 @@ var _target_zoom: float
 var _base_yaw: float
 var _yaw_offset := 0.0
 var _dragging := false
+## Sol tuş: haritada basıldı mı, nereden, eşik aşılıp sürüklemeye geçildi mi, son basış sürükleme miydi.
+var _left_down := false
+var _left_start := Vector2.ZERO
+var _left_dragging := false
+var _left_was_drag := false
 ## true iken oyuncu girdisi kamerayı oynatmaz (final sunumu).
 var cinematic := false
 var _glide: Tween
@@ -49,12 +59,34 @@ func _unhandled_input(event: InputEvent) -> void:
 		_target_zoom = clampf(_target_zoom + zoom_step, zoom_min, zoom_max)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE:
 		_dragging = event.pressed
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		# Arayüzün tükettiği tıklama buraya gelmez: panel / düğme üstünde basış sürükleme başlatmaz.
+		if event.pressed:
+			_left_down = true
+			_left_start = event.position
+			_left_dragging = false
+			_left_was_drag = false
+		else:
+			_left_was_drag = _left_dragging
+			_left_down = false
+			_left_dragging = false
 	elif event is InputEventMouseMotion and _dragging:
 		# Orta tuş arayüzün üstünde bırakıldıysa bırakma olayı buraya gelmez; tuş durumundan anla.
 		if not (event.button_mask & MOUSE_BUTTON_MASK_MIDDLE):
 			_dragging = false
 			return
 		_drag(event.position, event.relative)
+	elif event is InputEventMouseMotion and _left_down:
+		if not (event.button_mask & MOUSE_BUTTON_MASK_LEFT):
+			_left_down = false  # bırakma arayüzde ya da pencere dışında oldu
+			_left_dragging = false
+			return
+		if _left_dragging:
+			_drag(event.position, event.relative)
+		elif event.position.distance_to(_left_start) > drag_threshold:
+			# Eşik aşıldı: basılan noktadan bu yana birikmiş hareket tek seferde uygulanır, zemin imleçle gider.
+			_left_dragging = true
+			_drag(event.position, event.position - _left_start)
 
 
 func _process(delta: float) -> void:
@@ -101,8 +133,22 @@ func _drag(screen: Vector2, relative: Vector2) -> void:
 	else:
 		var motion := relative * _target_zoom * drag_sensitivity
 		delta = -(_flat_right() * motion.x + _flat_back() * motion.y)
-	_target_pos += delta
+	# Sınır burada da uygulanır: sürükleme sınırın dışına taşıp geri yaylanmaz, kenarda durur.
+	var clamped := Vector3(clampf(_target_pos.x + delta.x, bounds.position.x, bounds.end.x), _target_pos.y,
+			clampf(_target_pos.z + delta.z, bounds.position.y, bounds.end.y))
+	delta = clamped - _target_pos
+	_target_pos = clamped
 	position += Vector3(delta.x, 0.0, delta.z)
+
+
+## Sol tuşla harita şu an sürükleniyor mu (CityWorld fare üstü vurgusunu kapatır).
+func is_left_dragging() -> bool:
+	return _left_dragging
+
+
+## Son sol tuş basışı sürüklemeye dönüştü mü (bırakıldıktan sonra da true kalır; CityWorld bu bırakmayı tıklama saymaz).
+func was_left_drag() -> bool:
+	return _left_was_drag
 
 
 ## Kamerayı bir noktaya yumuşakça götürür (CitySandbox ve ileride odaklama için).

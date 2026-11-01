@@ -1,6 +1,7 @@
 extends SceneTree
 ## Sahip: A. Görsel revizyon 5 · kamera navigasyonu testi: WASD + ok tuşları (ekran yönü), sabit açı,
 ## orta tuşla zemini tutup sürükleme, arayüzle çakışma, zoom ve pan hızı, sınırlar, yazı alanı, seçim.
+## A11: sol tuşla sürükleme (eşik, seçimle çakışmama, arayüz, yakın/uzak zoom, sınırlar).
 ## Gerçek Game.tscn, gerçek tuş/fare olayları. Çalıştırma:
 ## <godot> --path . --resolution 1280x720 --script res://scripts/world/dev/test_camera_nav.gd
 
@@ -60,14 +61,24 @@ func middle(pressed: bool, pos: Vector2) -> void:
 	push_mouse(e)
 
 
-func motion(from: Vector2, to: Vector2, held := true) -> void:
+func left(pressed: bool, pos: Vector2) -> void:
+	var e := InputEventMouseButton.new()
+	e.button_index = MOUSE_BUTTON_LEFT
+	e.pressed = pressed
+	e.button_mask = MOUSE_BUTTON_MASK_LEFT if pressed else 0
+	e.position = pos
+	e.global_position = pos
+	push_mouse(e)
+
+
+func motion(from: Vector2, to: Vector2, held := true, mask := MOUSE_BUTTON_MASK_MIDDLE) -> void:
 	var steps := 8
 	for i in steps:
 		var e := InputEventMouseMotion.new()
 		e.position = from.lerp(to, float(i + 1) / steps)
 		e.relative = (to - from) / steps
 		e.global_position = e.position
-		e.button_mask = MOUSE_BUTTON_MASK_MIDDLE if held else 0
+		e.button_mask = mask if held else 0
 		push_mouse(e)
 		await process_frame
 
@@ -183,6 +194,101 @@ func _run() -> void:
 	var p := Vector2(rig.position.x, rig.position.z)
 	check(p.x <= b_rect.end.x + 0.01 and p.y <= b_rect.end.y + 0.01 and (p.x > b_rect.end.x - 1.0 or p.y > b_rect.end.y - 1.0),
 		"sınıra kadar gidiyor ve dışarı çıkmıyor (%.1f, %.1f; sınır %.0f, %.0f)" % [p.x, p.y, b_rect.end.x, b_rect.end.y])
+
+	print("\n[A11] sol tuşla sürükleme")
+	var picked_l := []
+	var on_pick := func(id, _k, _e): picked_l.append(id)
+	bus.plot_selected.connect(on_pick)
+	rig.set_view({"position": Vector3(0, 0, -4), "zoom": 50.0, "yaw": 0.0}, true)
+	await wait(0.4)
+	# Arsanın üstünde basıp sürükle: harita imleçle gider, arsa seçilmez.
+	var start_l := cam.unproject_position(city.find_plot(&"U07").global_position)
+	var end_l := start_l + Vector2(-260, -140)
+	var grabbed_l := ground(start_l)
+	left(true, start_l)
+	await motion(start_l, end_l, true, MOUSE_BUTTON_MASK_LEFT)
+	var hovered_while: bool = city._hovered != null
+	var dragging_now := rig.is_left_dragging()
+	left(false, end_l)
+	await wait(0.3)
+	var under_l := ground(end_l)
+	var dev_l := Vector2(under_l.x, under_l.z).distance_to(Vector2(grabbed_l.x, grabbed_l.z))
+	check(dragging_now and dev_l < 0.3, "sol tuşla sürükleme: tutulan zemin imleçle gitti (sapma %.2f)" % dev_l)
+	check(picked_l.is_empty(), "sürükleme bitince arsa seçilmedi (%s)" % str(picked_l))
+	check(not hovered_while, "sürüklenirken arsa fare üstü vurgusu yok")
+	check(is_equal_approx(rig.rotation.y, yaw0) and is_equal_approx(rig.get_node("Pitch").rotation.x, pitch0) and is_equal_approx(rig.get_view().zoom, 50.0),
+		"sol sürüklemede açı ve yakınlık sabit")
+	var rest := rig.position
+	await motion(end_l, start_l, false, MOUSE_BUTTON_MASK_LEFT)
+	await wait(0.3)
+	check(rig.position.distance_to(rest) < 0.01, "tuş bırakılınca kamera yeni yerinde kaldı")
+	# Eşiğin altındaki titreşim tıklamadır: arsa seçilir, kamera kıpırdamaz.
+	var plot_pos := cam.unproject_position(city.find_plot(&"U07").global_position)
+	var cam_before := rig.position
+	left(true, plot_pos)
+	await motion(plot_pos, plot_pos + Vector2(4, 3), true, MOUSE_BUTTON_MASK_LEFT)
+	left(false, plot_pos + Vector2(4, 3))
+	await wait(0.3)
+	check(picked_l == [&"U07"], "küçük titreşimli kısa tıklama arsayı seçti (%s)" % str(picked_l))
+	check(rig.position.distance_to(cam_before) < 0.05, "eşik altında kamera kıpırdamadı")
+	bus.plot_deselect_requested.emit()
+	await wait(0.2)
+	picked_l.clear()
+	# Arayüzde başlayan sol sürükleme haritayı oynatmaz, arsa seçmez.
+	var before_ui_l := rig.position
+	left(true, on_ui)
+	await motion(on_ui, on_ui + Vector2(0, -260), true, MOUSE_BUTTON_MASK_LEFT)
+	left(false, on_ui + Vector2(0, -260))
+	await wait(0.4)
+	check(rig.position.distance_to(before_ui_l) < 0.01 and picked_l.is_empty(), "alt çubukta başlayan sol sürükleme haritayı oynatmadı, seçim yok")
+	# Haritada başlayıp arayüzde bırakılırsa (bırakma olayı gelmez) sürükleme takılı kalmaz.
+	left(true, size * 0.5)
+	await motion(size * 0.5, size * 0.6, true, MOUSE_BUTTON_MASK_LEFT)
+	await motion(size * 0.6, size * 0.5, false, MOUSE_BUTTON_MASK_LEFT)
+	check(not rig.is_left_dragging(), "tuş arayüzde bırakılsa da sol sürükleme takılmıyor")
+	# Yakın ve uzak zoomda hassasiyet: tutulan zemin her ikisinde de imleçte (yakında az, uzakta çok kayar).
+	var travelled := []
+	var devs := []
+	for z in [22.0, 95.0]:
+		rig.set_view({"position": Vector3(0, 0, -4), "zoom": z, "yaw": 0.0}, true)
+		await wait(0.4)
+		var p0 := rig.position
+		var s0 := size * Vector2(0.5, 0.5)
+		var s1 := size * Vector2(0.62, 0.58)
+		var g0 := ground(s0)
+		left(true, s0)
+		await motion(s0, s1, true, MOUSE_BUTTON_MASK_LEFT)
+		left(false, s1)
+		await wait(0.3)
+		var g1 := ground(s1)
+		devs.append(Vector2(g1.x, g1.z).distance_to(Vector2(g0.x, g0.z)))
+		travelled.append(rig.position.distance_to(p0))
+	check(devs[0] < 0.3 and devs[1] < 0.3 and travelled[1] > travelled[0] * 2.5,
+		"hassasiyet zoom'a göre: yakın %.1f m, uzak %.1f m kaydı; zemin imleçte (sapma %.2f / %.2f)" % [travelled[0], travelled[1], devs[0], devs[1]])
+	# Sınırlar: çok uzun sürükleme sınırda durur.
+	rig.set_view({"position": Vector3(0, 0, -6), "zoom": 60.0, "yaw": 0.0}, true)
+	await wait(0.3)
+	for k in 6:
+		left(true, size * Vector2(0.8, 0.8))
+		await motion(size * Vector2(0.8, 0.8), size * Vector2(0.15, 0.15), true, MOUSE_BUTTON_MASK_LEFT)
+		left(false, size * Vector2(0.15, 0.15))
+	await wait(1.0)
+	var pl := Vector2(rig.position.x, rig.position.z)
+	var bl: Rect2 = rig.bounds
+	check(bl.grow(0.01).has_point(pl) and (pl.x > bl.end.x - 1.0 or pl.y > bl.end.y - 1.0),
+		"sol sürüklemeyle sınıra varılıyor, dışına çıkılmıyor (%.1f, %.1f)" % [pl.x, pl.y])
+	# Normal tıklama sürüklemelerden sonra da çalışıyor.
+	rig.set_view({"position": Vector3(4, 0, -1), "zoom": 45.0, "yaw": 0.0}, true)
+	await wait(0.4)
+	picked_l.clear()
+	var u08 := cam.unproject_position(city.find_plot(&"U08").global_position)
+	left(true, u08)
+	left(false, u08)
+	await wait(0.3)
+	check(picked_l == [&"U08"], "sürüklemelerden sonra tıklama yine seçiyor (%s)" % str(picked_l))
+	bus.plot_selected.disconnect(on_pick)
+	bus.plot_deselect_requested.emit()
+	await wait(0.2)
 
 	print("\n[oyun] seçim ve binalar kamera hareketinden etkilenmiyor")
 	rig.set_view({"position": Vector3(4, 0, -1), "zoom": 45.0, "yaw": 0.0}, true)
