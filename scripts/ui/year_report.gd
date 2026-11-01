@@ -72,7 +72,14 @@ func _render(report: Dictionary) -> void:
 
 	var t := "[color=#4dd9d1]%d yılı tamamlandı. Şehrinin yıllık raporu hazır.[/color]\n\n[b]Bütçe[/b]\n[table=2]" % report.year
 	t += _pair("Yıl başındaki para", UiText.thousands(before.credits))
-	t += _pair("Vergi geliri", "[color=#6bd185]+%s[/color]" % UiText.thousands(report.income))
+	var biz_income: int = report.get("business_income", 0)
+	t += _pair("Vergi geliri", "[color=#6bd185]+%s[/color]" % UiText.thousands(report.income - biz_income))
+	if biz_income > 0:
+		t += _pair("İşletmelerden gelen", "[color=#6bd185]+%s[/color]" % UiText.thousands(biz_income))
+	if report.get("fines", 0) > 0:
+		t += _pair("Çevre cezaları", "[color=#6bd185]+%s[/color]" % UiText.thousands(report.fines))
+	if report.get("inspection_cost", 0) > 0:
+		t += _pair("Ek denetimler", "[color=#ff8c73]-%s[/color]" % UiText.thousands(report.inspection_cost))
 	t += _pair("Bakım masrafları", "[color=#ff8c73]-%s[/color]" % UiText.thousands(report.upkeep))
 	if report.get("investment_cost", 0) > 0:
 		t += _pair("Yatırımlar", "[color=#ff8c73]-%s[/color]" % UiText.thousands(report.investment_cost))

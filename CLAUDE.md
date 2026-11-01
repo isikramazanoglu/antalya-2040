@@ -26,7 +26,7 @@ Ekip A final sunumunu `docs/FINAL_VISUAL_CONTRACT.md`'ye göre geliştirir.
 macOS'ta Godot: `/Applications/Godot.app/Contents/MacOS/Godot`. Windows'ta kurulu yol farklıdır.
 - Script hatası kontrolü: `<godot> --headless --path . --import`
 - Sahneyi kısa çalıştırma: `<godot> --headless --path . --quit-after 120 res://scenes/main/Game.tscn`
-- Ekip B headless testleri: `<godot> --headless --path . --script res://tests/test_day1_flow.gd` (ayrıca `test_day2_flow.gd`, `test_economy.gd`, `test_crises.gd`, `test_investments.gd`, `test_final.gd`; SONUÇ: TAMAM beklenir)
+- Ekip B headless testleri: `<godot> --headless --path . --script res://tests/test_day1_flow.gd` (ayrıca `test_day2_flow.gd`, `test_economy.gd`, `test_crises.gd`, `test_investments.gd`, `test_final.gd`, `test_months.gd`, `test_businesses.gd`; SONUÇ: TAMAM beklenir)
 - Pencereli testler: `<godot> --path . --script res://tests/test_menu.gd`, `test_e2e_game.gd`, `test_ui.gd`, `test_integration.gd`, `test_education.gd`, `test_playthrough.gd` (ui, integration, education ayrıca `--resolution 1920x1080` ile)
 - Denge simülasyonu: `<godot> --headless --path . --script res://tests/balance_sim.gd`
 - Windows export: `<godot> --headless --path . --export-release "Windows Desktop" build/windows/ANTALYA2040.exe`

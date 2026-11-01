@@ -1,0 +1,82 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/business_panel.gd" id="1_s"]
+
+[node name="BusinessPanel" type="PanelContainer"]
+theme_type_variation = &"SolidPanel"
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -330.0
+offset_right = 500.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_s")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "İşletmeler ve çevre denetimi"
+
+[node name="CloseButton" type="Button" parent="VBox/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 32)
+layout_mode = 2
+tooltip_text = "Kapat (Esc)"
+text = "×"
+
+[node name="Summary" type="RichTextLabel" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+
+[node name="Body" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="ListScroll" type="ScrollContainer" parent="VBox/Body"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="VBox/Body/ListScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Right" type="VBoxContainer" parent="VBox/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Detail" type="RichTextLabel" parent="VBox/Body/Right"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+
+[node name="Actions" type="HFlowContainer" parent="VBox/Body/Right"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+
+[node name="Status" type="Label" parent="VBox/Body/Right"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3

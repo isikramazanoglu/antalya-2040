@@ -10,6 +10,7 @@ var _water_alerted := false
 
 
 func _ready() -> void:
+	add_to_group("toasts")  # GameController işletme bildirimleri (Prompt 13)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	EventBus.build_approved.connect(_on_build_approved)
 	# Rapor ve kriz panelleri ekranın ortasını kaplar; o anda bildirimler başlığı örtmesin.

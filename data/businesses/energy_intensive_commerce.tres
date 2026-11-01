@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BusinessType" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/business_type.gd" id="1_btype"]
+
+[resource]
+script = ExtResource("1_btype")
+id = &"energy_intensive_commerce"
+display_name = "Soğuk depolu alışveriş merkezi"
+visual_id = &"Commercial_EnergyIntensive"
+size = 2
+employees = 70
+yearly_contribution = 35
+energy_use = 6.0
+water_use = 1.0
+ghg = 4.0
+ghg_energy_share = 0.9
+air = 1.0
+waste = 2.0
+spawn_weight = 0.7
+min_population = 520
+logistics = false
+description = "Büyük soğutucuları olan alışveriş merkezi. Çok elektrik harcar."

@@ -334,6 +334,18 @@ Emre'nin kredisi bittiği için kullanıcı kararıyla B yaptı. Ayrı dalda ve 
 - **Ekran görüntüleri** (gerçek oyun, arayüz gizli, 1920×1080, JPG): `docs/screenshots/01_city_overview.jpg`, `02_coastal_promenade.jpg`, `03_urban_district.jpg`, `04_public_space.jpg`, `05_city_life.jpg`, `06_closeup_architecture.jpg` (klasörde `.gdignore`: oyun paketine girmez).
 - **Yapılmadı / test edilmedi:** ışık ve atmosfer ayarları değiştirilmedi (görsel revizyon 3 sonucu korunuyor); LOD eklenmedi (FPS yeterli, ölçülmüş bir darboğaz yok); bisiklet süren karakter, mahalle sokaklarında hareketli trafik ve trafik ışıklarının trafiği yönetmesi hâlâ yok (Emre'nin notu); yayaların birbirinin içinden geçip geçmediği yalnızca A'nın `test_pedestrians.gd`'si ve görüntülerle kontrol edildi; Windows'ta çalıştırılmadı.
 
+### Prompt 13 notları (B, 2026-11-01) · İşletmeler, çevre denetimi, kayıt
+- Ayrıntı: `docs/BUSINESS_SYSTEM.md`; sözleşme v1.10 (§3.5 üç yeni sinyal, `stats.air_pollution/waste_pollution`, `emissions_by_sector.industry`, rapor alanları).
+- Kullanıcı kararları: işletmeler oyuncunun 15 arsasına değil ayrı **sanayi yerlerine** (I01–I08) kurulur; konumları Ekip A belirler. Projede kayıt sistemi yoktu; **bütün oyun için kayıt** kuruldu.
+- 10 işletme türü (`data/businesses/`), ay ay kendiliğinden kurulma (nüfus, boş yer, doluluk, hava kirliliği tavanı, su durumu, lojistik ihtiyacı), en çok 8 işletme. Katkı tek para birimi kredi olarak gelire ve ay ay bütçeye eklenir.
+- Sera gazı karbon salımına "Sanayi" kalemi olarak eklenir; yerel hava kirliliği ve atık yükü ayrı endeksler (yaşam kalitesi ve doğa yıllık düşer). Küresel CO₂ ölçümü değişmez.
+- Denetim: ayda 3 ücretsiz hak, ek denetim 20 kredi, aynı işletme 3 ayda bir. İhlal verilerden (hava/atık ÷ oyun standardı). Ceza ihlale bir kez ve işletme başına yılda bir kez; kirliliği azaltmaz. Kararlar: filtre, temiz enerji, atık arıtma (sıfırlamaz, %60 azaltır), süre ver, faaliyeti durdur / yeniden aç.
+- Denge ölçümü (ay ay 13 yıl, `bizsim`): ilk ölçümde her ay denetleyip ceza kesen oyuncu yılda 135–285 kredi topluyordu (işletme gelirinden fazla). Taban ceza 15 → 5, tavan 250 → 120, yılda bir ceza sınırı; sonra yılda 5–15 kredi. Kirlilik etkisi 0,06/0,05 → 0,03/0,03. Pasif oyunda 13 yılda ~5 işletme, yılda ~135 kredi katkı, yaşam kalitesi ~12 puan daha düşük. `balance_sim.gd` yıl yıl ilerlediği için işletme kurmaz; eski senaryo sonuçları değişmedi.
+- Kayıt: `user://antalya2040_save.dat` (ikili, sürüm 1, nesne yüklenmez). Her Ocak ve ana menüye dönerken otomatik; oyun bitince silinir; ana menüde "DEVAM ET". Yalnızca build fazında kaydedilir (ceza/ödül çoğalmaz). Testler (`--script`) oyuncunun kaydına dokunmaz.
+- Arayüz: HUD "Sanayi" düğmesi → İşletmeler ve çevre denetimi paneli (liste, ayrıntı, denetim, ceza, kararlar); bildirimler; yıl sonu raporunda işletme geliri, çevre cezaları, ek denetimler; Laboratuvar karbon grafiklerinde "Sanayi".
+- Testler: yeni `tests/test_businesses.gd` (promptun 16 senaryosu + kayıt/yükleme) TAMAM; B'nin 13 testi + A'nın 10 testi iki çözünürlükte TAMAM. `test_ui` emisyon grafiği 5 kaleme, `test_months` rapor toplamı ceza/denetim satırlarına uyarlandı. `test_integration` ve `test_playthrough` Ekip A12 inşaat gösterimi bitene kadar bekliyor (tıklama ıskalıyordu).
+- Ekip A için: sanayi yerlerinin konumu ve 10 modelin eşleştirmesi (`visual_id`), `business_spawned/updated/removed` dinleyicisi, duman `smoke_intensity`'den. Ayrıntı: BUSINESS_SYSTEM.md §8.
+
 ### Jüri demo akışı (5–7 dk, sabit kriz yılları, ek demo modu gerekmez)
 1. Giriş (30 sn): ana menü, arkada canlı şehir; "Oyun hakkında".
 2. 2040 şehri (45 sn): HUD; kaynak paneli, enerji üretim/tüketim, yerel emisyon.
