@@ -9,6 +9,7 @@
 [ext_resource type="StandardMaterial3D" path="res://assets/materials/ground.tres" id="7_ground"]
 [ext_resource type="StandardMaterial3D" path="res://assets/materials/sand.tres" id="8_sand"]
 [ext_resource type="PackedScene" path="res://scenes/world/Reservoir.tscn" id="9_Reservoir"]
+[ext_resource type="Script" path="res://scripts/world/pedestrians.gd" id="10_pedestrians"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.4745, 0.7255, 0.8471, 1)
@@ -202,6 +203,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -40)
 
 [node name="Decor" type="Node3D" parent="."]
 script = ExtResource("5_city_decor")
+
+[node name="Pedestrians" type="Node3D" parent="."]
+script = ExtResource("10_pedestrians")
 
 [node name="DisasterFX" parent="." node_paths=PackedStringArray("world_environment", "sun", "sea") instance=ExtResource("4_DisasterFX")]
 world_environment = NodePath("../WorldEnvironment")

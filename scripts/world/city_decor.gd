@@ -87,11 +87,6 @@ const FLOWERS: Array[Material] = [
 const M_POT_STONE := preload("res://assets/materials/buildings/bld_stone.tres")
 const M_POT_CREAM := preload("res://assets/materials/buildings/bld_cream.tres")
 const M_BIN := preload("res://assets/materials/buildings/bld_green_accent.tres")
-const SKINS: Array[Material] = [
-	preload("res://assets/materials/city/skin_light.tres"),
-	preload("res://assets/materials/city/skin_mid.tres"),
-	preload("res://assets/materials/city/skin_dark.tres"),
-]
 const SHIRTS: Array[Material] = [
 	preload("res://assets/materials/buildings/bld_turquoise.tres"),
 	preload("res://assets/materials/buildings/bld_terracotta.tres"),
@@ -101,13 +96,6 @@ const SHIRTS: Array[Material] = [
 	preload("res://assets/materials/buildings/bld_bin_yellow.tres"),
 	preload("res://assets/materials/city/flower_pink.tres"),
 ]
-const TROUSERS: Array[Material] = [
-	preload("res://assets/materials/buildings/bld_metal_dark.tres"),
-	preload("res://assets/materials/buildings/bld_window.tres"),
-	preload("res://assets/materials/buildings/bld_wood.tres"),
-	preload("res://assets/materials/buildings/bld_stone.tres"),
-]
-const M_HAIR := preload("res://assets/materials/buildings/bld_soil_dark.tres")
 const M_LIGHT := preload("res://assets/materials/signal_light.tres")
 const ACCENTS: Array[Material] = [
 	preload("res://assets/materials/buildings/bld_turquoise.tres"),
@@ -175,9 +163,11 @@ var _cylinder := CylinderMesh.new()
 var _cone := CylinderMesh.new()
 var _pyramid := CylinderMesh.new()
 var _car_meshes := {}
-## Statik insan figürleri tek mesh'te birleşir: materyal başına bir yüzey (birkaç draw call).
-var _people_tools := {}
-var _capsule := CapsuleMesh.new()
+## Görsel revizyon 8: oturan / ayakta duran kişilerin yerleri (Pedestrians düğümü okur). Her öğe:
+## {position, yaw, pose (&"sit" | &"stand"), look: [int, int, int]}.
+var people_spots: Array[Dictionary] = []
+## Yerleşen kütüphane binalarının tabanları (yaya rotası testi denetler).
+var building_footprints: Array[Rect2] = []
 
 
 func _ready() -> void:
@@ -185,12 +175,9 @@ func _ready() -> void:
 		child.queue_free()
 	_batches.clear()
 	_cars.clear()
+	people_spots.clear()
+	building_footprints.clear()
 	_car_meshes.clear()
-	_people_tools.clear()
-	_capsule.radius = 0.5
-	_capsule.height = 2.0
-	_capsule.radial_segments = 8
-	_capsule.rings = 2
 	_box.size = Vector3.ONE
 	_prism.size = Vector3.ONE
 	_sphere.radius = 0.5
@@ -219,7 +206,6 @@ func _ready() -> void:
 	_build_mountains()
 	_flush_batches()
 	_flush_buildings()
-	_flush_people()
 	_build_traffic()
 
 
@@ -539,7 +525,7 @@ func _build_town_square() -> void:
 	for side in [-1.0, 1.0]:
 		_olive(cx + side * 4.4, TOWN_SQUARE.end.y - 1.3, 0.9)
 		_cypress(cx + side * 4.6, hall_z + 0.2, 0.9)
-		_add(_box, M_WOOD, Vector3(cx + side * 2.3, 0.25, fountain.z), Vector3(0.4, 0.3, 1.2))
+		_add(_box, M_WOOD, Vector3(cx + side * 2.3, 0.07, fountain.z), Vector3(0.4, 0.14, 1.2))
 	# Döşeme: kenarda koyu taş bant, çeşmenin çevresinde açık taş halka; köşelerde çiçeklik ve ağaç grubu.
 	var sq := TOWN_SQUARE
 	for edge in [Rect2(sq.position.x, sq.position.y, sq.size.x, 0.35), Rect2(sq.position.x, sq.end.y - 0.35, sq.size.x, 0.35),
@@ -554,8 +540,8 @@ func _build_town_square() -> void:
 		_person(Vector3(cx + side * 1.3, 0.06, fountain.z + 1.48), PI, &"sit")
 		_pot(Vector3(cx + side * 1.8, 0.06, portico_z + 0.9), 0.9)
 		_lamp(Vector3(cx + side * (sq.size.x * 0.5 - 0.6), 0.06, sq.position.y + 3.6), -1.0)
-	_person(Vector3(cx - 0.8, 0.06, fountain.z - 1.4), 0.3, &"stand")
-	_person(Vector3(cx - 0.55, 0.06, fountain.z - 1.55), -2.6, &"stand")
+	_person(Vector3(cx + 2.9, 0.06, fountain.z - 1.5), 0.6, &"stand")
+	_person(Vector3(cx + 3.25, 0.06, fountain.z - 1.15), -2.4, &"stand")
 	_person(Vector3(cx + 2.8, 0.06, fountain.z - 0.6), PI * 0.5, &"walk")
 
 
@@ -574,17 +560,29 @@ func _build_coast_square() -> void:
 	# Büfenin önünde kafe masaları ve şemsiyeleri, köşelerde saksılar.
 	for k in 3:
 		var t := Vector3(c.x - 0.6 + k * 1.15, 0.06, c.y - 0.9)
-		_add(_cylinder, M_WOOD, t + Vector3(0, 0.22, 0), Vector3(0.5, 0.05, 0.5))
-		_add(_cylinder, M_RAIL, t + Vector3(0, 0.11, 0), Vector3(0.06, 0.22, 0.06))
+		_add(_cylinder, M_WOOD, t + Vector3(0, 0.3, 0), Vector3(0.5, 0.04, 0.5))
+		_add(_cylinder, M_RAIL, t + Vector3(0, 0.15, 0), Vector3(0.06, 0.3, 0.06))
 		_add(_cylinder, M_WOOD, t + Vector3(0, 0.6, 0), Vector3(0.04, 1.1, 0.04))
 		_add(_cone, AWNINGS[k % AWNINGS.size()], t + Vector3(0, 1.2, 0), Vector3(1.0, 0.25, 1.0))
 	for corner in [Vector3(COAST_SQUARE.position.x + 0.4, 0.06, COAST_SQUARE.position.y + 0.4), Vector3(COAST_SQUARE.end.x - 0.4, 0.06, COAST_SQUARE.position.y + 0.4)]:
 		_pot_group(corner, 0.9)
-	_person(Vector3(c.x - 0.6, 0.06, c.y - 0.62), PI, &"sit")
-	_person(Vector3(c.x + 0.55, 0.06, c.y - 1.2), 0.0, &"sit")
+	for seat in [[Vector3(c.x - 0.6, 0.06, c.y - 0.53), PI], [Vector3(c.x + 0.55, 0.06, c.y - 1.29), 0.0]]:
+		_cafe_chair(seat[0], seat[1])
+	_person(Vector3(c.x - 0.6, 0.06, c.y - 0.55), PI, &"sit")
+	_person(Vector3(c.x + 0.55, 0.06, c.y - 1.27), 0.0, &"sit")
 	_person(Vector3(c.x + 1.9, 0.06, c.y - 0.1), PI * 0.8, &"stand")
 	_person(Vector3(c.x + 2.15, 0.06, c.y - 0.3), -PI * 0.6, &"stand")
 	_lamp(Vector3(c.x - 2.6, 0.06, c.y - 1.6), -1.0)
+
+
+## Kafe sandalyesi (bank ile aynı oturma yüksekliği); yerel +z oturanın baktığı yön.
+func _cafe_chair(base: Vector3, yaw: float) -> void:
+	var b := Basis(Vector3.UP, yaw)
+	_push(_box, M_WOOD, Transform3D(b * Basis.from_scale(Vector3(0.22, 0.03, 0.2)), base + Vector3(0, 0.105, 0)))
+	_push(_box, M_WOOD, Transform3D(b * Basis.from_scale(Vector3(0.22, 0.16, 0.025)), base + b * Vector3(0, 0.22, -0.1)))
+	for sx in [-0.09, 0.09]:
+		for sz in [-0.08, 0.08]:
+			_push(_box, M_RAIL, Transform3D(b * Basis.from_scale(Vector3(0.02, 0.1, 0.02)), base + b * Vector3(sx, 0.05, sz)))
 
 
 # --- Mevcut evler: beyaz sıva, terracotta çatı, damda güneş kolektörü ---
@@ -661,6 +659,12 @@ func _try_place(key: StringName, left: float, z: float, area: Rect2) -> Rect2:
 			tools[material] = st
 		(tools[material] as SurfaceTool).append_from(mesh, s, xform)
 	_blocked.append(footprint.grow(0.2))
+	building_footprints.append(footprint)
+	# Görsel revizyon 8: dükkân önünde ve bazı ev kapılarında bekleyen kişi (rastgele sayı çekmeden, konumdan).
+	var h := absi(hash(Vector2i(roundi(x * 10.0), roundi(z * 10.0))))
+	if (key.begins_with("shop") and h % 3 != 0) or (key.begins_with("house") and h % 5 == 0):
+		people_spots.append({"position": Vector3(x + (h % 7) * 0.12 - 0.36, 0.0, footprint.end.y + 0.3),
+			"yaw": PI * 0.15 * float(h % 5 - 2), "pose": &"stand", "look": [h, h / 7, h / 13]})
 	# Bazı evlerin yanında zeytin ağacı (dekor, yer varsa).
 	if key.begins_with("house") and _rng.randf() < 0.25 and _is_free(Rect2(footprint.end.x + 0.2, z - 0.5, 1.0, 1.0)):
 		_olive(footprint.end.x + 0.7, z, 0.65)
@@ -942,11 +946,15 @@ func _near(x: float, list: Array, margin: float) -> bool:
 
 ## Bank: ahşap oturak ve sırtlık, taş ayaklar. yaw 0: sırtlık kuzeyde, oturan güneye (+z, denize) bakar.
 func _bench(base: Vector3, yaw: float) -> void:
+	# İnsan ölçeğinde (revizyon 8): oturak 0,12 birim (~0,3 m; karakterlerin oturma pozuna göre), derinlik 0,22,
+	# sırtlık iki çıta; ayaklar taş. Oturan kişi bankın yerel +z'sine 0,09 birim kaydırılır (pedestrians.gd).
 	var b := Basis(Vector3.UP, yaw)
-	_push(_box, M_WOOD, Transform3D(b * Basis.from_scale(Vector3(1.1, 0.07, 0.36)), base + Vector3(0, 0.3, 0)))
-	_push(_box, M_WOOD, Transform3D(b * Basis.from_scale(Vector3(1.1, 0.26, 0.06)), base + b * Vector3(0, 0.46, -0.17)))
+	_push(_box, M_WOOD, Transform3D(b * Basis.from_scale(Vector3(1.1, 0.035, 0.22)), base + Vector3(0, 0.1, 0)))
+	for k in 2:
+		_push(_box, M_WOOD, Transform3D(b * Basis.from_scale(Vector3(1.1, 0.06, 0.03)), base + b * Vector3(0, 0.2 + k * 0.1, -0.1)))
 	for sx in [-0.45, 0.45]:
-		_push(_box, M_PLANTER, Transform3D(b * Basis.from_scale(Vector3(0.08, 0.3, 0.32)), base + b * Vector3(sx, 0.15, 0)))
+		_push(_box, M_PLANTER, Transform3D(b * Basis.from_scale(Vector3(0.07, 0.1, 0.2)), base + b * Vector3(sx, 0.05, 0)))
+		_push(_box, M_PLANTER, Transform3D(b * Basis.from_scale(Vector3(0.05, 0.3, 0.04)), base + b * Vector3(sx, 0.15, -0.1)))
 
 
 ## Saksı: terracotta, taş, krem beton, modern dikdörtgen ya da geniş kase; içinde çalı + çiçek ya da küçük süs ağacı.
@@ -1025,15 +1033,12 @@ func _viewpoint(base: Vector3) -> void:
 
 ## Ayakta, yürüyen ya da oturan figür; boy yaklaşık 0,78 birim (≈ 1,75 m). +z ileri.
 func _person(base: Vector3, yaw: float, pose: StringName) -> void:
-	var shirt: Material = SHIRTS[_rng.randi() % SHIRTS.size()]
-	var trousers: Material = TROUSERS[_rng.randi() % TROUSERS.size()]
-	var skin: Material = SKINS[_rng.randi() % SKINS.size()]
-	var holder := Transform3D(Basis(Vector3.UP, yaw), base)
-	for part in _person_parts(pose, shirt, trousers, skin):
-		if not _people_tools.has(part[1]):
-			_people_tools[part[1]] = SurfaceTool.new()
-		(_people_tools[part[1]] as SurfaceTool).append_from(part[0], 0,
-				holder * Transform3D(Basis.from_euler(part[4]) * Basis.from_scale(part[3]), part[2]))
+	# Görsel revizyon 8: kişiler Pedestrians düğümünde iskeletli karakterlerle kurulur; burada yalnızca yer ve
+	# duruş kaydedilir. Aynı sayıda rastgele sayı çekilir ki şehrin geri kalan yerleşimi değişmesin.
+	var look := [_rng.randi(), _rng.randi(), _rng.randi()]
+	if pose == &"walk":
+		return  # yürüyenler artık rotalarda gerçekten yürüyor (pedestrians.gd)
+	people_spots.append({"position": base, "yaw": yaw, "pose": pose, "look": look})
 
 
 ## Kütüphane binaları: her mahalle tek MeshInstance3D, materyal başına bir yüzey (az draw call; mahalle
@@ -1073,49 +1078,6 @@ static func _building_layer(material: Material) -> String:
 	if name in ["rail", "metal", "plant"]:
 		return "fine"
 	return "detail"
-
-
-func _flush_people() -> void:
-	if _people_tools.is_empty():
-		return
-	var mesh := ArrayMesh.new()
-	for material in _people_tools:
-		(_people_tools[material] as SurfaceTool).commit(mesh)
-		mesh.surface_set_material(mesh.get_surface_count() - 1, material)
-	var instance := MeshInstance3D.new()
-	instance.name = "People"
-	instance.mesh = mesh
-	add_child(instance)
-	_people_tools.clear()
-
-
-## Figürün parçaları: [mesh, materyal, konum, ölçek, dönüş].
-func _person_parts(pose: StringName, shirt: Material, trousers: Material, skin: Material) -> Array:
-	var parts: Array = []  # [mesh, material, pos, scale, rot]
-	var hip := 0.36
-	if pose == &"sit":
-		hip = 0.33
-		for lx in [-0.045, 0.045]:
-			parts.append([_capsule, trousers, Vector3(lx, hip, 0.1), Vector3(0.07, 0.11, 0.07), Vector3(PI * 0.5, 0, 0)])
-			parts.append([_capsule, trousers, Vector3(lx, hip * 0.5, 0.2), Vector3(0.06, 0.09, 0.06), Vector3.ZERO])
-	else:
-		var swing := 0.25 if pose == &"walk" else 0.0
-		for k in 2:
-			var lx := -0.045 if k == 0 else 0.045
-			var a := swing if k == 0 else -swing
-			parts.append([_capsule, trousers, Vector3(lx, hip * 0.5, 0), Vector3(0.07, hip * 0.5, 0.07), Vector3(a, 0, 0)])
-	var chest := hip + 0.15
-	parts.append([_capsule, shirt, Vector3(0, chest, 0), Vector3(0.15, 0.12, 0.1), Vector3.ZERO])
-	var arm_swing := 0.3 if pose == &"walk" else 0.08
-	for k in 2:
-		var ax := -0.1 if k == 0 else 0.1
-		var a := arm_swing if k == 0 else -arm_swing
-		if pose == &"sit":
-			a = -0.6
-		parts.append([_capsule, shirt, Vector3(ax, chest - 0.02, 0.02 if pose == &"sit" else 0.0), Vector3(0.045, 0.11, 0.045), Vector3(a, 0, 0)])
-	parts.append([_sphere, skin, Vector3(0, chest + 0.2, 0), Vector3(0.12, 0.13, 0.12), Vector3.ZERO])
-	parts.append([_sphere, M_HAIR, Vector3(0, chest + 0.24, -0.01), Vector3(0.125, 0.08, 0.125), Vector3.ZERO])
-	return parts
 
 
 ## Taş çiçeklik: yeşillik ve iki renk çiçek.

@@ -1,11 +1,11 @@
 # Varlık kaynakları ve lisansları
 
-Son güncelleme: 2026-11-01 (Ekip A, görsel revizyon 7 · Akdeniz bina kütüphanesi).
+Son güncelleme: 2026-11-01 (Ekip A, görsel revizyon 8 · insan karakterleri; revizyon 7 · bina kütüphanesi).
 
 ## Özet
 
-Projede **dışarıdan alınmış 3D model, doku ya da materyal yok**. Bütün binalar, dekor, insan figürleri ve efektler
-proje içinde, Godot 4.7.2'nin yerleşik mesh'leri (BoxMesh, CylinderMesh, SphereMesh, PrismMesh, PlaneMesh,
+Tek harici varlık grubu **insan karakterleridir** (Quaternius, CC0; aşağıda). Bunun dışında bütün binalar, dekor ve
+efektler proje içinde, Godot 4.7.2'nin yerleşik mesh'leri (BoxMesh, CylinderMesh, SphereMesh, PrismMesh, PlaneMesh,
 CapsuleMesh) ve `SurfaceTool` ile kodla üretildi. Dokular Godot'nun `NoiseTexture2D` / `FastNoiseLite` kaynaklarıyla
 çalışma anında üretiliyor; resim dosyası değiller. Gerçek marka, logo ya da işletme adı kullanılmadı; tabela alanları boş.
 
@@ -40,6 +40,28 @@ Modeller **yatırım değildir**: BuildingDefinition'a, yatırım kimliğine ya 
 | `assets/buildings/public/public_building_b.tres` / `.tscn` | Sosyal tesis / okul | Proje içinde üretildi | Ekip A | Proje lisansı |
 | `assets/materials/architecture/arch_*.tres` | Mimari palet (24 StandardMaterial3D) | Proje içinde üretildi | Ekip A | Proje lisansı |
 
+## İnsan karakterleri (görsel revizyon 8, harici, CC0)
+
+| Alan | Bilgi |
+|---|---|
+| Paket | Ultimate Animated Character Pack (Kasım 2019; glTF klasörü 31.10.2021) |
+| Üretici | Quaternius (https://quaternius.com) |
+| Kaynak | https://quaternius.com/packs/ultimatedanimatedcharacter.html → paketin resmî Google Drive klasörü, `glTF/` |
+| Lisans | CC0 1.0 Universal (Public Domain Dedication) — https://creativecommons.org/publicdomain/zero/1.0/ |
+| Atıf | Gerekli değil; nezaketen "LowPoly Models by @Quaternius" |
+| Lisans metni | `assets/characters/pedestrians/License_Quaternius_Ultimate_Animated_Character_Pack.txt` (pakettekiyle aynı) |
+| Erişim tarihi | 2026-11-01 |
+| Değişiklik | `.gltf` (gömülü buffer) → `.glb` olarak paketlendi (geometri, iskelet, animasyon değişmedi); renkler oyunda materyal geçersiz kılmayla verilir (paketteki ten rengi glTF'de neredeyse siyah geliyordu) |
+
+Kullanılan 12 model (`assets/characters/pedestrians/`): `qt_casual_male.glb`, `qt_casual_female.glb`,
+`qt_casual2_male.glb`, `qt_casual2_female.glb`, `qt_casual3_male.glb`, `qt_casual3_female.glb`, `qt_casual_bald.glb`,
+`qt_old_classy_male.glb`, `qt_old_classy_female.glb`, `qt_suit_male.glb`, `qt_suit_female.glb`,
+`qt_doctor_female_young.glb`. Hepsinde 23 kemikli iskelet ve aynı 17 animasyon (Walk, Idle, SitDown, StandUp,
+Walk_Carry, Run …). Oyunda Walk, Idle ve SitDown (son kare oturma pozu) kullanılır.
+
+Değerlendirilip kullanılmayan: Kenney "Mini Characters" (CC0) — iskelet ve animasyonları uygundu, ancak oranları
+çok "chibi" (baş boyun yarısı) olduğu için projeye eklenmedi.
+
 ## Diğer varlıklar
 
 | Klasör | İçerik | Kaynak | Lisans |
@@ -48,6 +70,7 @@ Modeller **yatırım değildir**: BuildingDefinition'a, yatırım kimliğine ya 
 | `assets/materials/`, `assets/materials/city/`, `assets/materials/plot_*` | Zemin, yol, kaldırım, bitki, su materyalleri (gürültü dokuları çalışma anında) | Proje içi | Proje lisansı |
 | `scripts/world/city_decor.gd` | Yollar, ağaçlar, insan figürleri, araçlar, marina, dağlar | Kodla üretilir (sahneye kaydedilmez) | Proje lisansı |
 | `assets/models/` | Harici model yok (bkz. `assets/models/LICENSES.md`) | — | — |
+| `scripts/world/pedestrians.gd` | Yaya rotaları, karakter renkleri, oturma yerleşimi | Proje içi kod | Proje lisansı |
 
 Arayüz varlıkları (`assets/ui/`, yazı tipleri, simgeler) Ekip B'nin sorumluluğundadır ve kaynakları B'nin
 belgelerindedir.
